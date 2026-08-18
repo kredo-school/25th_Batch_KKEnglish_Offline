@@ -41,15 +41,15 @@ class LoginController extends Controller
     // ログイン後の処理
     protected function authenticated($request, $user)
     {
-        if ($user->role->name === 'student') {
+        if ($user->role->role_name === 'student') {
             return redirect()->route('student.dashboard');
         }
 
-        if ($user->role->name === 'teacher') {
+        if ($user->role->role_name === 'teacher') {
             return redirect()->route('teacher.dashboard');
         }
 
-        if ($user->role->name === 'admin') {
+        if ($user->role->role_name === 'admin') {
             return redirect()->route('admin.dashboard');
         }
 
