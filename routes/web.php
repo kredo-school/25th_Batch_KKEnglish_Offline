@@ -11,7 +11,7 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::view('/frontend-test', 'students.dashboard');
+Route::view('/frontend-test', 'teachers.dashboard');
 
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/dashboard', function () {

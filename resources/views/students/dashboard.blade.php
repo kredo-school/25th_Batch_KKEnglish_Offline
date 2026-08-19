@@ -44,7 +44,7 @@
                         <div class="card-body">
 
                             {{-- タイトル＋日付切り替え --}}
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex align-items-center gap-4 mb-4">
 
                                 <h5 class="mb-0">
                                     本日のレッスン
