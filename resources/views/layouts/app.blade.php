@@ -22,9 +22,16 @@
     <div id="app">
         @include('components.navbar')
 
-        <main class="py-4">
-            @yield('content')
-        </main>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-md-3 col-lg-2 px-0">
+                <x-sidebar />
+            </aside>
+
+            <main class="col-md-9 col-lg-10 py-4">
+                @yield('content')
+            </main>
+        </div>
     </div>
 </body>
 </html>
