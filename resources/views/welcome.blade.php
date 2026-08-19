@@ -17,7 +17,7 @@
             <div class="flex h-20 items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow ring-1 ring-slate-200">
-                        <span class="text-2xl">🅺</span>
+                        <span class="text-2xl"><img src="{{ asset('images/kkenglish-logo.png') }}" alt="KK English" height="55"></span>
                     </div>
                 </div>
 
@@ -90,12 +90,11 @@
 
                 <div class="relative">
                     <div class="rounded-[2rem] bg-gradient-to-br from-white to-slate-50 p-8 shadow-xl ring-1 ring-slate-100">
-                        <div class="flex h-[420px] items-center justify-center rounded-[1.5rem] bg-white shadow-inner ring-1 ring-slate-100">
+                        <div class="flex h-[550px] items-center justify-center rounded-[1.5rem] bg-white shadow-inner ring-1 ring-slate-100">
                             <div class="text-center">
-                                <div class="text-8xl font-black tracking-tight">
-                                    <span class="text-amber-400">K</span><span class="text-sky-500">K</span>
-                                </div>
-                                <div class="mt-2 text-4xl font-black text-sky-500">English</div>
+                                {{-- <div class="text-8xl font-black tracking-tight"> --}}
+                                    <img src="{{ asset('images/kkenglish-logo.png') }}" alt="KK English" height="55">
+                                {{-- </div> --}}
                                 <div class="mt-6 text-lg text-slate-500">Hero visual placeholder</div>
                             </div>
                         </div>
@@ -387,7 +386,7 @@
                 <div>
                     <div class="flex items-center gap-3">
                         <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-2xl shadow">
-                            🅺
+                            <img src="{{ asset('images/kkenglish-logo.png') }}" alt="KK English" height="55">
                         </div>
                         <div class="text-2xl font-black text-white">KK English</div>
                     </div>
