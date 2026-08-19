@@ -28,8 +28,24 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    // protected $redirectTo = '/home';
 
+    protected function registered($request, $user)
+{
+    switch ($user->role->role_code) {
+        case 'student':
+            return redirect()->route('student.dashboard');
+
+        case 'teacher':
+            return redirect()->route('teacher.dashboard');
+
+        case 'admin':
+            return redirect()->route('admin.dashboard');
+
+        default:
+            return redirect('/');
+    }
+}
     /**
      * Create a new controller instance.
      *
