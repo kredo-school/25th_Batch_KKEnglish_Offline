@@ -2,22 +2,37 @@
     $user = auth()->user();
     $roleId = (int) ($user->role_id ?? 0);
 
-    // role別設定
-    $roleConfig = match ($roleId) {
-        1 => [ // student
-            'barClass' => 'bg-info-subtle',   // 水色系（Bootstrap）
+    // v2: ログインロールではなく「今見ている画面」を優先
+    if (request()->routeIs('student.*')) {
+        $viewMode = 'student';
+    } elseif (request()->routeIs('teacher.*')) {
+        $viewMode = 'teacher';
+    } elseif (request()->routeIs('admin.*')) {
+        $viewMode = 'admin';
+    } else {
+        $viewMode = match ($roleId) {
+            1 => 'student',
+            2 => 'teacher',
+            3 => 'admin',
+            default => 'guest',
+        };
+    }
+
+    $roleConfig = match ($viewMode) {
+        'student' => [
+            'barClass' => 'bg-info-subtle',
             'textClass' => 'text-dark',
             'homeLabel' => 'Student Home',
             'accountLabel' => 'Student',
         ],
-        2 => [ // teacher
-            'barClass' => 'bg-warning',       // オレンジ系
+        'teacher' => [
+            'barClass' => 'bg-warning',
             'textClass' => 'text-dark',
             'homeLabel' => 'Teacher Home',
             'accountLabel' => 'Teacher',
         ],
-        3 => [ // admin
-            'barClass' => 'bg-dark',          // 黒
+        'admin' => [
+            'barClass' => 'bg-dark',
             'textClass' => 'text-white',
             'homeLabel' => 'Admin Home',
             'accountLabel' => 'Admin',
@@ -45,6 +60,13 @@
         <a href="#" class="nav-link {{ $roleConfig['textClass'] }}">
             {{ $roleConfig['homeLabel'] }}
         </a>
+
+        {{-- adminが他画面表示中のバッジ --}}
+        @if ($roleId === 3 && $viewMode !== 'admin')
+            <span class="badge text-bg-warning ms-2">
+                Admin viewing {{ ucfirst($viewMode) }}
+            </span>
+        @endif
 
         {{-- 右：アカウント --}}
         <div class="dropdown ms-auto">
