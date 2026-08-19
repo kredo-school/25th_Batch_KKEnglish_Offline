@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -11,4 +11,4 @@
     @include('components.navbar')
 
 </body>
-</html>
+</html> --}}
