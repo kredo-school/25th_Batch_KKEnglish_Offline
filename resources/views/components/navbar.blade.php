@@ -24,29 +24,37 @@
             'textClass' => 'text-dark',
             'homeLabel' => 'Student Home',
             'accountLabel' => 'Student',
+            'homeHref' => route('student.dashboard'),
         ],
         'teacher' => [
-            'barClass' => 'bg-warning',
+            // オレンジ固定（Bootstrap warningは黄色寄り）
+            'barClass' => '',
+            'barStyle' => 'background-color:#f59e0b;',
             'textClass' => 'text-dark',
             'homeLabel' => 'Teacher Home',
             'accountLabel' => 'Teacher',
+            'homeHref' => route('teacher.dashboard'),
         ],
         'admin' => [
             'barClass' => 'bg-dark',
             'textClass' => 'text-white',
             'homeLabel' => 'Admin Home',
             'accountLabel' => 'Admin',
+            'homeHref' => route('admin.dashboard'),
         ],
         default => [
             'barClass' => 'bg-white',
             'textClass' => 'text-dark',
             'homeLabel' => 'Home',
             'accountLabel' => 'Guest',
+            'homeHref' => '#',
         ],
     };
+
+    $barStyle = $roleConfig['barStyle'] ?? '';
 @endphp
 
-<nav class="navbar navbar-expand-lg border-bottom {{ $roleConfig['barClass'] }}">
+<nav class="navbar navbar-expand-lg border-bottom {{ $roleConfig['barClass'] }}" style="{{ $barStyle }}">
     <div class="container">
 
         {{-- 左：ロゴ --}}
@@ -57,7 +65,7 @@
         </a>
 
         {{-- Home --}}
-        <a href="#" class="nav-link {{ $roleConfig['textClass'] }}">
+        <a href="{{ $roleConfig['homeHref'] }}" class="nav-link {{ $roleConfig['textClass'] }}">
             {{ $roleConfig['homeLabel'] }}
         </a>
 
