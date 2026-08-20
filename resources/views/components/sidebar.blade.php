@@ -1,4 +1,4 @@
-<aside class="bg-light border-end min-vh-100">
+<aside style="background-color: #dee2e6;" class=" border-end min-vh-100">
     <nav class="px-2 py-3 fw-bold fs-5">
         @php
             $user = auth()->user();
