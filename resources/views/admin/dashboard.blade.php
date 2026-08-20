@@ -7,7 +7,7 @@
 
            {{-- admin Sidebar --}}
         <div class="col-md-3 col-lg-2 p-0">
-            @include('components.admin')
+            @include('components.sidebars.admin')
         </div>
 
         {{-- Dashboard --}}
