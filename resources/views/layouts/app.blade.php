@@ -2,7 +2,7 @@
     $user = auth()->user();
     $roleId = (int) ($user->role_id ?? 0);
 
-    // 画面コンテキスト優先（admin横断閲覧対応）
+    // ログインロールではなく「閲覧中の画面コンテキスト」を優先
     if (request()->routeIs('student.*')) {
         $viewMode = 'student';
     } elseif (request()->routeIs('teacher.*')) {
@@ -19,26 +19,6 @@
     }
 @endphp
 
-@endphp
-
-{{-- @php
-    $roleId = (int) (auth()->user()->role_id ?? 0);
-@endphp
-
-@if ($roleId === 1)
-    @include('components.sidebars.student')
-
-@elseif ($roleId === 2)
-    @include('components.sidebars.teacher')
-
-@elseif ($roleId === 3)
-    @include('components.sidebars.admin')
-@endif --}}
-
-
-
-
-
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -50,6 +30,7 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
@@ -60,7 +41,13 @@
         <div class="row">
             @auth
                 <aside class="col-md-3 col-lg-2 px-0">
-                    @include('components.sidebar', ['viewMode' => $viewMode, 'roleId' => $roleId])
+                    @if ($viewMode === 'student')
+                        @include('components.sidebars.student')
+                    @elseif ($viewMode === 'teacher')
+                        @include('components.sidebars.teacher')
+                    @elseif ($viewMode === 'admin')
+                        @include('components.sidebars.admin')
+                    @endif
                 </aside>
             @endauth
 
