@@ -1,4 +1,4 @@
-{{-- @php
+@php
     $user = auth()->user();
     $roleId = (int) ($user->role_id ?? 0);
 
@@ -17,9 +17,9 @@
             default => 'guest',
         };
     }
-@endphp --}}
+@endphp
 
-@php
+{{-- @php
     $roleId = (int) (auth()->user()->role_id ?? 0);
 @endphp
 
@@ -31,7 +31,9 @@
 
 @elseif ($roleId === 3)
     @include('components.sidebars.admin')
-@endif
+@endif --}}
+
+
 
 
 
