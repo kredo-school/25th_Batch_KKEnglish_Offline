@@ -17,10 +17,8 @@
             default => 'guest',
         };
     }
-<<<<<<< HEAD
 @endphp
 
-=======
 @endphp
 
 {{-- @php
@@ -41,7 +39,6 @@
 
 
 
->>>>>>> 8163f179deb5b61f0d6cf7e0a0bf0ca0ccfd1f05
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
