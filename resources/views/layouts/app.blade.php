@@ -19,6 +19,26 @@
     }
 @endphp
 
+@endphp
+
+{{-- @php
+    $roleId = (int) (auth()->user()->role_id ?? 0);
+@endphp
+
+@if ($roleId === 1)
+    @include('components.sidebars.student')
+
+@elseif ($roleId === 2)
+    @include('components.sidebars.teacher')
+
+@elseif ($roleId === 3)
+    @include('components.sidebars.admin')
+@endif --}}
+
+
+
+
+
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>

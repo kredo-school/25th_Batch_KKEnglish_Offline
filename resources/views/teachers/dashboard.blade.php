@@ -7,7 +7,7 @@
 
         {{-- teacher Sidebar --}}
         <div class="col-md-3 col-lg-2 p-0">
-            @include('components.teacher')
+            @include('components.sidebars.teacher')
         </div>
 
 
