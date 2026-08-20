@@ -2,6 +2,9 @@
 
 @section('content')
 
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
 <div class="container-fluid">
     <div class="row">
 
@@ -136,6 +139,24 @@
 
             </div>
         </div>
+
+
+        {{-- Reservation Calendar --}}
+<div class="card mt-4">
+    <div class="card-body">
+
+        <div class="d-flex align-items-center mb-3">
+            <i class="fa-regular fa-calendar me-2"></i>
+
+            <h5 class="mb-0">
+                Reservation Calendar
+            </h5>
+        </div>
+
+        <div id="calendar"></div>
+
+    </div>
+</div>
 
     </div>
 </div>
