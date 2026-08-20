@@ -17,8 +17,31 @@
             default => 'guest',
         };
     }
+<<<<<<< HEAD
 @endphp
 
+=======
+@endphp
+
+{{-- @php
+    $roleId = (int) (auth()->user()->role_id ?? 0);
+@endphp
+
+@if ($roleId === 1)
+    @include('components.sidebars.student')
+
+@elseif ($roleId === 2)
+    @include('components.sidebars.teacher')
+
+@elseif ($roleId === 3)
+    @include('components.sidebars.admin')
+@endif --}}
+
+
+
+
+
+>>>>>>> 8163f179deb5b61f0d6cf7e0a0bf0ca0ccfd1f05
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
