@@ -15,10 +15,8 @@
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-20 items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow ring-1 ring-slate-200">
-                        <span class="text-2xl"><img src="{{ asset('images/kkenglish-logo.png') }}" alt="KK English" height="55"></span>
-                    </div>
+                <div class="flex items-center">
+                    <img src="{{ asset('images/kkenglish-logo.png') }}" alt="KK English" class="block h-16 w-auto object-contain">
                 </div>
 
                 <nav class="hidden lg:flex items-center gap-10 text-[15px] font-semibold text-slate-500">
@@ -385,8 +383,8 @@
             <div class="grid gap-12 lg:grid-cols-4">
                 <div>
                     <div class="flex items-center gap-3">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-2xl shadow">
-                            <img src="{{ asset('images/kkenglish-logo.png') }}" alt="KK English" height="55">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow ring-1 ring-slate-200 overflow-hidden">
+                        <img src="{{ asset('images/kkenglish-logo.png') }}" alt="KK English" class="block h-8 w-auto object-contain">
                         </div>
                         <div class="text-2xl font-black text-white">KK English</div>
                     </div>

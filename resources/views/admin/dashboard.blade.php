@@ -5,6 +5,11 @@
 <div class="container-fluid">
     <div class="row">
 
+           {{-- admin Sidebar --}}
+        <div class="col-md-3 col-lg-2 p-0">
+            @include('components.admin')
+        </div>
+
         {{-- Dashboard --}}
         <div class="col-12">
 
