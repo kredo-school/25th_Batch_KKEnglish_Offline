@@ -8,11 +8,6 @@
 <div class="container-fluid">
     <div class="row">
 
-      {{-- Student Sidebar --}}
-        <div class="col-md-3 col-lg-2 p-0">
-            @include('components.sidebars.student')
-        </div>
-
 
         {{-- Dashboard --}}
       <div class="col-12">

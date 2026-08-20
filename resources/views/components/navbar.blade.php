@@ -1,107 +1,55 @@
-@php
-    $user = auth()->user();
-    $roleId = (int) ($user->role_id ?? 0);
+<nav class="navbar navbar-expand-lg border-bottom {{ $barClass }}">
 
-    // v2: ログインロールではなく「今見ている画面」を優先
-    if (request()->routeIs('student.*')) {
-        $viewMode = 'student';
-    } elseif (request()->routeIs('teacher.*')) {
-        $viewMode = 'teacher';
-    } elseif (request()->routeIs('admin.*')) {
-        $viewMode = 'admin';
-    } else {
-        $viewMode = match ($roleId) {
-            1 => 'student',
-            2 => 'teacher',
-            3 => 'admin',
-            default => 'guest',
-        };
-    }
-
-    $roleConfig = match ($viewMode) {
-        'student' => [
-            'barClass' => 'bg-info-subtle',
-            'textClass' => 'text-dark',
-            'homeLabel' => 'Student Home',
-            'accountLabel' => 'Student',
-            'homeHref' => route('student.dashboard'),
-        ],
-        'teacher' => [
-            // オレンジ固定（Bootstrap warningは黄色寄り）
-            'barClass' => '',
-            'barStyle' => 'background-color:#f59e0b;',
-            'textClass' => 'text-dark',
-            'homeLabel' => 'Teacher Home',
-            'accountLabel' => 'Teacher',
-            'homeHref' => route('teacher.dashboard'),
-        ],
-        'admin' => [
-            'barClass' => 'bg-dark',
-            'textClass' => 'text-white',
-            'homeLabel' => 'Admin Home',
-            'accountLabel' => 'Admin',
-            'homeHref' => route('admin.dashboard'),
-        ],
-        default => [
-            'barClass' => 'bg-white',
-            'textClass' => 'text-dark',
-            'homeLabel' => 'Home',
-            'accountLabel' => 'Guest',
-            'homeHref' => '#',
-        ],
-    };
-
-    $barStyle = $roleConfig['barStyle'] ?? '';
-@endphp
-
-<nav class="navbar navbar-expand-lg border-bottom {{ $roleConfig['barClass'] }}" style="{{ $barStyle }}">
     <div class="container">
 
-        {{-- 左：ロゴ --}}
-        <a class="navbar-brand" href="#">
+        {{-- ロゴ --}}
+        <a class="navbar-brand" href="{{ $homeHref }}">
             <img src="{{ asset('images/kkenglish-logo.png') }}"
                  alt="KK English"
                  height="55">
         </a>
 
         {{-- Home --}}
-        <a href="{{ $roleConfig['homeHref'] }}" class="nav-link {{ $roleConfig['textClass'] }}">
-            {{ $roleConfig['homeLabel'] }}
+        <a href="{{ $homeHref }}"
+           class="nav-link {{ $textClass }}">
+            Home
         </a>
 
-        {{-- adminが他画面表示中のバッジ --}}
-        @if ($roleId === 3 && $viewMode !== 'admin')
-            <span class="badge text-bg-warning ms-2">
-                Admin viewing {{ ucfirst($viewMode) }}
-            </span>
-        @endif
-
-        {{-- 右：アカウント --}}
+        {{-- Account --}}
         <div class="dropdown ms-auto">
-            <button class="btn border-0 dropdown-toggle d-flex align-items-center gap-2 {{ $roleConfig['textClass'] }}"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
 
-                <div class="d-flex align-items-center justify-content-center">
-                    <i class="fa-solid fa-circle-user fa-2x"></i>
-                </div>
+            <button class="btn border-0 shadow-none dropdown-toggle d-flex align-items-center {{ $textClass }}"
+                    data-bs-toggle="dropdown">
 
-                <span class="text-start">
-                    {{ $user->name ?? $roleConfig['accountLabel'] }}
-                </span>
+                <i class="fa-solid fa-circle-user me-2 fa-2x"></i>
+                {{ $user?->name ?? $accountLabel }}
+
             </button>
 
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+
+                {{-- Profile --}}
+                <li>
+                    <a class="dropdown-item" href="#">
+                        Profile
+                    </a>
+                </li>
+
+                {{-- Logout --}}
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="dropdown-item">Logout</button>
+
+                        <button type="submit" class="dropdown-item">
+                            Logout
+                        </button>
                     </form>
                 </li>
+
             </ul>
+
         </div>
 
     </div>
+
 </nav>
