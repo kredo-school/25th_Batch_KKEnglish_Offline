@@ -1,4 +1,4 @@
-<aside style="background-color: #dee2e6;" class=" border-end min-vh-100">
+{{-- <aside style="background-color: #dee2e6;" class=" border-end min-vh-100">
     <nav class="px-2 py-3 fw-bold fs-5">
         @php
             $user = auth()->user();
@@ -15,19 +15,19 @@
             } else {
                 $effectiveRoleId = $roleId;
             }
-        @endphp
+        @endphp --}}
 
         {{-- admin横断閲覧の見える化 --}}
-        @if ($roleId === 3 && $effectiveRoleId !== 3)
+        {{-- @if ($roleId === 3 && $effectiveRoleId !== 3)
             <div class="alert alert-warning py-1 px-2 small mb-2">
                 Adminとして
                 {{ $effectiveRoleId === 1 ? 'Student' : 'Teacher' }}
                 画面を表示中
             </div>
-        @endif
+        @endif --}}
 
         {{-- student --}}
-        @if ($effectiveRoleId === 1)
+        {{-- @if ($effectiveRoleId === 1)
             <a href="{{ route('student.dashboard') }}" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Dashboard</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Book a lesson</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">My lessons</a>
@@ -36,18 +36,18 @@
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Teaching Materials</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Notifications</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">User Guide</a>
-            <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">AI customized Lesson</a>
+            <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">AI customized Lesson</a> --}}
 
         {{-- teacher --}}
-        @elseif ($effectiveRoleId === 2)
+        {{-- @elseif ($effectiveRoleId === 2)
             <a href="{{ route('teacher.dashboard') }}" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Dashboard</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Booked lessons</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Lesson History</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Teaching Materials</a>
-            <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Notifications</a>
+            <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Notifications</a> --}}
 
         {{-- admin --}}
-        @elseif ($effectiveRoleId === 3)
+        {{-- @elseif ($effectiveRoleId === 3)
             <a href="{{ route('admin.dashboard') }}" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Dashboard</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Teacher management</a>
             <a href="#" class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">Material management</a>
@@ -57,4 +57,4 @@
             <p class="px-3 py-2 text-muted">No menu to show</p>
         @endif
     </nav>
-</aside>
+</aside> --}}

@@ -5,6 +5,12 @@
 <div class="container-fluid">
     <div class="row">
 
+        {{-- teacher Sidebar --}}
+        <div class="col-md-3 col-lg-2 p-0">
+            @include('components.teacher')
+        </div>
+
+
 
         {{-- Dashboard --}}
         <div class="col-12">
