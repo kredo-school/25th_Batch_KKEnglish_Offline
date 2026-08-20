@@ -5,13 +5,8 @@
 <div class="container-fluid">
     <div class="row">
 
-        {{-- Sidebar --}}
-        <div class="col-md-2 p-0">
-            {{-- @include('components.admin-sidebar') --}}
-        </div>
-
         {{-- Dashboard --}}
-        <div class="col-md-10">
+        <div class="col-12">
 
             {{-- Hello Header --}}
             <div class="bg-light p-4 mb-4">
@@ -20,8 +15,12 @@
                 </h2>
 
                 <p class="text-secondary mb-0">
-                    2026年8月19日
-                </p>
+           {{ now()->format('l, F j') }}
+        </p>
+
+         <p class="fw-semibold mb-0">
+            {{ now()->format('H:i') }}
+          </p>
             </div>
 
             {{-- Weekly Summary --}}

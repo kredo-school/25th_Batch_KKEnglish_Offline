@@ -5,27 +5,28 @@
 <div class="container-fluid">
     <div class="row">
 
-        {{-- Sidebar --}}
-        <div class="col-md-2 p-0">
-            {{-- @include('components.student-sidebar') --}}
-        </div>
-
         {{-- Dashboard --}}
-        <div class="col-md-10">
+      <div class="col-12">
 
          {{-- Hello Header --}}
         <div class="bg-light p-4 mb-4 d-flex justify-content-between align-items-center">
 
          {{-- 名前・日付 --}}
-    <div>
+      <div>
         <h2 class="fw-bold mb-1">
             Hello, Name
         </h2>
 
         <p class="text-secondary mb-0">
-            2026年8月19日
+           {{ now()->format('l, F j') }}
         </p>
-    </div>
+
+         <p class="fw-semibold mb-0">
+            <i class="fa-regular fa-clock me-1"></i>
+            {{ now()->format('H:i') }}
+          </p>
+
+      </div>
 
     {{-- レッスン予約ボタン --}}
     <a href="#" class="btn btn-primary">
@@ -35,7 +36,7 @@
 </div>
 
             {{-- Main --}}
-            <div class="row g-4">
+            <div class="row g-3">
 
                 {{-- 左側：本日のレッスン --}}
                 <div class="col-md-7">
