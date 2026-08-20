@@ -2,6 +2,7 @@
     $user = auth()->user();
     $roleId = (int) ($user->role_id ?? 0);
 
+    // 画面コンテキスト優先（admin横断閲覧対応）
     if (request()->routeIs('student.*')) {
         $viewMode = 'student';
     } elseif (request()->routeIs('teacher.*')) {
