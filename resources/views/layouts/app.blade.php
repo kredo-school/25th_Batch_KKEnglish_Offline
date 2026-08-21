@@ -92,14 +92,21 @@
         <div class="row g-0">
 
             {{-- Sidebar --}}
-            @auth
-                <aside class="col-md-3 col-lg-2">
-                    @include('components.sidebar', [
-                        'viewMode' => $viewMode
-                    ])
-                </aside>
-            @endauth
+@auth
+    <aside class="col-md-3 col-lg-2">
 
+        @if ($viewMode == 'student')
+            @include('components.sidebars.student')
+
+        @elseif ($viewMode == 'teacher')
+            @include('components.sidebars.teacher')
+
+        @elseif ($viewMode == 'admin')
+            @include('components.sidebars.admin')
+        @endif
+
+    </aside>
+@endauth
 
             {{-- 各ページの内容 --}}
             <main class="col py-4 px-4">

@@ -60,20 +60,20 @@
 </aside> --}}
 
 {{-- Student --}}
-@if ($viewMode == 'student')
+{{-- @if ($viewMode == 'student')
 
     @include('components.sidebars.student')
 
 
 {{-- Teacher --}}
-@elseif ($viewMode == 'teacher')
+{{-- @elseif ($viewMode == 'teacher')
 
     @include('components.sidebars.teacher')
-
+ --}}
 
 {{-- Admin --}}
-@elseif ($viewMode == 'admin')
+{{-- @elseif ($viewMode == 'admin')
 
     @include('components.sidebars.admin')
 
-@endif
+@endif --}}
