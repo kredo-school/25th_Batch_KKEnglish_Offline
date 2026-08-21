@@ -58,3 +58,22 @@
         @endif
     </nav>
 </aside> --}}
+
+{{-- Student --}}
+{{-- @if ($viewMode == 'student')
+
+    @include('components.sidebars.student')
+
+
+{{-- Teacher --}}
+{{-- @elseif ($viewMode == 'teacher')
+
+    @include('components.sidebars.teacher')
+ --}}
+
+{{-- Admin --}}
+{{-- @elseif ($viewMode == 'admin')
+
+    @include('components.sidebars.admin')
+
+@endif --}}

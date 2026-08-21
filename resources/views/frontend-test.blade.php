@@ -8,7 +8,7 @@
 
 <body>
 
-    @include('components.navbar')
+
 
 </body>
 </html>
