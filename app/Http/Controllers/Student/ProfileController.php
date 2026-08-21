@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 
 class ProfileController extends Controller
@@ -45,7 +46,7 @@ class ProfileController extends Controller
         $user->phone_number = $request->input('phone_number');
         $user->nationality = $request->input('nationality');
         $user->gender = $request->input('gender');
-        $user->save();
+
 
         if( $request->filled('password')) {
             $user->password = Hash::make($request->input('password'));
@@ -64,13 +65,14 @@ class ProfileController extends Controller
             $user->profile_image = $path;
         }
 
+         $user->save();
+
+
         $student = $user->student; // Assuming the user has a related student model
         if ($student) {
             $student->birthday = $request->input('birthday');
             $student->save();
         }
-
-
 
         return redirect()->route('student.profile')->with('success', 'Profile updated successfully.');
     }

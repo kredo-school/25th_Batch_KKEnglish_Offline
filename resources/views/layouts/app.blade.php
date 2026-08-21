@@ -67,9 +67,13 @@
 
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+<<<<<<< HEAD
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+=======
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+>>>>>>> origin/master
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
@@ -78,6 +82,7 @@
 
 <div id="app">
 
+<<<<<<< HEAD
     {{-- Navbar --}}
     @include('components.navbar', [
         'user' => $user,
@@ -86,6 +91,21 @@
         'accountLabel' => $accountLabel,
         'homeHref' => $homeHref
     ])
+=======
+    <div class="container-fluid">
+        <div class="row">
+            @auth
+                <aside class="col-md-3 col-lg-2 px-0">
+                    @if ($viewMode === 'student')
+                        @include('components.sidebars.student')
+                    @elseif ($viewMode === 'teacher')
+                        @include('components.sidebars.teacher')
+                    @elseif ($viewMode === 'admin')
+                        @include('components.sidebars.admin')
+                    @endif
+                </aside>
+            @endauth
+>>>>>>> origin/master
 
 
     <div class="container-fluid px-0">
