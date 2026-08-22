@@ -72,7 +72,7 @@
                                     </a>
 
                                     <span class="fw-bold">
-                                        8月19日
+                                        {{ now()->format('n月j日') }}
                                     </span>
 
                                     <a href="#"
