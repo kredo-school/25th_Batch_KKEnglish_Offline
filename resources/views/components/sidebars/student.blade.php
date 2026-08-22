@@ -1,4 +1,4 @@
-<aside class="bg-light border-end min-vh-100">
+<aside class="bg-light border-end h-100">
     <nav class="px-2 py-3 fw-bold fs-5">
 
         <a href="{{ route('student.dashboard') }}"

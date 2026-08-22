@@ -20,6 +20,7 @@
         </p>
 
          <p class="fw-semibold mb-0">
+            <i class="fa-regular fa-clock me-1"></i>
             {{ now()->format('H:i') }}
           </p>
             </div>

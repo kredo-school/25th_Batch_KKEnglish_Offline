@@ -90,7 +90,7 @@
     ])
 
     <div class="container-fluid px-0">
-        <div class="row g-0">
+        <div class="row g-0 align-items-stretch">
 
             {{-- Sidebar --}}
 @auth
