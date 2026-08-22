@@ -5,6 +5,13 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
+<style>
+    #calendar a {
+        color: #000;
+        text-decoration: none;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="row">
 
@@ -160,6 +167,30 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+
+        locale: 'ja',
+
+        headerToolbar: {
+            left: 'title',
+            center: '',
+            right: 'prev,next'
+        },
+
+        height: 'auto'
+    });
+
+    calendar.render();
+});
+</script>
+
 
     </div>
 </div>
