@@ -68,11 +68,10 @@ class ProfileController extends Controller
          $user->save();
 
 
-        $student = $user->student; // Assuming the user has a related student model
-        if ($student) {
-            $student->birthday = $request->input('birthday');
-            $student->save();
-        }
+        $user->student()->updateOrCreate(
+            [],
+            ['birthday' => $request->input('birthday')]
+        );
 
         return redirect()->route('student.profile')->with('success', 'Profile updated successfully.');
     }
