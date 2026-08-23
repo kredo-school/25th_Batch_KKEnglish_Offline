@@ -70,12 +70,16 @@ class RegisterController extends Controller
     {
         $studentRole = Role::where('role_code', 'student')->firstOrFail();
 
-        return User::create([
+        $user = User::create([
             'role_id' => $studentRole->id,
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
+        $user->student()->create();
+
+        return $user;
     }
 }
