@@ -30,9 +30,15 @@
 
                 {{-- Profile --}}
                 <li>
-                    <a class="dropdown-item" href="#">
-                        Profile
-                    </a>
+                    @if($user->role=='student')
+                        <a class="dropdown-item" href="{{ route('student.profile') }}">
+                            Profile
+                        </a>
+                    @elseif($user->role=='teacher')
+                        <a class="dropdown-item" href="{{ route('teacher.profile') }}">
+                            Profile
+                        </a>
+                    @endif
                 </li>
 
                 {{-- Logout --}}
