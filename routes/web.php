@@ -11,9 +11,10 @@ use App\Http\Controllers\Teacher\ScheduleController;
 
 // Test route for frontend testing
 Route::view('/frontend-test', 'teachers.profile')->name('teacher.profile');
-Route::view('/materials-test', 'materials.index')->name('teaching.materials');
-Route::view('/teacher-profile-edit-test', 'teachers.profile-edit')
-    ->name('teacher.profile.edit');
+Route::view('/teachers-test', 'teachers.index')->name('teachers.test');
+
+
+
 
 // Public routes
 Auth::routes();
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     // Teacher Schedule Routes
     Route::get('/teachers/schedules/create', [ScheduleController::class, 'create'])->name('teacher.schedules.create');
     Route::post('/teachers/schedules', [ScheduleController::class, 'store'])->name('teacher.schedules.store');
+    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->name('teacher.profile');
 });
 
 

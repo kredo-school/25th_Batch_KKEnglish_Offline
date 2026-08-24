@@ -26,7 +26,7 @@
             Learning Progress
         </a>
 
-        <a href="{{ route('teaching.materials') }}"
+        <a href="{{ route('materials.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
             Teaching Materials
         </a>
