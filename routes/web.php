@@ -10,9 +10,10 @@ use App\Http\Controllers\Teacher\TeacherController;
 
 // Test route for frontend testing
 Route::view('/frontend-test', 'teachers.profile')->name('teacher.profile');
-Route::view('/materials-test', 'materials.index')->name('teaching.materials');
-Route::view('/teacher-profile-edit-test', 'teachers.profile-edit')
-    ->name('teacher.profile.edit');
+Route::view('/teachers-test', 'teachers.index')->name('teachers.test');
+
+
+
 
 // Public routes
 Auth::routes();
@@ -43,7 +44,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     })->name('teacher.dashboard');
 
     Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
-    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
+    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->name('teacher.profile');
 });
 
 
