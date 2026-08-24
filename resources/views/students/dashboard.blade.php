@@ -26,8 +26,7 @@
       <div>
         <h2 class="fw-bold mb-1">
             Hello, {{ auth()->user()->first_name }}
-            {{-- ダミー　ヘッダーができたら、下記をヘッダーに持って行ってください。 --}}
-            <a href="{{ route('student.profile') }}" class="btn btn-link">Profile</a>
+
         </h2>
 
         <p class="text-secondary mb-0">
