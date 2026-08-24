@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\Teacher\TeacherController;
 
 
 // Test route for frontend testing
@@ -41,6 +42,8 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
         return view('teachers.dashboard');
     })->name('teacher.dashboard');
 
+    Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
+    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
 });
 
 
@@ -53,4 +56,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     });
 
 // Material Routes
-Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
+// 閲覧（ログインユーザー全員）
+Route::middleware(['auth'])->group(function () {
+    Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
+    Route::get('/materials/{material}', [MaterialController::class, 'show'])->name('materials.show');
+});
+
+// 編集（adminのみ）
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/materials/create', [MaterialController::class, 'create'])->name('materials.create');
+    Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
+    Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
+    Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
+    Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+});
