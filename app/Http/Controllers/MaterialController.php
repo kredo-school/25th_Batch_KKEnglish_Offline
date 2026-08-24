@@ -12,7 +12,7 @@ class MaterialController extends Controller
     // 閲覧
     public function index(): View
     {
-        $materials = Material::query()->latest('id')->paginate(20);
+        $materials = Material::query()->latest('material_id')->paginate(20);
         return view('materials.index', compact('materials'));
     }
 
