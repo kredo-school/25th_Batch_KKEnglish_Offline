@@ -9,6 +9,8 @@ use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 // Test route for frontend testing
 Route::view('/frontend-test', 'teachers.profile')->name('teacher.profile');
 Route::view('/materials-test', 'materials.index')->name('teaching.materials');
+Route::view('/teacher-profile-edit-test', 'teachers.profile-edit')
+    ->name('teacher.profile.edit');
 
 // Public routes
 Auth::routes();
