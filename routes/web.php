@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
+use App\Http\Controllers\MaterialController;
 
 
 // Test route for frontend testing
@@ -50,3 +51,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
     });
+
+// Material Routes
+Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
