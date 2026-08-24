@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Student Dashboard')
+
 @section('content')
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
