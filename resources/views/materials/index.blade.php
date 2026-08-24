@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Teaching Materials')
+
 @section('content')
 
 <div class="container py-4">
@@ -12,19 +14,29 @@
         {{-- 教材1 --}}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
-                <div class="card-body">
+               <div class="card-body d-flex align-items-center">
 
-                    <h5 class="fw-bold">
-                        Daily Conversation
-                    </h5>
+                    <img src="{{ asset('images/material1.jpg') }}"
+                         alt="Daily Conversation"
+                         width="90"
+                         height="90"
+                         class="rounded me-3"
+                         style="object-fit: cover;">
 
-                    <p class="text-secondary">
-                        Practice useful English expressions for everyday situations.
-                    </p>
+                    <div>
 
-                    <p class="mb-0">
-                        <strong>Category:</strong> Conversation
-                    </p>
+                         <span class="badge bg-primary mb-2">
+                            Beginner
+                        </span>
+
+                        <h5 class="fw-bold mb-2">
+                            Daily Conversation
+                        </h5>
+
+                        <p class="text-secondary mb-0">
+                            Practice useful English expressions for everyday situations.
+                        </p>
+                    </div>
 
                 </div>
             </div>
@@ -34,19 +46,28 @@
         {{-- 教材2 --}}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
-                <div class="card-body">
+                <div class="card-body d-flex align-items-center">
 
-                    <h5 class="fw-bold">
-                        Business English
-                    </h5>
+                      <img src="{{ asset('images/material2.jpg') }}"
+                         alt="Business English"
+                         width="90"
+                         height="90"
+                         class="rounded me-3"
+                         style="object-fit: cover;">
 
-                    <p class="text-secondary">
-                        Learn practical expressions for business situations.
-                    </p>
+                     <div>
+                        <span class="badge bg-success mb-2">
+                            Intermediate
+                        </span>
 
-                    <p class="mb-0">
-                        <strong>Category:</strong> Business
-                    </p>
+                        <h5 class="fw-bold mb-2">
+                            Business English
+                        </h5>
+
+                        <p class="text-secondary mb-0">
+                            Learn practical expressions for business situations.
+                        </p>
+                    </div>
 
                 </div>
             </div>
@@ -56,19 +77,28 @@
         {{-- 教材3 --}}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
-                <div class="card-body">
+               <div class="card-body d-flex align-items-center">
 
-                    <h5 class="fw-bold">
-                        Free Discussion
-                    </h5>
+                    <img src="{{ asset('images/material3.jpg') }}"
+                         alt="Free Discussion"
+                         width="90"
+                         height="90"
+                         class="rounded me-3"
+                         style="object-fit: cover;">
 
-                    <p class="text-secondary">
-                        Improve your speaking skills through discussions.
-                    </p>
+                    <div>
+                        <span class="badge bg-warning text-dark mb-2">
+                            Advanced
+                        </span>
 
-                    <p class="mb-0">
-                        <strong>Category:</strong> Discussion
-                    </p>
+                        <h5 class="fw-bold mb-2">
+                            Free Discussion
+                        </h5>
+
+                        <p class="text-secondary mb-0">
+                            Improve your speaking skills through discussions.
+                        </p>
+                    </div>
 
                 </div>
             </div>
