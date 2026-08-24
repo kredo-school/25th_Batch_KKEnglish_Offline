@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Teacher\TeacherController;
+use App\Http\Controllers\Teacher\ScheduleController;
 
 
 // Test route for frontend testing
@@ -44,6 +45,11 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     })->name('teacher.dashboard');
 
     Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
+    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
+
+    // Teacher Schedule Routes
+    Route::get('/teachers/schedules/create', [ScheduleController::class, 'create'])->name('teacher.schedules.create');
+    Route::post('/teachers/schedules', [ScheduleController::class, 'store'])->name('teacher.schedules.store');
     Route::get('/teachers/{id}', [TeacherController::class, 'show'])->name('teacher.profile');
 });
 
