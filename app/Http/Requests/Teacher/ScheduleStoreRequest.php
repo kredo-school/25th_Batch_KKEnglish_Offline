@@ -23,20 +23,23 @@ class ScheduleStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'start_at' => ['required', 'date', 'after_or_equal:now'],
-            'end_at'   => ['required', 'date', 'after:start_at'],
+            'available_date' => ['required', 'date', 'after_or_equal:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time'   => ['required', 'date_format:H:i', 'after:start_time'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'start_at.required' => '開始日時は必須です。',
-            'start_at.date' => '開始日時は有効な日付である必要があります。',
-            'start_at.after_or_equal' => '開始日時は現在の日時以降である必要があります。',
-            'end_at.required' => '終了日時は必須です。',
-            'end_at.date' => '終了日時は有効な日付である必要があります。',
-            'end_at.after' => '終了日時は開始日時より後である必要があります。',
+            'available_date.required' => '利用可能日は必須です。',
+            'available_date.date' => '利用可能日は有効な日付である必要があります。',
+            'available_date.after_or_equal' => '利用可能日は今日以降である必要があります。',
+            'start_time.required' => '開始時刻は必須です。',
+            'start_time.date_format' => '開始時刻は有効な時刻である必要があります。',
+            'end_time.required' => '終了時刻は必須です。',
+            'end_time.date_format' => '終了時刻は有効な時刻である必要があります。',
+            'end_time.after' => '終了時刻は開始時刻より後である必要があります。',
         ];
     }
 }

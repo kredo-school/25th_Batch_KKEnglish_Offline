@@ -14,13 +14,10 @@ class TeacherController extends Controller
      */
     public function index(): View
     {
+    /**
+     * 講師一覧
+     */
         $teachers = Teacher::query()
-            ->select([
-                'id',
-                'name',
-                'profile',
-                'created_at',
-            ])
             ->latest('id')
             ->paginate(20);
 
@@ -33,13 +30,6 @@ class TeacherController extends Controller
     public function show(int $id): View
     {
         $teacher = Teacher::query()
-            ->select([
-                'id',
-                'name',
-                'profile',
-                'created_at',
-                'updated_at',
-            ])
             ->findOrFail($id);
 
         return view('teachers.show', compact('teacher'));
