@@ -29,8 +29,9 @@ class TeacherController extends Controller
      */
     public function show(int $id): View
     {
+        abort_unless(ctype_digit($id), 404);
         $teacher = Teacher::query()
-            ->findOrFail($id);
+            ->findOrFail((int) $id);
 
         return view('teachers.show', compact('teacher'));
     }
