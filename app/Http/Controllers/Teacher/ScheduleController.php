@@ -30,10 +30,91 @@ class ScheduleController extends Controller
         return view('teachers.schedules.index', compact('schedules'));
     }
 
-    public function create(): View
+    public function create(): \Illuminate\Contracts\View\View
     {
-        return view('teachers.schedules.create');
+        $user = auth()->user();
+        $teacherId = $user->teacher_id; // 確認が必要
+
+        $startOfWeek = request('week_start')
+            ? \Carbon\Carbon::parse(request('week_start'))->startOfDay()
+            : now()->startOfWeek(\Carbon\Carbon::MONDAY);
+        $endOfWeek = $startOfWeek->copy()->addDays(6);
+
+        $rows = \App\Models\TeacherSchedule::query()
+            ->where('teacher_id', $teacherId)
+            ->whereBetween('available_date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+            ->get(['available_date','start_time','end_time','status']);
+
+        $existingMap = [];
+        foreach ($rows as $r) {
+            $date = \Carbon\Carbon::parse($r->available_date)->toDateString();
+            $start = \Carbon\Carbon::parse($r->start_time);
+            $end = \Carbon\Carbon::parse($r->end_time);
+            for ($t = $start->copy(); $t->lt($end); $t->addMinutes(30)) {
+                $existingMap[$date][$t->format('H:i')] = $r->status;
+            }
+        }
+
+        return view('teachers.schedules.create', compact('existingMap'));
     }
+
+    public function storeGrid(\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $user = auth()->user();
+        $teacherId = $user->teacher_id; // 確認が必要
+        $cells = $request->input('cells', []);
+
+        if (empty($cells)) return back()->with('error', '選択がありません。');
+
+        // 日付ごとに時刻配列
+        $byDate = [];
+        foreach ($cells as $c) {
+            $date = $c['date'] ?? null;
+            $time = $c['time'] ?? null;
+            if (!$date || !$time) continue;
+            if ($date < now()->toDateString()) return back()->with('error', "{$date} は過去日です。");
+            $byDate[$date][] = $time;
+        }
+
+        foreach ($byDate as $date => $times) {
+            $times = array_values(array_unique($times));
+            sort($times); // 'H:i' 文字列で時系列に並ぶ
+
+            // 連続区間に圧縮
+            $ranges = [];
+            $start = $times[0] ?? null;
+            $prev = $start;
+
+            for ($i = 1; $i < count($times); $i++) {
+                $curr = $times[$i];
+                $prevPlus30 = \Carbon\Carbon::createFromFormat('H:i', $prev)->addMinutes(30)->format('H:i');
+
+                if ($curr !== $prevPlus30) {
+                    $ranges[] = [$start, \Carbon\Carbon::createFromFormat('H:i', $prev)->addMinutes(30)->format('H:i')];
+                    $start = $curr;
+                }
+                $prev = $curr;
+            }
+
+            if ($start !== null) {
+                $ranges[] = [$start, \Carbon\Carbon::createFromFormat('H:i', $prev)->addMinutes(30)->format('H:i')];
+            }
+
+            foreach ($ranges as [$s, $e]) {
+                \App\Models\TeacherSchedule::firstOrCreate(
+                    [
+                        'teacher_id' => $teacherId,
+                        'available_date' => $date,
+                        'start_time' => $s . ':00',
+                        'end_time' => $e . ':00',
+                    ],
+                    ['status' => 'available']
+                );
+            }
+        }
+
+        return redirect()->route('teacher.schedules.index')->with('success', '連続選択した空き時間を登録しました。');
+}
 
     public function store(ScheduleStoreRequest $request): RedirectResponse
     {

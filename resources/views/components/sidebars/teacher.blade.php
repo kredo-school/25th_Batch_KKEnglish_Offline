@@ -26,5 +26,10 @@
             Notifications
         </a>
 
+        <a href="{{ route('teacher.schedules.create') }}"
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+            Schedule Settings
+        </a>
+
     </nav>
 </aside>
