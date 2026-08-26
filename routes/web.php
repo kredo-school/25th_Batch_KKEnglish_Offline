@@ -51,6 +51,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 Route::middleware(['auth', 'role:teacher,admin'])->group(function () {
     Route::get('/teachers/schedules', [ScheduleController::class, 'index'])->name('teacher.schedules.index');
     Route::get('/teachers/schedules/create', [ScheduleController::class, 'create'])->name('teacher.schedules.create');
+        // グリッド選択保存（create画面から送信）
+    Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])->name('teacher.schedules.storeGrid');
+    
     Route::post('/teachers/schedules', [ScheduleController::class, 'store'])->name('teacher.schedules.store');
 
     Route::get('/teachers/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('teacher.schedules.edit');
