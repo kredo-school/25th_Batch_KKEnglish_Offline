@@ -97,7 +97,13 @@
     <aside class="col-md-3 col-lg-2">
 
         @if ($viewMode == 'student')
-            @include('components.sidebars.student')
+            @if (request()->routeIs('teachers.*'))
+                {{-- 生徒の予約画面専用サイドバー --}}
+                @include('components.sidebars')
+            @else
+                {{-- 生徒の通常サイドバー --}}
+                @include('components.sidebars.student')
+            @endif
 
         @elseif ($viewMode == 'teacher')
             @include('components.sidebars.teacher')
