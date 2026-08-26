@@ -25,9 +25,6 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 // 認証ユーザー共通（閲覧系）
 Route::middleware(['auth'])->group(function () {
-    // Teacher list/profile（studentも閲覧可）
-    Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
-    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->whereNumber('id')->name('teachers.show');
 
     // Material 閲覧
     Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
@@ -43,7 +40,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
-
+// Teacher list/profile（studentも閲覧可）
+    Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
+    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->whereNumber('id')->name('teachers.show');
     Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
         ->name('student.lessons.cancel');
 });
