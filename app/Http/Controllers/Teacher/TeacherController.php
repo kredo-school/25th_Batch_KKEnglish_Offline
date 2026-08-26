@@ -21,7 +21,7 @@ class TeacherController extends Controller
             ->latest('id')
             ->paginate(20);
 
-        return view('teachers.index', compact('teachers'));
+        return view('students.teacher-list', compact('teachers'));
     }
 
     /**
