@@ -64,6 +64,9 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teachers/dashboard', function () {
         return view('teachers.dashboard');
     })->name('teacher.dashboard');
+
+Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
+    ->name('teacher.schedules.storeGrid');
 });
 
 // Admin Routes
