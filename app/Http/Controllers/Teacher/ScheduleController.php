@@ -59,6 +59,10 @@ class ScheduleController extends Controller
     public function storeGrid(Request $request): RedirectResponse
     {
         [$teacherId] = $this->resolveTeacherContext($request);
+
+if ($teacherId <= 0) {
+    return back()->with('error', '講師IDが不正です。teacherを選択してください。');
+}
         $cells = $request->input('cells', []);
 
         if (empty($cells)) {
@@ -232,24 +236,32 @@ public function update(ScheduleUpdateRequest $request, TeacherSchedule $schedule
         ->with('success', 'スケジュールを更新しました。');
 }
 
-    public function destroy(TeacherSchedule $schedule): RedirectResponse
-    {
-        $user = auth()->user();
+    public function destroy(Request $request, TeacherSchedule $schedule): RedirectResponse
+{
+    $user = auth()->user();
 
-        if ($user->role === 'teacher' && (int) $schedule->teacher_id !== (int) $user->teacher_id) {
-            abort(403);
-        }
-
-        if ($schedule->status === 'booked') {
-            return redirect()->route('teacher.schedules.index')
-                ->with('error', '予約済みのスケジュールは削除できません。');
-        }
-
-        $schedule->delete();
-
-        return redirect()->route('teacher.schedules.index')
-            ->with('success', 'スケジュールを削除しました。');
+    if ($user->role === 'teacher' && (int) $schedule->teacher_id !== (int) $user->teacher_id) {
+        abort(403);
     }
+
+    if ($schedule->status === 'booked') {
+        return redirect()->route('teacher.schedules.index', [
+            'week_start' => $request->input('week_start'),
+            'teacher_id' => $request->input('teacher_id'),
+            'view_start' => $request->input('view_start'),
+            'view_end'   => $request->input('view_end'),
+        ])->with('error', '予約済みのスケジュールは削除できません。');
+    }
+
+    $schedule->delete();
+
+    return redirect()->route('teacher.schedules.index', [
+        'week_start' => $request->input('week_start'),
+        'teacher_id' => $request->input('teacher_id'),
+        'view_start' => $request->input('view_start'),
+        'view_end'   => $request->input('view_end'),
+    ])->with('success', 'スケジュールを削除しました。');
+}
 
     /**
      * teacher_id と teachers一覧を解決

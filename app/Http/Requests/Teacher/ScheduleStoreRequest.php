@@ -26,6 +26,7 @@ class ScheduleStoreRequest extends FormRequest
             'available_date' => ['required', 'date', 'after_or_equal:today'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time'   => ['required', 'date_format:H:i', 'after:start_time'],
+            'status' => ['nullable', 'in:available,booked,closed'],
         ];
     }
 
@@ -40,6 +41,7 @@ class ScheduleStoreRequest extends FormRequest
             'end_time.required' => '終了時刻は必須です。',
             'end_time.date_format' => '終了時刻は有効な時刻である必要があります。',
             'end_time.after' => '終了時刻は開始時刻より後である必要があります。',
+            'status.in' => 'ステータスは利用可能、予約済み、または閉鎖のいずれかである必要があります。',
         ];
     }
 }
