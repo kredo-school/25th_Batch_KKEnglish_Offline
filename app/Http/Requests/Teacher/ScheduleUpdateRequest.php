@@ -32,8 +32,11 @@ class ScheduleUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'available_date.required' => '利用可能日は必須です。',
+            'available_date.date' => '利用可能日は有効な日付である必要があります。',
             'available_date.after_or_equal' => '過去の日付は指定できません。',
             'end_time.after' => '終了時間は開始時間より後にしてください。',
+            'status.in' => 'ステータスは利用可能、予約済み、または閉鎖のいずれかである必要があります。',
         ];
     }
 }
