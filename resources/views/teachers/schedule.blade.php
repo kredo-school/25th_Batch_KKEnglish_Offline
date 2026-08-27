@@ -15,7 +15,8 @@
         </button>
     </div>
 
-{{-- $days / $times を作る処理は最終的にControllerへ移す --}}
+
+    {{-- $days / $times を作る処理は最終的にControllerへ移す --}}
     @php
         use Carbon\Carbon;
 
@@ -43,7 +44,7 @@
     <div id="editMessage"
          class="alert alert-warning d-none">
 
-        Click the time slots you are available.
+        Click the time slots you are unavailable.
 
     </div>
 
@@ -207,13 +208,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
 
-            // Availableの切り替え
-            cell.classList.toggle('table-success');
+            // Unavailableの切り替え
+            cell.classList.toggle('table-secondary');
 
 
-            if (cell.classList.contains('table-success')) {
+            if (cell.classList.contains('table-secondary')) {
 
-                cell.textContent = 'Available';
+                cell.textContent = 'Unavailable';
 
             } else {
 
@@ -254,14 +255,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         document
-            .querySelectorAll('.schedule-cell.table-success')
+            .querySelectorAll('.schedule-cell.table-secondary')
             .forEach(function (cell) {
 
                 schedules.push({
 
                     date: cell.dataset.date,
 
-                    time: cell.dataset.time
+                    time: cell.dataset.time,
+
+                    status: 'unavailable'
 
                 });
 
@@ -281,11 +284,13 @@ document.addEventListener('DOMContentLoaded', function () {
             [
                 {
                     date: "2026-08-26",
-                    time: "10:00"
+                    time: "10:00",
+                    status: "unavailable"
                 },
                 {
                     date: "2026-08-26",
-                    time: "11:00"
+                    time: "11:00",
+                    status: "unavailable"
                 }
             ]
 
