@@ -11,7 +11,7 @@ use App\Http\Controllers\Teacher\ScheduleController;
 
 // Test route for frontend testing
 Route::view('/frontend-test', 'teachers.profile')->name('teacher.profile');
-Route::view('/teachers-test', 'teachers.index')->name('teachers.test');
+Route::view('/teachers-test', 'teachers.schedule')->name('teachers.schedule');
 
 // Public routes
 Auth::routes();
