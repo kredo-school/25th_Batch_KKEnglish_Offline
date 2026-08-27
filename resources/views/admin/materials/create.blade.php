@@ -3,7 +3,7 @@
 @section('content')
 <h2 class="fw-bold mb-3">Register Materials</h2>
 @if($errors->any()) <div class="alert alert-danger"><ul>@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div> @endif
-<form method="POST" action="{{ route('admin.materials.store') }}">
+<form method="POST" action="{{ route('admin.materials.store') }}" enctype="multipart/form-data">
     @csrf
     @include('admin.materials._form')
     <button class="btn btn-primary">Register</button>

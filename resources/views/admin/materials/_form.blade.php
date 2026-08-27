@@ -3,6 +3,17 @@
     <input type="text" name="name" class="form-control" value="{{ old('name', $material->name ?? '') }}" required>
 </div>
 <div class="mb-3">
+    <label class="form-label">Material Picture</label>
+    <input type="file" name="cover_image_file" class="form-control" accept="image/*">
+
+    @if(!empty($material?->cover_image))
+        <div class="mt-2">
+            <img src="{{ asset('storage/' . $material->cover_image) }}" alt="cover" width="120" class="rounded border">
+        </div>
+    @endif
+</div>
+
+<div class="mb-3">
     <label class="form-label">Description</label>
     <textarea name="description" class="form-control">{{ old('description', $material->description ?? '') }}</textarea>
 </div>

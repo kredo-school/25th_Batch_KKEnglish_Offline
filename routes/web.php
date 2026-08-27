@@ -85,6 +85,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
     Route::get('/materials/create', [AdminMaterialController::class, 'create'])->name('materials.create');
     Route::post('/materials', [AdminMaterialController::class, 'store'])->name('materials.store');
+    Route::get('/materials/{material}', [AdminMaterialController::class, 'show'])->name('materials.show');
     Route::get('/materials/{material}/edit', [AdminMaterialController::class, 'edit'])->name('materials.edit');
     Route::put('/materials/{material}', [AdminMaterialController::class, 'update'])->name('materials.update');
     Route::delete('/materials/{material}', [AdminMaterialController::class, 'destroy'])->name('materials.destroy');
