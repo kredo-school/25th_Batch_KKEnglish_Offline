@@ -11,7 +11,7 @@
             Teacher management
         </a>
 
-        <a href="#"
+        <a href="{{ route('admin.materials.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
             Material management
         </a>

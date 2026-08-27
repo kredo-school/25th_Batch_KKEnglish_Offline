@@ -8,6 +8,9 @@ use App\Http\Controllers\Student\LessonController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\ScheduleController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
+use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 
 // Test route for frontend testing
 Route::view('/frontend-test', 'teachers.profile')->name('teacher.profile');
@@ -53,7 +56,7 @@ Route::middleware(['auth', 'role:teacher,admin'])->group(function () {
     Route::get('/teachers/schedules/create', [ScheduleController::class, 'create'])->name('teacher.schedules.create');
         // グリッド選択保存（create画面から送信）
     Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])->name('teacher.schedules.storeGrid');
-    
+
     Route::post('/teachers/schedules', [ScheduleController::class, 'store'])->name('teacher.schedules.store');
 
     Route::get('/teachers/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('teacher.schedules.edit');
@@ -72,15 +75,18 @@ Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid']
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admins/dashboard', function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admins')
+    ->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
         return view('admin.dashboard');
-    })->name('admin.dashboard');
+    })->name('dashboard');
 
     // Material 編集
-    Route::get('/materials/create', [MaterialController::class, 'create'])->name('materials.create');
-    Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
-    Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
-    Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
-    Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+    Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
+    Route::get('/materials/create', [AdminMaterialController::class, 'create'])->name('materials.create');
+    Route::post('/materials', [AdminMaterialController::class, 'store'])->name('materials.store');
+    Route::get('/materials/{material}/edit', [AdminMaterialController::class, 'edit'])->name('materials.edit');
+    Route::put('/materials/{material}', [AdminMaterialController::class, 'update'])->name('materials.update');
+    Route::delete('/materials/{material}', [AdminMaterialController::class, 'destroy'])->name('materials.destroy');
+    Route::patch('/materials/{material}/suspend',[AdminMaterialController::class, 'suspend'])->name('materials.suspend');
 });
