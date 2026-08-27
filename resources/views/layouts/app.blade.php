@@ -97,9 +97,10 @@
     <aside class="col-md-3 col-lg-2">
 
         @if ($viewMode == 'student')
-            @if (request()->routeIs('teachers.*'))
+            {{-- 生徒ページの予約ページでは専用のサイドバーを表示　route判定--}}
+            @if (request()->routeIs('students.teacher-list*'))
                 {{-- 生徒の予約画面専用サイドバー --}}
-                @include('components.sidebars')
+                @include('students.components.sidebar')
             @else
                 {{-- 生徒の通常サイドバー --}}
                 @include('components.sidebars.student')
