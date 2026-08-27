@@ -7,21 +7,18 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class MaterialUpdateRequest extends MaterialStoreRequest
 {
-    // 同じルール・認可を使う
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    // authorize() メソッドは親クラスの MaterialStoreRequest のものを使用するため削除
+    public function authorize(): bool
+    {
+        // まず切り分け優先なら true
+        // 本番は admin 判定に置き換え推奨
+        return auth()->check()
+        && auth()->user()->role
+        && auth()->user()->role->role_code === 'admin';
+    }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            // MaterialStoreRequest のルールをそのまま使用する場合は空配列のままでよい
-        ];
+        // 親のバリデーションを継承
+        return parent::rules();
     }
 }

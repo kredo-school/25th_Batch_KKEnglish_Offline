@@ -24,7 +24,7 @@ class MaterialStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'cover_image' => ['nullable', 'string', 'max:255'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
             'level' => ['nullable', 'string', 'max:100'],
             'target_level' => ['nullable', 'string', 'max:100'],

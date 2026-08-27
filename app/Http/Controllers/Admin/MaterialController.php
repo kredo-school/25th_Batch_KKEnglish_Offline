@@ -9,6 +9,7 @@ use App\Models\Material;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MaterialController extends Controller
 {
@@ -34,13 +35,22 @@ class MaterialController extends Controller
 
     public function store(MaterialStoreRequest $request): RedirectResponse
     {
-        Material::create([
-            ...$request->validated(),
-            'status' => $request->input('status', 'active'),
-        ]);
+        $data = $request->validated();
 
-        return redirect()->route('admin.materials.index')
-            ->with('success', '教材を登録しました。');
+        if ($request->hasFile('cover_image_file')) {
+            $data['cover_image'] = $request->file('cover_image_file')->store('materials', 'public');
+        }
+
+        unset($data['cover_image_file']);
+
+        \App\Models\Material::create($data);
+
+        return redirect()->route('admin.materials.index')->with('success', '教材を登録しました。');
+    }
+
+    public function show(Material $material): View
+    {
+        return view('admin.materials.show', compact('material'));
     }
 
     public function edit(Material $material): View
@@ -50,10 +60,20 @@ class MaterialController extends Controller
 
     public function update(MaterialUpdateRequest $request, Material $material): RedirectResponse
     {
-        $material->update($request->validated());
+        $data = $request->validated();
 
-        return redirect()->route('admin.materials.index')
-            ->with('success', '教材を更新しました。');
+        if ($request->hasFile('cover_image_file')) {
+            if (!empty($material->cover_image) && Storage::disk('public')->exists($material->cover_image)) {
+                Storage::disk('public')->delete($material->cover_image);
+            }
+            $data['cover_image'] = $request->file('cover_image_file')->store('materials', 'public');
+        }
+
+        unset($data['cover_image_file']);
+
+        $material->update($data);
+
+        return redirect()->route('admin.materials.index')->with('success', '教材を更新しました。');
     }
 
     public function suspend(Material $material): RedirectResponse
@@ -62,5 +82,18 @@ class MaterialController extends Controller
 
         return redirect()->route('admin.materials.index')
             ->with('success', '教材を一時停止しました。');
+    }
+
+    public function destroy(Material $material): RedirectResponse
+    {
+        // 画像があれば先に削除
+        if (!empty($material->cover_image) && Storage::disk('public')->exists($material->cover_image)) {
+            Storage::disk('public')->delete($material->cover_image);
+        }
+
+        $material->delete();
+
+        return redirect()->route('admin.materials.index')
+            ->with('success', '教材を削除しました。');
     }
 }
