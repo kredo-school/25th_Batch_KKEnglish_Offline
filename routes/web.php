@@ -11,6 +11,7 @@ use App\Http\Controllers\Teacher\ScheduleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 // Test route for frontend testing
 Route::view('/frontend-test', 'teachers.profile')->name('teacher.profile');
@@ -90,4 +91,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     Route::put('/materials/{material}', [AdminMaterialController::class, 'update'])->name('materials.update');
     Route::delete('/materials/{material}', [AdminMaterialController::class, 'destroy'])->name('materials.destroy');
     Route::patch('/materials/{material}/suspend',[AdminMaterialController::class, 'suspend'])->name('materials.suspend');
+
+    // User 編集
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+    // Teacher Management
+    Route::get('/teachers', [AdminTeacherController::class, 'index'])->name('teachers.index');
+    Route::get('/teachers/create', [AdminTeacherController::class, 'create'])->name('teachers.create');
+    Route::post('/teachers', [AdminTeacherController::class, 'store'])->name('teachers.store');
+    Route::get('/teachers/{teacher}', [AdminTeacherController::class, 'show'])->name('teachers.show');
+    Route::get('/teachers/{teacher}/edit', [AdminTeacherController::class, 'edit'])->name('teachers.edit');
+    Route::put('/teachers/{teacher}', [AdminTeacherController::class, 'update'])->name('teachers.update');
+    Route::delete('/teachers/{teacher}', [AdminTeacherController::class, 'destroy'])->name('teachers.destroy');
 });
