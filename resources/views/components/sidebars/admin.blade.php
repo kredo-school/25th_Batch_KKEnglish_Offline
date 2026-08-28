@@ -6,7 +6,7 @@
             Dashboard
         </a>
 
-        <a href="#"
+        <a href="{{ route('admin.teachers.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
             Teacher management
         </a>
@@ -24,6 +24,11 @@
         <a href="#"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
             Schedule management
+        </a>
+
+        <a href="{{ route('admin.users.index') }}"
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+            User management
         </a>
 
     </nav>
