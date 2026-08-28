@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 // Test route for frontend testing
 Route::view('/frontend-test', 'teachers.profile')->name('teacher.profile');
 Route::view('/teachers-test', 'teachers.schedule')->name('teachers.schedule');
+Route::view('/reservation-test', 'students.reservations.index')
+    ->name('reservation.test');
 
 // Public routes
 Auth::routes();
