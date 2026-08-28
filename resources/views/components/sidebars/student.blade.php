@@ -6,9 +6,14 @@
             Dashboard
         </a>
 
-        <a href="{{ route('students.teacher-list') }}"
+        <a href="{{ route('reservation.test') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
             Book a lesson
+        </a>
+
+         <a href="{{ route('students.teacher-list') }}"
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+            Teacher list
         </a>
 
         <a href="#"

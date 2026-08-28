@@ -98,7 +98,8 @@
 
         @if ($viewMode == 'student')
             {{-- 生徒ページの予約ページでは専用のサイドバーを表示　route判定--}}
-            @if (request()->routeIs('students.teacher-list*'))
+            {{-- @if (request()->routeIs('students.teacher-list*')) --}}
+            @if (request()->routeIs('reservation.test'))
                 {{-- 生徒の予約画面専用サイドバー --}}
                 @include('students.components.sidebar')
             @else
