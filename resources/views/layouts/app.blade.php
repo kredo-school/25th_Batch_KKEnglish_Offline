@@ -1,45 +1,27 @@
 @php
     $user = auth()->user();
 
-    // ログインユーザーのrole_id
-    $roleId = $user?->role_id;
-
-    // 1 = Student
-    // 2 = Teacher
-    // 3 = Admin
-    if ($roleId == 1) {
-        $viewMode = 'student';
-
-    } elseif ($roleId == 2) {
-        $viewMode = 'teacher';
-
-    } elseif ($roleId == 3) {
-        $viewMode = 'admin';
-
-    } else {
-        $viewMode = 'guest';
-    }
-
+    $roleCode = $user?->role?->role_code;
 @endphp
 
 
 @php
     // Navbarの表示
-    if ($viewMode == 'student') {
+    if ($roleCode == 'student') {
 
         $barClass = 'bg-info-subtle';
         $textClass = 'text-dark';
         $accountLabel = 'Student';
         $homeHref = route('student.dashboard');
 
-    } elseif ($viewMode == 'teacher') {
+    } elseif ($roleCode == 'teacher') {
 
         $barClass = 'bg-warning';
         $textClass = 'text-dark';
         $accountLabel = 'Teacher';
         $homeHref = route('teacher.dashboard');
 
-    } elseif ($viewMode == 'admin') {
+    } elseif ($roleCode == 'admin') {
 
         $barClass = 'bg-dark';
         $textClass = 'text-white';
@@ -96,7 +78,7 @@
 @auth
     <aside class="col-md-3 col-lg-2">
 
-        @if ($viewMode == 'student')
+        @if ($roleCode == 'student')
             {{-- 生徒ページの予約ページでは専用のサイドバーを表示　route判定--}}
             {{-- @if (request()->routeIs('students.teacher-list*')) --}}
             @if (request()->routeIs('reservation.test'))
@@ -107,10 +89,10 @@
                 @include('components.sidebars.student')
             @endif
 
-        @elseif ($viewMode == 'teacher')
+        @elseif ($roleCode == 'teacher')
             @include('components.sidebars.teacher')
 
-        @elseif ($viewMode == 'admin')
+        @elseif ($roleCode == 'admin')
             @include('components.sidebars.admin')
         @endif
 

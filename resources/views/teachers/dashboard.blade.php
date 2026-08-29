@@ -15,7 +15,7 @@
             <div class="bg-light p-4 mb-4">
                 <h2 class="fw-bold mb-1">
                     Hello, Name
-                     <a href="{{ route('teacher.profile') }}" class="btn btn-link">Profile</a>
+                     {{-- <a href="{{ route('teachers.show') }}" class="btn btn-link">Profile</a> --}}
                 </h2>
 
                   <p class="text-secondary mb-0">
