@@ -7,6 +7,13 @@
         <a href="{{ route('admin.teachers.create') }}" class="btn btn-primary">Teacher Register</a>
     </div>
 
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
     <form method="GET" class="row g-2 mb-3">
         <div class="col-md-4">
             <input type="text" name="keyword" value="{{ request('keyword') }}" class="form-control" placeholder="Name/Email/Specialty">
@@ -16,24 +23,36 @@
 
     <div class="table-responsive">
         <table class="table table-striped">
-            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Specialty</th><th>Career</th></tr></thead>
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Specialty</th><th>Career</th><th>Status</th>
+                    <th class="text-nowrap">Actions</th></tr></thead>
             <tbody>
             @forelse($teachers as $teacher)
+                @php
+                    $user = $teacher->user; // null safety
+                    $status = $user->status ?? 'unknown';
+                @endphp
                 <tr>
                     <td>{{ $teacher->id }}</td>
-                    <td>{{ $teacher->user->last_name ?? '' }} {{ $teacher->user->first_name ?? '' }}</td>
+                    <td>{{ $teacher->user->first_name ?? '' }} {{ $teacher->user->last_name ?? '' }}</td>
                     <td>{{ $teacher->user->email ?? '-' }}</td>
                     <td>{{ $teacher->specialty ?? '-' }}</td>
                     <td>{{ $teacher->career ?? '-' }}</td>
+                    <td>
+                        <span class="badge {{ $status === 'active' ? 'bg-success' : 'bg-secondary' }}">
+                            {{ $status }}
+                        </span>
+                    </td>
                     <td class="text-nowrap">
                         <a href="{{ route('admin.teachers.show', $teacher) }}" class="btn btn-sm btn-outline-secondary">Details</a>
                         <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <form action="{{ route('admin.teachers.destroy', $teacher) }}" method="POST" class="d-inline"
-                                onsubmit="return confirm('この講師アカウントを停止しますか？');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">Deactivate</button>
-                        </form>
+                        @if($status === 'active')
+                            <form action="{{ route('admin.teachers.destroy', $teacher) }}" method="POST" class="d-inline"
+                                  onsubmit="return confirm('この講師アカウントを停止しますか？');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger">Deactivate</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
             @empty
