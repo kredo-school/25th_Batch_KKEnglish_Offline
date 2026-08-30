@@ -3,13 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Material extends Model
 {
     protected $table = 'materials';
     protected $primaryKey = 'material_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
+
 
     protected $fillable = [
         'name',
@@ -21,8 +20,9 @@ class Material extends Model
         'printed_textbook',
         'status',
     ];
-    public function getRouteKeyName(): string
-    {
-        return 'material_id';
-    }
+    public function reservations(): HasMany
+{
+    return $this->hasMany(Reservation::class, 'material_id', 'material_id');
+}
+
 }

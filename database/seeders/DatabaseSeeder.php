@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             MaterialSeeder::class,
+            TeacherProfileSeeder::class,
         ]);
 
         User::factory()->create([

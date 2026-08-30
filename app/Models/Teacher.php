@@ -3,6 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\User;
+use App\Models\TeacherSchedule;
+use App\Models\ScheduleException;
+use App\Models\Reservation;
 
 class Teacher extends Model
 {
@@ -18,13 +24,26 @@ class Teacher extends Model
         'rating_average',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         // users.id と teachers.user_id(string) を紐づけ
-        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
-    public function schedules()
+
+    public function schedules(): HasMany
     {
         return $this->hasMany(TeacherSchedule::class);
     }
+
+    public function scheduleExceptions(): HasMany
+    {
+        return $this->hasMany(ScheduleException::class);
+    }
+
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
 }
