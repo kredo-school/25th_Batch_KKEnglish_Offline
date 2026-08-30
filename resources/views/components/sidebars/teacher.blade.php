@@ -2,7 +2,8 @@
     <nav class="px-2 py-3 fw-bold fs-5">
 
         <a href="{{ route('teacher.dashboard') }}"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('teacher.dashboard') ? 'bg-warning-subtle' : '' }}">
             Dashboard
         </a>
 

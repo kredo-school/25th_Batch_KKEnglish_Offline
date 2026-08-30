@@ -9,9 +9,6 @@ use Illuminate\Contracts\View\View;
 
 class TeacherController extends Controller
 {
-    /**
-     * 講師一覧
-     */
     public function index(): View
     {
     /**
@@ -29,9 +26,7 @@ class TeacherController extends Controller
      */
     public function show(int $id): View
     {
-        abort_unless(ctype_digit($id), 404);
-        $teacher = Teacher::query()
-            ->findOrFail((int) $id);
+        $teacher = Teacher::findOrFail($id);
 
         return view('teachers.show', compact('teacher'));
     }

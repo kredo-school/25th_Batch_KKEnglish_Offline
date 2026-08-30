@@ -36,7 +36,6 @@
                             John
                         </h5>
 
-                        {{-- お気に入り --}}
                         <i class="fa-solid fa-heart text-danger"></i>
 
                     </div>
@@ -51,9 +50,7 @@
                         Daily Conversation
                     </p>
 
-                    {{-- バックエンド実装後 --}}
-                    {{-- href="{{ route('teachers.show', $teacher->id) }}" に変更 --}}
-                    <a href="{{ route('teacher.profile') }}"
+                    <a href="#"
                        class="btn btn-outline-primary btn-sm w-100">
                         View Profile
                     </a>
@@ -83,7 +80,6 @@
                             Jane
                         </h5>
 
-                        {{-- お気に入り --}}
                         <i class="fa-solid fa-heart text-danger"></i>
 
                     </div>
@@ -98,9 +94,7 @@
                         Grammar
                     </p>
 
-                    {{-- バックエンド実装後 --}}
-                    {{-- href="{{ route('teachers.show', $teacher->id) }}" に変更 --}}
-                    <a href="{{ route('teacher.profile') }}"
+                    <a href="#"
                        class="btn btn-outline-primary btn-sm w-100">
                         View Profile
                     </a>
@@ -121,267 +115,60 @@
 
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3">
 
-        {{-- Teacher 1 --}}
-        <div class="col">
+        @foreach ($teachers as $teacher)
 
-            <div class="card h-100">
+            <div class="col">
 
-                <img src="{{ asset('images/teacher1.jpg') }}"
-                     alt="John"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
+                <div class="card h-100">
 
-                <div class="card-body">
+                    <img src="{{ $teacher->user->profile_image }}"
+                         alt="{{ $teacher->user->first_name }}"
+                         class="card-img-top"
+                         style="height: 180px; object-fit: cover;">
 
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="card-body d-flex flex-column">
 
-                        <h5 class="fw-bold mb-0">
-                            Ken
-                        </h5>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
 
-                         <i class="fa-regular fa-heart text-secondary"></i>
+                            <h5 class="fw-bold mb-0"
+                                style="min-height: 48px;">
+                                {{ $teacher->user->first_name }}
+                                {{ $teacher->user->last_name }}
+                            </h5>
+
+                            <i class="fa-regular fa-heart text-secondary ms-2"></i>
+
+                        </div>
+
+                        <p class="mb-1 small">
+                            <span class="text-secondary">
+                                Nationality:
+                            </span>
+
+                            {{ $teacher->user->nationality }}
+                        </p>
+
+                        <p class="mb-3 small"
+                           style="min-height: 60px;">
+                            <span class="text-secondary">
+                                Specialty:
+                            </span>
+
+                            {{ $teacher->specialty }}
+                        </p>
+
+                        <a href="{{ route('teachers.show', $teacher->id) }}"
+                           class="btn btn-outline-primary btn-sm w-100 mt-auto">
+                            View Profile
+                        </a>
 
                     </div>
-
-                    <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
-                        Philippines
-                    </p>
-
-                    <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
-                        Daily Conversation
-                    </p>
-
-                    <a href="{{ route('teacher.profile') }}"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        View Profile
-                    </a>
 
                 </div>
 
             </div>
 
-        </div>
-
-
-        {{-- Teacher 2 --}}
-        <div class="col">
-
-            <div class="card h-100">
-
-                <img src="{{ asset('images/teacher2.jpg') }}"
-                     alt="Jane"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-
-                        <h5 class="fw-bold mb-0">
-                            Kei
-                        </h5>
-
-                         <i class="fa-regular fa-heart text-secondary"></i>
-                    </div>
-
-                    <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
-                        Philippines
-                    </p>
-
-                    <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
-                        Grammar
-                    </p>
-
-                    <a href="{{ route('teacher.profile') }}"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        View Profile
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- Teacher 3 --}}
-        <div class="col">
-
-            <div class="card h-100">
-
-                <img src="{{ asset('images/teacher3.jpg') }}"
-                     alt="Bob"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-
-                        <h5 class="fw-bold mb-0">
-                            Bob
-                        </h5>
-
-                        <i class="fa-regular fa-heart text-secondary"></i>
-
-                    </div>
-
-                    <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
-                        Philippines
-                    </p>
-
-                    <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
-                        Pronunciation
-                    </p>
-
-                    <a href="{{ route('teacher.profile') }}"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        View Profile
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- Teacher 4 --}}
-        <div class="col">
-
-            <div class="card h-100">
-
-                <img src="{{ asset('images/teacher4.jpg') }}"
-                     alt="Mary"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-
-                        <h5 class="fw-bold mb-0">
-                            Mary
-                        </h5>
-
-                        <i class="fa-regular fa-heart text-secondary"></i>
-
-                    </div>
-
-                    <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
-                        Philippines
-                    </p>
-
-                    <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
-                        Business English
-                    </p>
-
-                    <a href="{{ route('teacher.profile') }}"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        View Profile
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- Teacher 5 --}}
-        <div class="col">
-
-            <div class="card h-100">
-
-                <img src="{{ asset('images/teacher5.jpg') }}"
-                     alt="Mike"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-
-                        <h5 class="fw-bold mb-0">
-                            Mike
-                        </h5>
-
-                        <i class="fa-regular fa-heart text-secondary"></i>
-
-                    </div>
-
-                    <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
-                        Philippines
-                    </p>
-
-                    <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
-                        Daily Conversation
-                    </p>
-
-                    <a href="{{ route('teacher.profile') }}"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        View Profile
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- Teacher 6 --}}
-        <div class="col">
-
-            <div class="card h-100">
-
-                <img src="{{ asset('images/teacher6.jpg') }}"
-                     alt="Anna"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-
-                        <h5 class="fw-bold mb-0">
-                            Anna
-                        </h5>
-
-                        <i class="fa-regular fa-heart text-secondary"></i>
-
-                    </div>
-
-                    <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
-                        Philippines
-                    </p>
-
-                    <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
-                        Kids English
-                    </p>
-
-                    <a href="{{ route('teacher.profile') }}"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        View Profile
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
+        @endforeach
 
     </div>
 
