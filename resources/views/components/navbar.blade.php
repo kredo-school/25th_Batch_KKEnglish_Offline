@@ -35,7 +35,7 @@
                             Profile
                         </a>
                     @elseif($roleCode=='teacher')
-                        <a class="dropdown-item" href="{{ route('teacher.profile') }}">
+                        <a class="dropdown-item" href="{{ route('teachers.show', $user->teacher->id) }}">
                             Profile
                         </a>
                     @endif

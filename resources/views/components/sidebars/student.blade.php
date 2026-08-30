@@ -2,17 +2,20 @@
     <nav class="px-2 py-3 fw-bold fs-5">
 
         <a href="{{ route('student.dashboard') }}"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('student.dashboard') ? 'student-active fw-semibold' : '' }}">
             Dashboard
         </a>
 
         <a href="{{ route('reservation.test') }}"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('reservation.test') ? 'student-active fw-semibold' : '' }}">
             Book a lesson
         </a>
 
          <a href="{{ route('students.teacher-list') }}"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('students.teacher-list') ? 'student-active fw-semibold' : '' }}">
             Teacher list
         </a>
 
@@ -32,7 +35,8 @@
         </a>
 
         <a href="{{ route('materials.index') }}"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('materials.*') ? 'student-active fw-semibold' : '' }}">
             Teaching Materials
         </a>
 
@@ -53,3 +57,9 @@
 
     </nav>
 </aside>
+
+<style>
+    .student-active {
+        background-color: rgba(13, 202, 240, 0.10);
+    }
+</style>

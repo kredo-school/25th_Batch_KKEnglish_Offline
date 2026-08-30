@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 // Test route for frontend testing
-Route::view('/frontend-test', 'teachers.show')->name('teacher.profile');
+// Route::view('/frontend-test', 'teachers.show')->name('teacher.profile');
 Route::view('/teachers-test', 'teachers.schedule')->name('teachers.schedule');
 Route::view('/reservation-test', 'students.reservations.index')
 ->name('reservation.test');
@@ -37,6 +37,8 @@ Route::middleware(['auth'])->group(function () {
     // Material 閲覧
     Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
     Route::get('/materials/{material}', [MaterialController::class, 'show'])->name('materials.show');
+
+    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->whereNumber('id')->name('teachers.show');
 });
 
 // Student Routes
@@ -50,7 +52,6 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
-    Route::get('/teachers/{id}', [TeacherController::class, 'show'])->whereNumber('id')->name('teachers.show');
     Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
         ->name('student.lessons.cancel');
 });
