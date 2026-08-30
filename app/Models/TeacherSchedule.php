@@ -3,24 +3,60 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TeacherSchedule extends Model
 {
-    protected $table = 'teacher_schedules';
     protected $primaryKey = 'schedule_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
     protected $fillable = [
-        'teacher_id',
-        'date',
-        'start_time',
-        'end_time',
-        'status',
+        'teacher_id', 'shift_pattern_id', 'available_date',
+        'start_time', 'end_time', 'status', 'created_by',
+        'confirmed_by', 'confirmed_at', 'cancelled_by', 'cancelled_at',
     ];
 
-    public function teacher()
+    protected function casts(): array
+    {
+        return [
+            'available_date' => 'date',
+            'confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+        ];
+    }
+
+    public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class);
+    }
+
+    public function shiftPattern(): BelongsTo
+    {
+        return $this->belongsTo(ShiftPattern::class);
+    }
+
+    public function exceptions(): HasMany
+    {
+        return $this->hasMany(ScheduleException::class, 'schedule_id', 'schedule_id');
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class, 'schedule_id', 'schedule_id');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function confirmer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    public function canceller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 }
