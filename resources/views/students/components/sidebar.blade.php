@@ -4,77 +4,22 @@
         Book a Lesson
     </h5>
 
+
     {{-- Date --}}
     <div class="mb-4">
 
         <label for="reservationDate"
                class="form-label fw-bold">
-
             Date
-
+            <span class="text-danger">*</span>
         </label>
 
-        <input type="date"
-               id="reservationDate"
-               class="form-control">
-
-    </div>
-
-
-    {{-- Time --}}
-    <div class="mb-4">
-
-        <label for="reservationTime"
-               class="form-label fw-bold">
-
-            Time
-
-        </label>
-
-        <select id="reservationTime"
-                class="form-select">
-
-            <option value="">
-                All Times
-            </option>
-
-            <option value="09:00">
-                09:00
-            </option>
-
-            <option value="10:00">
-                10:00
-            </option>
-
-            <option value="11:00">
-                11:00
-            </option>
-
-            <option value="12:00">
-                12:00
-            </option>
-
-            <option value="13:00">
-                13:00
-            </option>
-
-            <option value="14:00">
-                14:00
-            </option>
-
-            <option value="15:00">
-                15:00
-            </option>
-
-            <option value="16:00">
-                16:00
-            </option>
-
-            <option value="17:00">
-                17:00
-            </option>
-
-        </select>
+        <input
+            type="date"
+            id="reservationDate"
+            name="reservation_date"
+            class="form-control w-100"
+        >
 
     </div>
 
@@ -84,16 +29,18 @@
 
         <label for="reservationMaterial"
                class="form-label fw-bold">
-
             Material
-
+            <span class="text-danger">*</span>
         </label>
 
-        <select id="reservationMaterial"
-                class="form-select">
+        <select
+            id="reservationMaterial"
+            name="material"
+            class="form-select w-100"
+        >
 
             <option value="">
-                All Materials
+                Select Material
             </option>
 
             {{-- 仮データ --}}
@@ -114,6 +61,65 @@
             </option>
 
         </select>
+
+    </div>
+
+
+    {{-- Time --}}
+    <div class="mb-4">
+
+        <label class="form-label fw-bold">
+            Time
+        </label>
+
+        <p class="text-secondary small mb-2">
+            Select a time to narrow down available teachers.
+        </p>
+
+        <div class="row g-2">
+
+            {{-- Hour --}}
+            <div class="col-6">
+
+                <input
+                    type="number"
+                    id="reservationHour"
+                    name="reservation_hour"
+                    class="form-control w-100"
+                    min="1"
+                    max="24"
+                    placeholder="Hour"
+                >
+
+            </div>
+
+
+            {{-- Minute --}}
+            <div class="col-6">
+
+                <select
+                    id="reservationMinute"
+                    name="reservation_minute"
+                    class="form-select w-100"
+                >
+
+                    <option value="">
+                        Minute
+                    </option>
+
+                    <option value="00">
+                        00
+                    </option>
+
+                    <option value="30">
+                        30
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
 
     </div>
 
