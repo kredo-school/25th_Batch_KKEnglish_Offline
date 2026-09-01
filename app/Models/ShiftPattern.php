@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ShiftPattern extends Model
 {
@@ -24,6 +25,7 @@ class ShiftPattern extends Model
         ];
     }
 
+    // slot実体
     public function schedules(): HasMany
     {
         return $this->hasMany(TeacherSchedule::class, 'shift_pattern_id');
@@ -32,5 +34,27 @@ class ShiftPattern extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function rules(): HasMany
+    {
+        return $this->hasMany(ShiftPatternRule::class, 'shift_pattern_id');
+    }
+
+    public function breaks(): HasMany
+    {
+        return $this->hasMany(ShiftPatternBreak::class, 'shift_pattern_id');
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(TeacherShiftAssignment::class, 'shift_pattern_id');
+    }
+
+    public function teachers(): BelongsToMany
+    {
+        return $this->belongsToMany(Teacher::class, 'teacher_shift_assignments')
+            ->withPivot(['effective_from', 'effective_to', 'priority'])
+            ->withTimestamps();
     }
 }

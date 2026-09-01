@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TeacherSchedule extends Model
 {
@@ -58,5 +59,21 @@ class TeacherSchedule extends Model
     public function canceller(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cancelled_by');
+    }
+
+    public function startAtJst(): CarbonImmutable
+    {
+        return CarbonImmutable::parse(
+            $this->available_date->format('Y-m-d') . ' ' . $this->start_time,
+            \App\Support\AppTime::BUSINESS_TZ
+        );
+    }
+
+    public function endAtJst(): CarbonImmutable
+    {
+        return CarbonImmutable::parse(
+            $this->available_date->format('Y-m-d') . ' ' . $this->end_time,
+            \App\Support\AppTime::BUSINESS_TZ
+        );
     }
 }
