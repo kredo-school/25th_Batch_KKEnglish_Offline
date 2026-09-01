@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ShiftPatternController;
 
 // Test route for frontend testing
 // Route::view('/frontend-test', 'teachers.show')->name('teacher.profile');
@@ -112,4 +113,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     Route::get('/teachers/{teacher}/edit', [AdminTeacherController::class, 'edit'])->name('teachers.edit');
     Route::put('/teachers/{teacher}', [AdminTeacherController::class, 'update'])->name('teachers.update');
     Route::delete('/teachers/{teacher}', [AdminTeacherController::class, 'destroy'])->name('teachers.destroy');
+
+    // Shift Pattern Management
+    Route::resource('shift-patterns', ShiftPatternController::class)
+        ->only(['create', 'store', 'edit', 'update']);
 });
