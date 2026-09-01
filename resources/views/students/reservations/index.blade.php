@@ -22,7 +22,7 @@
             <div id="selectionMessage"
                  class="alert alert-light border">
 
-                Please select a date, time, and material to book a lesson.
+                Please select a date and material.
 
             </div>
 
@@ -59,8 +59,8 @@
 
                 {{-- John --}}
                 <div class="col teacher-card"
-                     data-dates="2026-08-29,2026-08-30,2026-08-31"
-                     data-times="09:00,10:00"
+                     data-dates="2026-09-01,2026-09-02,2026-09-03"
+                     data-times="09:00,09:30,10:00,10:30"
                      data-materials="beginner,conversation">
 
                     <div class="card h-100">
@@ -70,7 +70,7 @@
                              class="card-img-top"
                              style="height: 180px; object-fit: cover;">
 
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
 
                             <h5 class="fw-bold mb-2">
                                 John
@@ -90,20 +90,28 @@
                                 Daily Conversation
                             </p>
 
-                            <a href="#"
-                               class="btn btn-outline-primary btn-sm w-100 mb-2">
 
-                                View Profile
+                            {{-- ボタン位置をカード下部に揃える --}}
+                            <div class="mt-auto">
 
-                            </a>
+                                <a href="#"
+                                   class="btn btn-outline-primary btn-sm w-100 mb-2
+                                          view-schedule-btn disabled"
+                                   aria-disabled="true">
 
-                            <button type="button"
-                                    class="btn btn-secondary btn-sm w-100 book-btn"
-                                    disabled>
+                                    View Schedule
 
-                                Book
+                                </a>
 
-                            </button>
+                                <button type="button"
+                                        class="btn btn-secondary btn-sm w-100 book-btn"
+                                        disabled>
+
+                                    Book
+
+                                </button>
+
+                            </div>
 
                         </div>
 
@@ -114,8 +122,8 @@
 
                 {{-- Jane --}}
                 <div class="col teacher-card"
-                     data-dates="2026-08-30,2026-08-31"
-                     data-times="10:00,11:00,12:00"
+                     data-dates="2026-09-01,2026-09-02"
+                     data-times="10:00,10:30,11:00,11:30,12:00"
                      data-materials="grammar,business">
 
                     <div class="card h-100">
@@ -125,7 +133,7 @@
                              class="card-img-top"
                              style="height: 180px; object-fit: cover;">
 
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
 
                             <h5 class="fw-bold mb-2">
                                 Jane
@@ -145,20 +153,26 @@
                                 Grammar
                             </p>
 
-                            <a href="#"
-                               class="btn btn-outline-primary btn-sm w-100 mb-2">
+                            <div class="mt-auto">
 
-                                View Profile
+                                <a href="#"
+                                   class="btn btn-outline-primary btn-sm w-100 mb-2
+                                          view-schedule-btn disabled"
+                                   aria-disabled="true">
 
-                            </a>
+                                    View Schedule
 
-                            <button type="button"
-                                    class="btn btn-secondary btn-sm w-100 book-btn"
-                                    disabled>
+                                </a>
 
-                                Book
+                                <button type="button"
+                                        class="btn btn-secondary btn-sm w-100 book-btn"
+                                        disabled>
 
-                            </button>
+                                    Book
+
+                                </button>
+
+                            </div>
 
                         </div>
 
@@ -169,8 +183,8 @@
 
                 {{-- Bob --}}
                 <div class="col teacher-card"
-                     data-dates="2026-08-29,2026-08-31"
-                     data-times="09:00,11:00,13:00"
+                     data-dates="2026-09-01,2026-09-03"
+                     data-times="09:00,09:30,11:00,11:30,13:00"
                      data-materials="beginner,grammar">
 
                     <div class="card h-100">
@@ -180,7 +194,7 @@
                              class="card-img-top"
                              style="height: 180px; object-fit: cover;">
 
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
 
                             <h5 class="fw-bold mb-2">
                                 Bob
@@ -200,20 +214,26 @@
                                 Pronunciation
                             </p>
 
-                            <a href="#"
-                               class="btn btn-outline-primary btn-sm w-100 mb-2">
+                            <div class="mt-auto">
 
-                                View Profile
+                                <a href="#"
+                                   class="btn btn-outline-primary btn-sm w-100 mb-2
+                                          view-schedule-btn disabled"
+                                   aria-disabled="true">
 
-                            </a>
+                                    View Schedule
 
-                            <button type="button"
-                                    class="btn btn-secondary btn-sm w-100 book-btn"
-                                    disabled>
+                                </a>
 
-                                Book
+                                <button type="button"
+                                        class="btn btn-secondary btn-sm w-100 book-btn"
+                                        disabled>
 
-                            </button>
+                                    Book
+
+                                </button>
+
+                            </div>
 
                         </div>
 
@@ -224,8 +244,8 @@
 
                 {{-- Mary --}}
                 <div class="col teacher-card"
-                     data-dates="2026-08-30,2026-08-31"
-                     data-times="10:00,12:00,14:00"
+                     data-dates="2026-09-02,2026-09-03"
+                     data-times="10:00,10:30,12:00,12:30,14:00"
                      data-materials="conversation,business">
 
                     <div class="card h-100">
@@ -235,7 +255,7 @@
                              class="card-img-top"
                              style="height: 180px; object-fit: cover;">
 
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
 
                             <h5 class="fw-bold mb-2">
                                 Mary
@@ -255,20 +275,26 @@
                                 Business English
                             </p>
 
-                            <a href="#"
-                               class="btn btn-outline-primary btn-sm w-100 mb-2">
+                            <div class="mt-auto">
 
-                                View Profile
+                                <a href="#"
+                                   class="btn btn-outline-primary btn-sm w-100 mb-2
+                                          view-schedule-btn disabled"
+                                   aria-disabled="true">
 
-                            </a>
+                                    View Schedule
 
-                            <button type="button"
-                                    class="btn btn-secondary btn-sm w-100 book-btn"
-                                    disabled>
+                                </a>
 
-                                Book
+                                <button type="button"
+                                        class="btn btn-secondary btn-sm w-100 book-btn"
+                                        disabled>
 
-                            </button>
+                                    Book
+
+                                </button>
+
+                            </div>
 
                         </div>
 
@@ -302,14 +328,30 @@
 
 <script>
 
+    /*
+     * ===============================
+     * Sidebar inputs
+     * ===============================
+     */
+
     const dateInput =
         document.getElementById('reservationDate');
 
-    const timeSelect =
-        document.getElementById('reservationTime');
+    const hourInput =
+        document.getElementById('reservationHour');
+
+    const minuteSelect =
+        document.getElementById('reservationMinute');
 
     const materialSelect =
         document.getElementById('reservationMaterial');
+
+
+    /*
+     * ===============================
+     * Main elements
+     * ===============================
+     */
 
     const teacherCards =
         document.querySelectorAll('.teacher-card');
@@ -333,20 +375,68 @@
         document.getElementById('selectedMaterial');
 
 
+    /*
+     * ===============================
+     * Teacher Filter
+     * ===============================
+     */
+
     function updateTeachers() {
 
         const date =
             dateInput.value;
 
-        const time =
-            timeSelect.value;
+        const hour =
+            hourInput.value;
+
+        const minute =
+            minuteSelect.value;
 
         const material =
             materialSelect.value;
 
 
+        /*
+         * Hour + Minute が両方選択された場合だけ
+         * 09:00 のような形式にする
+         */
+        const time =
+            hour && minute
+                ? String(hour).padStart(2, '0') + ':' + minute
+                : '';
+
+
+        /*
+         * 2条件
+         * Date + Material
+         *
+         * → View Schedule 有効
+         */
+        const twoSelected =
+            date &&
+            material;
+
+
+        /*
+         * 3条件
+         * Date + Material + Time
+         *
+         * → Book 有効
+         */
+        const threeSelected =
+            date &&
+            material &&
+            time;
+
+
         let visibleCount = 0;
 
+
+        /*
+         * ===============================
+         * Teacher Card Filter
+         * ===============================
+         */
 
         teacherCards.forEach(card => {
 
@@ -361,22 +451,22 @@
 
 
             /*
-             * 選択されていない条件は無視する
+             * 未選択の条件は無視
              */
             const matchDate =
                 !date || dates.includes(date);
 
-            const matchTime =
-                !time || times.includes(time);
-
             const matchMaterial =
                 !material || materials.includes(material);
+
+            const matchTime =
+                !time || times.includes(time);
 
 
             if (
                 matchDate &&
-                matchTime &&
-                matchMaterial
+                matchMaterial &&
+                matchTime
             ) {
 
                 card.classList.remove('d-none');
@@ -393,8 +483,11 @@
 
 
         /*
+         * ===============================
          * Teacherが0件
+         * ===============================
          */
+
         if (visibleCount === 0) {
 
             noTeachers.classList.remove('d-none');
@@ -407,18 +500,50 @@
 
 
         /*
-         * 3条件すべて選択済みか
+         * ===============================
+         * View Schedule
+         *
+         * Date + Materialで有効
+         * ===============================
          */
-        const allSelected =
-            date &&
-            time &&
-            material;
 
+        document.querySelectorAll('.view-schedule-btn')
+            .forEach(button => {
+
+                if (twoSelected) {
+
+                    button.classList.remove('disabled');
+
+                    button.removeAttribute(
+                        'aria-disabled'
+                    );
+
+                } else {
+
+                    button.classList.add('disabled');
+
+                    button.setAttribute(
+                        'aria-disabled',
+                        'true'
+                    );
+
+                }
+
+            });
+
+
+        /*
+         * ===============================
+         * Book
+         *
+         * Date + Material + Timeで有効
+         * ===============================
+         */
 
         document.querySelectorAll('.book-btn')
             .forEach(button => {
 
-                if (allSelected) {
+                if (threeSelected) {
 
                     button.disabled = false;
 
@@ -448,15 +573,26 @@
 
 
         /*
-         * メッセージ
+         * ===============================
+         * Message
+         * ===============================
          */
-        if (allSelected) {
+
+        if (threeSelected) {
 
             selectionMessage.className =
                 'alert alert-success';
 
             selectionMessage.textContent =
-                'All selections are complete. Please choose a teacher.';
+                'All selections are complete. Please choose a teacher to book.';
+
+        } else if (twoSelected) {
+
+            selectionMessage.className =
+                'alert alert-info';
+
+            selectionMessage.textContent =
+                'You can view a teacher schedule, or select a time to book directly.';
 
         } else {
 
@@ -464,14 +600,17 @@
                 'alert alert-light border';
 
             selectionMessage.textContent =
-                'Please select a date, time, and material to book a lesson.';
+                'Please select a date and material.';
 
         }
 
 
         /*
-         * 選択条件のBadge
+         * ===============================
+         * Selected Conditions
+         * ===============================
          */
+
         const hasCondition =
             date ||
             time ||
@@ -493,7 +632,10 @@
         }
 
 
-        // Date Badge
+        /*
+         * Date Badge
+         */
+
         if (date) {
 
             selectedDate.textContent =
@@ -512,7 +654,10 @@
         }
 
 
-        // Time Badge
+        /*
+         * Time Badge
+         */
+
         if (time) {
 
             selectedTime.textContent =
@@ -531,7 +676,10 @@
         }
 
 
-        // Material Badge
+        /*
+         * Material Badge
+         */
+
         if (material) {
 
             selectedMaterial.textContent =
@@ -557,14 +705,22 @@
 
 
     /*
-     * どれから選んでも自動Filter
+     * ===============================
+     * Event
+     * ===============================
      */
+
     dateInput.addEventListener(
         'change',
         updateTeachers
     );
 
-    timeSelect.addEventListener(
+    hourInput.addEventListener(
+        'input',
+        updateTeachers
+    );
+
+    minuteSelect.addEventListener(
         'change',
         updateTeachers
     );
@@ -576,8 +732,11 @@
 
 
     /*
-     * 初期表示
+     * ===============================
+     * Initial Display
+     * ===============================
      */
+
     updateTeachers();
 
 </script>
