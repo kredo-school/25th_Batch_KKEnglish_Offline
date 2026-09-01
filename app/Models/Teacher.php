@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use App\Models\TeacherSchedule;
@@ -44,6 +45,18 @@ class Teacher extends Model
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function shiftAssignments(): HasMany
+    {
+        return $this->hasMany(TeacherShiftAssignment::class);
+    }
+
+    public function shiftPatterns(): BelongsToMany
+    {
+        return $this->belongsToMany(ShiftPattern::class, 'teacher_shift_assignments')
+            ->withPivot(['effective_from', 'effective_to', 'priority'])
+            ->withTimestamps();
     }
 
 }
