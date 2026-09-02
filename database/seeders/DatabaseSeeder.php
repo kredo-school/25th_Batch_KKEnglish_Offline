@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             MaterialSeeder::class,
             TeacherProfileSeeder::class,
             ExceptionTypeSeeder::class,
+            ShiftPatternSeeder::class,
+            TeacherScheduleSeeder::class,
+
         ]);
 
         User::factory()->create([
