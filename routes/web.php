@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ShiftPatternController;
+use App\Http\Controllers\Admin\ShiftPatternAssignmentController;
 use App\Http\Controllers\Teacher\ScheduleExceptionController;
 
 // Test route for frontend testing
@@ -122,4 +123,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     // Shift Pattern Management
     Route::resource('shift-patterns', ShiftPatternController::class)
         ->only(['create', 'store', 'edit', 'update']);
+
+    // Shift Pattern Assignment
+    Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])
+        ->name('shift-pattern-assignments.create');
+    Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])
+        ->name('shift-pattern-assignments.store');
 });
