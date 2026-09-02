@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ShiftPatternController;
+use App\Http\Controllers\Admin\ShiftPatternAssignmentController;
 
 // Test route for frontend testing
 // Route::view('/frontend-test', 'teachers.show')->name('teacher.profile');
@@ -77,8 +78,6 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
         return view('teachers.dashboard');
     })->name('teacher.dashboard');
 
-Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
-    ->name('teacher.schedules.storeGrid');
 });
 
 // Admin Routes
@@ -117,4 +116,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     // Shift Pattern Management
     Route::resource('shift-patterns', ShiftPatternController::class)
         ->only(['create', 'store', 'edit', 'update']);
+
+    // Shift Pattern Assignment
+    Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])
+        ->name('shift-pattern-assignments.create');
+    Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])
+        ->name('shift-pattern-assignments.store');
 });

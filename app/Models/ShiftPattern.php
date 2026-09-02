@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ShiftPattern extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'pattern_code', 'pattern_name', 'start_time', 'end_time',
         'end_day_offset', 'slot_minutes', 'is_active',
@@ -38,7 +40,7 @@ class ShiftPattern extends Model
 
     public function rules(): HasMany
     {
-        return $this->hasMany(ShiftPatternRule::class, 'shift_pattern_id');
+        return $this->hasMany(ShiftPatternRelated::class, 'shift_pattern_id');
     }
 
     public function breaks(): HasMany
