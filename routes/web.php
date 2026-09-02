@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ShiftPatternController;
+use App\Http\Controllers\Teacher\ScheduleExceptionController;
 
 // Test route for frontend testing
 // Route::view('/frontend-test', 'teachers.show')->name('teacher.profile');
@@ -76,6 +77,10 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teachers/dashboard', function () {
         return view('teachers.dashboard');
     })->name('teacher.dashboard');
+
+    Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
+    Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
+    Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teacher.schedule-exceptions.destroy');
 
 Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
     ->name('teacher.schedules.storeGrid');

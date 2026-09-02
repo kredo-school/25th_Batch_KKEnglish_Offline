@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreScheduleExceptionRequest;
+use App\Http\Requests\Teacher\StoreScheduleExceptionRequest;
 use App\Models\ExceptionType;
 use App\Models\ScheduleException;
 use App\Models\TeacherSchedule;
