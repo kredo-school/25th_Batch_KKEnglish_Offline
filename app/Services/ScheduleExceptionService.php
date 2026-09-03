@@ -184,7 +184,10 @@ class ScheduleExceptionService
     ): void {
         $hasReservation = $schedule->reservations()
             ->whereHas('status', function ($query) {
-                $query->where('status_code', 'reserved');
+                $query->whereIn('status_code', [
+                    'pending',
+                    'confirmed'
+                ]);
             })
             ->where('start_at', '<', $endAt)
             ->where('end_at', '>', $startAt)
