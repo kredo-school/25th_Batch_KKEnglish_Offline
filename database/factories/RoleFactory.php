@@ -12,8 +12,8 @@ class RoleFactory extends Factory
     public function definition(): array
     {
         return [
-            'role_name' => fake()->unique()->word(),
-            'role_code' => strtoupper(fake()->unique()->lexify('???')), // 3文字ユニーク
+            'role_name' => 'student',
+            'role_code' => 'student',
         ];
     }
 

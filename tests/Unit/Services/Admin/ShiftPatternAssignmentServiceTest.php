@@ -9,6 +9,7 @@ use App\Services\Admin\GenerateTeacherSchedulesService;
 use App\Services\Admin\ShiftPatternAssignmentService;
 use DomainException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Mockery;
 use Tests\TestCase;
 
@@ -16,7 +17,7 @@ class ShiftPatternAssignmentServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function 重複時replace_falseで例外(): void
     {
         $teacher = Teacher::factory()->create();
@@ -46,7 +47,7 @@ class ShiftPatternAssignmentServiceTest extends TestCase
         ], 99);
     }
 
-    /** @test */
+    #[Test]
     public function 正常時は割当作成と生成件数集計(): void
     {
         $teacher = Teacher::factory()->create();

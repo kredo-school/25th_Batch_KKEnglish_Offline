@@ -15,6 +15,11 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
+        \Log::info('role-middleware', [
+    'required' => $roles ?? null,          // middleware引数
+    'actual_code' => auth()->user()?->role?->role_code,
+    'actual_name' => auth()->user()?->role?->role_name,
+]);
         if(!auth()->check()) {
             return redirect()->route('login');
         }
