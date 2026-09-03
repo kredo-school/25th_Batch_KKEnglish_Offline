@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ShiftPatternController;
 use App\Http\Controllers\Admin\ShiftPatternAssignmentController;
 use App\Http\Controllers\Teacher\ScheduleExceptionController;
+use App\Http\Controllers\Student\AvailabilityController;
 
 // Test route for frontend testing
 Route::view('/reservation-test', 'students.reservations.index')
@@ -55,6 +56,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
     Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
         ->name('student.lessons.cancel');
+// Teacher reservations/
+    Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
 });
 
 // Teacher/Admin 共通（Schedule編集）
