@@ -20,9 +20,10 @@ class ReservationService
         int $teacherId,
         int $scheduleId,
         string $lessonType,
-        int $usePoints
+        int $usePoints,
+        bool $isAutoAssigned = false,
     ): Reservation {
-        return DB::transaction(function () use ($studentId, $teacherId, $scheduleId, $lessonType, $usePoints) {
+        return DB::transaction(function () use ($studentId, $teacherId, $scheduleId, $lessonType, $usePoints, $isAutoAssigned) {
             /** @var TeacherSchedule $schedule */
             $schedule = TeacherSchedule::query()
                 ->where('schedule_id', $scheduleId)
@@ -61,6 +62,7 @@ class ReservationService
                 'end_at'       => $endUtc,
                 'used_points'  => $usePoints,
                 'status'       => 'reserved',
+                'is_auto_assigned'  => $isAutoAssigned,
             ]);
 
             $schedule->status = 'booked';

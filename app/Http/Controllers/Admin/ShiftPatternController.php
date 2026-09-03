@@ -12,6 +12,15 @@ use Illuminate\Http\Request;
 
 class ShiftPatternController extends Controller
 {
+    public function index()
+    {
+        $patterns = \App\Models\ShiftPattern::query()
+            ->latest('id')
+            ->paginate(20);
+
+        return view('admin.shift-patterns.index', compact('patterns'));
+    }
+
     public function create(): View
     {
         return view('admin.shift-patterns.create');

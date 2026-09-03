@@ -25,7 +25,7 @@
                 <option value="">Select</option>
                 @foreach($patterns as $p)
                     <option value="{{ $p->id }}" @selected(old('shift_pattern_id')==$p->id)>
-                        [{{ $p->pattern_code }}] {{ $p->pattern_name }}
+                        Pattern #{{ $p->id }}
                     </option>
                 @endforeach
             </select>
@@ -33,14 +33,16 @@
 
         <div class="mb-3">
             <label>Teacher(s) (multiple selection)</label>
-            <select name="teacher_ids[]" class="form-control" multiple size="12" required>
-                @foreach($teachers as $t)
-                    <option value="{{ $t->id }}" @selected(collect(old('teacher_ids', []))->contains($t->id))>
-                        {{ $t->id }} - {{ $t->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+            <select name="teacher_ids[]" class="form-select" multiple required size="10">
+        @foreach($teachers as $t)
+            <option value="{{ $t->id }}"
+                @selected(collect(old('teacher_ids', []))->contains($t->id))>
+                {{ trim(($t->user->first_name ?? '') . ' ' . ($t->user->last_name ?? '')) ?: ('Teacher #'.$t->id) }}
+            </option>
+        @endforeach
+    </select>
+    <small class="text-muted">Ctrl(⌘)+クリックで複数選択</small>
+</div>
 
         <div class="row">
             <div class="col-md-4 mb-3">
