@@ -19,12 +19,12 @@ class ShiftPatternAdminServiceTest extends TestCase
 {
     parent::setUp();
 
-    \Illuminate\Support\Facades\DB::listen(function ($query) {
-        if (str_contains($query->sql, 'insert into "roles"')) {
-            dump('ROLES INSERT SQL: '.$query->sql, $query->bindings);
-            dump((new \Exception('trace'))->getTraceAsString());
-        }
-    });
+    // \Illuminate\Support\Facades\DB::listen(function ($query) {
+    //     if (str_contains($query->sql, 'insert into "roles"')) {
+    //         dump('ROLES INSERT SQL: '.$query->sql, $query->bindings);
+    //         dump((new \Exception('trace'))->getTraceAsString());
+    //     }
+    // });
 
     $this->service = app(\App\Services\Admin\ShiftPatternAdminService::class);
 }
