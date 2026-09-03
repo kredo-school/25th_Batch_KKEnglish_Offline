@@ -29,15 +29,58 @@
 
     </div>
 
+
     @php
 
         use Carbon\Carbon;
 
-        // 今週の月曜日
-        $startOfWeek =
-            now()->startOfWeek(Carbon::MONDAY);
+        /*
+        |--------------------------------------------------------------------------
+        | 表示する週
+        |--------------------------------------------------------------------------
+        |
+        | URLに week_start がある
+        | → 指定された週を表示
+        |
+        | ない
+        | → 今週を表示
+        |
+        */
 
-        // 月曜日〜日曜日
+        $startOfWeek =
+            request('week_start')
+                ? Carbon::parse(
+                    request('week_start')
+                )->startOfWeek(Carbon::MONDAY)
+                : now()->startOfWeek(Carbon::MONDAY);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 前週・翌週
+        |--------------------------------------------------------------------------
+        */
+
+        $previousWeek =
+            $startOfWeek
+                ->copy()
+                ->subWeek()
+                ->format('Y-m-d');
+
+
+        $nextWeek =
+            $startOfWeek
+                ->copy()
+                ->addWeek()
+                ->format('Y-m-d');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 月曜日〜日曜日
+        |--------------------------------------------------------------------------
+        */
+
         $days = collect(range(0, 6))
             ->map(
                 fn ($i) =>
@@ -47,7 +90,13 @@
             );
 
 
-        // 06:00〜22:00を30分単位で作成
+        /*
+        |--------------------------------------------------------------------------
+        | 06:00〜22:00
+        | 30分単位
+        |--------------------------------------------------------------------------
+        */
+
         $times = collect();
 
         $time =
@@ -71,19 +120,55 @@
 
 
     {{-- ===============================
-         Week
+         Week Navigation
     ================================ --}}
-    <div class="text-center mb-3">
+    <div class="
+        d-flex
+        justify-content-between
+        align-items-center
+        mb-3
+    ">
 
-        <h5 class="fw-bold">
+        {{-- Previous Week --}}
+        <a
+            href="{{ url()->current() }}?week_start={{ $previousWeek }}"
+            class="btn btn-outline-secondary btn-sm"
+        >
 
-            {{ $days->first()->format('M d') }}
+            <i class="fa-solid fa-chevron-left me-1"></i>
 
-            -
+            Previous Week
 
-            {{ $days->last()->format('M d, Y') }}
+        </a>
 
-        </h5>
+
+        {{-- Week Range --}}
+        <div class="text-center">
+
+            <h5 class="fw-bold mb-0">
+
+                {{ $days->first()->format('M d') }}
+
+                -
+
+                {{ $days->last()->format('M d, Y') }}
+
+            </h5>
+
+        </div>
+
+
+        {{-- Next Week --}}
+        <a
+            href="{{ url()->current() }}?week_start={{ $nextWeek }}"
+            class="btn btn-outline-secondary btn-sm"
+        >
+
+            Next Week
+
+            <i class="fa-solid fa-chevron-right ms-1"></i>
+
+        </a>
 
     </div>
 
@@ -171,7 +256,9 @@
 
                             <td
                                 class="schedule-cell bg-light"
+
                                 data-date="{{ $day->format('Y-m-d') }}"
+
                                 data-time="{{ $time }}"
 
                                 {{-- 勤務時間内か --}}
@@ -186,8 +273,11 @@
                                 {{-- 編集開始時の状態 --}}
                                 data-original-unavailable="false"
 
-                                style="height: 45px;
-                                       cursor: default;">
+                                style="
+                                    height: 45px;
+                                    cursor: default;
+                                "
+                            >
                             </td>
 
                         @endforeach
@@ -207,7 +297,13 @@
          Edit Actions
     ================================ --}}
     <div id="editActions"
-         class="d-none justify-content-end align-items-center gap-2 mt-3">
+         class="
+            d-none
+            justify-content-end
+            align-items-center
+            gap-2
+            mt-3
+         ">
 
 
         {{-- 休み理由 --}}
@@ -262,28 +358,52 @@ document.addEventListener(
          */
 
         const editBtn =
-            document.getElementById('editBtn');
+            document.getElementById(
+                'editBtn'
+            );
+
 
         const cancelBtn =
-            document.getElementById('cancelBtn');
+            document.getElementById(
+                'cancelBtn'
+            );
+
 
         const saveBtn =
-            document.getElementById('saveBtn');
+            document.getElementById(
+                'saveBtn'
+            );
+
 
         const editActions =
-            document.getElementById('editActions');
+            document.getElementById(
+                'editActions'
+            );
+
 
         const editMessage =
-            document.getElementById('editMessage');
+            document.getElementById(
+                'editMessage'
+            );
+
 
         const errorMessage =
-            document.getElementById('errorMessage');
+            document.getElementById(
+                'errorMessage'
+            );
+
 
         const successMessage =
-            document.getElementById('successMessage');
+            document.getElementById(
+                'successMessage'
+            );
+
 
         const exceptionType =
-            document.getElementById('exceptionType');
+            document.getElementById(
+                'exceptionType'
+            );
+
 
         const cells =
             document.querySelectorAll(
@@ -292,26 +412,48 @@ document.addEventListener(
 
 
         /*
-         * CSRF Token
+         * ===============================
+         * 表示中の週
+         * ===============================
+         *
+         * Bladeで作った
+         * $startOfWeek をJSでも使用
+         *
          */
+
+        const currentWeekStart =
+            '{{ $startOfWeek->format('Y-m-d') }}';
+
+
+
+        /*
+         * ===============================
+         * CSRF Token
+         * ===============================
+         */
+
         const token =
             document
                 .querySelector(
                     'meta[name="csrf-token"]'
                 )
-                .getAttribute('content');
+                .getAttribute(
+                    'content'
+                );
 
 
         /*
          * 閲覧 / 編集モード
          */
-        let editing = false;
+        let editing =
+            false;
 
 
         /*
          * Cancel用
          */
-        let originalSchedule = [];
+        let originalSchedule =
+            [];
 
 
         /*
@@ -321,6 +463,7 @@ document.addEventListener(
          */
 
         loadSchedule();
+
 
 
         /*
@@ -334,6 +477,8 @@ document.addEventListener(
          * ExceptionType
          *
          * を取得
+         *
+         * 表示中のweek_startも送る
          * ===============================
          */
 
@@ -341,15 +486,22 @@ document.addEventListener(
 
             hideMessages();
 
+
             try {
 
                 const response =
                     await fetch(
-                        '/teachers/schedule-exceptions',
+                        '/teachers/schedule-exceptions'
+                        + '?week_start='
+                        + encodeURIComponent(
+                            currentWeekStart
+                        ),
                         {
                             headers: {
+
                                 'Accept':
                                     'application/json'
+
                             }
                         }
                     );
@@ -374,20 +526,26 @@ document.addEventListener(
                 /*
                  * 確定勤務を表示
                  */
-                applySchedules(data);
+                applySchedules(
+                    data
+                );
 
 
                 /*
                  * 休み理由をselectへ
                  */
                 applyExceptionTypes(
-                    data.exception_types ?? []
+                    data.exception_types
+                    ?? []
                 );
 
 
             } catch (error) {
 
-                console.error(error);
+                console.error(
+                    error
+                );
+
 
                 showError(
                     'Failed to load schedule.'
@@ -398,46 +556,58 @@ document.addEventListener(
         }
 
 
+
         /*
          * ===============================
          * TeacherScheduleを画面へ反映
          * ===============================
          */
 
-        function applySchedules(data) {
+        function applySchedules(
+            data
+        ) {
 
             /*
              * 最初に全部勤務外にする
              */
-            cells.forEach(function (cell) {
+            cells.forEach(
+                function (cell) {
 
-                cell.dataset.working =
-                    'false';
+                    cell.dataset.working =
+                        'false';
 
-                cell.dataset.scheduleId =
-                    '';
 
-                cell.dataset.exceptionId =
-                    '';
+                    cell.dataset.scheduleId =
+                        '';
 
-                cell.dataset.originalUnavailable =
-                    'false';
 
-                cell.classList.add(
-                    'bg-light'
-                );
+                    cell.dataset.exceptionId =
+                        '';
 
-                cell.classList.remove(
-                    'table-secondary'
-                );
 
-                cell.textContent =
-                    '';
+                    cell.dataset.originalUnavailable =
+                        'false';
 
-                cell.style.cursor =
-                    'default';
 
-            });
+                    cell.classList.add(
+                        'bg-light'
+                    );
+
+
+                    cell.classList.remove(
+                        'table-secondary'
+                    );
+
+
+                    cell.textContent =
+                        '';
+
+
+                    cell.style.cursor =
+                        'default';
+
+                }
+            );
 
 
             /*
@@ -447,17 +617,26 @@ document.addEventListener(
                 function (schedule) {
 
                     const date =
-                        schedule.available_date;
+                        schedule
+                            .available_date;
 
 
                     const startTime =
-                        schedule.start_time
-                            .substring(0, 5);
+                        schedule
+                            .start_time
+                            .substring(
+                                0,
+                                5
+                            );
 
 
                     const endTime =
-                        schedule.end_time
-                            .substring(0, 5);
+                        schedule
+                            .end_time
+                            .substring(
+                                0,
+                                5
+                            );
 
 
                     cells.forEach(
@@ -483,7 +662,8 @@ document.addEventListener(
                             /*
                              * 勤務時間内
                              *
-                             * 例
+                             * 例:
+                             *
                              * 06:00〜12:00
                              *
                              * 06:00 ○
@@ -505,7 +685,8 @@ document.addEventListener(
                                  * APIの主キー名に合わせる
                                  */
                                 cell.dataset.scheduleId =
-                                    schedule.schedule_id;
+                                    schedule
+                                        .schedule_id;
 
 
                                 cell.classList.remove(
@@ -532,6 +713,7 @@ document.addEventListener(
         }
 
 
+
         /*
          * ===============================
          * Existing Exceptions
@@ -543,13 +725,18 @@ document.addEventListener(
             date
         ) {
 
-            if (!schedule.exceptions) {
+            if (
+                !schedule.exceptions
+            ) {
+
                 return;
+
             }
 
 
             schedule.exceptions.forEach(
                 function (exception) {
+
 
                     /*
                      * cancelledは表示しない
@@ -576,24 +763,31 @@ document.addEventListener(
                      * 07:00
                      */
                     const startAt =
-                        exception.start_at;
+                        exception
+                            .start_at;
 
 
                     const time =
                         startAt
-                            .substring(11, 16);
+                            .substring(
+                                11,
+                                16
+                            );
 
 
                     const cell =
-                        document.querySelector(
-                            '.schedule-cell'
-                            + `[data-date="${date}"]`
-                            + `[data-time="${time}"]`
-                        );
+                        document
+                            .querySelector(
+                                '.schedule-cell'
+                                + `[data-date="${date}"]`
+                                + `[data-time="${time}"]`
+                            );
 
 
                     if (!cell) {
+
                         return;
+
                     }
 
 
@@ -601,13 +795,15 @@ document.addEventListener(
                         'table-secondary'
                     );
 
+
                     cell.textContent =
                         'Unavailable';
 
 
                     cell.dataset.exceptionId =
                         exception.id
-                        ?? exception
+                        ??
+                        exception
                             .schedule_exception_id;
 
 
@@ -620,18 +816,10 @@ document.addEventListener(
         }
 
 
+
         /*
          * ===============================
          * Exception Types
-         *
-         * Seeder
-         *
-         * 私用
-         * 通院
-         * 研修
-         * 緊急休暇
-         *
-         * をselectへ表示
          * ===============================
          */
 
@@ -655,21 +843,25 @@ document.addEventListener(
 
 
                     option.value =
-                        type.exception_type_id;
+                        type
+                            .exception_type_id;
 
 
                     option.textContent =
-                        type.type_name;
+                        type
+                            .type_name;
 
 
-                    exceptionType.appendChild(
-                        option
-                    );
+                    exceptionType
+                        .appendChild(
+                            option
+                        );
 
                 }
             );
 
         }
+
 
 
         /*
@@ -700,6 +892,7 @@ document.addEventListener(
                     function (cell) {
 
                         originalSchedule.push({
+
                             cell:
                                 cell,
 
@@ -716,6 +909,7 @@ document.addEventListener(
                             originalUnavailable:
                                 cell.dataset
                                     .originalUnavailable
+
                         });
 
                     }
@@ -727,19 +921,22 @@ document.addEventListener(
                 );
 
 
-                editActions.classList
+                editActions
+                    .classList
                     .remove(
                         'd-none'
                     );
 
 
-                editActions.classList
+                editActions
+                    .classList
                     .add(
                         'd-flex'
                     );
 
 
-                editMessage.classList
+                editMessage
+                    .classList
                     .remove(
                         'd-none'
                     );
@@ -753,7 +950,8 @@ document.addEventListener(
                     function (cell) {
 
                         if (
-                            cell.dataset.working
+                            cell.dataset
+                                .working
                             === 'true'
                         ) {
 
@@ -769,6 +967,7 @@ document.addEventListener(
         );
 
 
+
         /*
          * ===============================
          * Cell Click
@@ -782,11 +981,14 @@ document.addEventListener(
                     'click',
                     function () {
 
+
                         /*
                          * 閲覧モード
                          */
                         if (!editing) {
+
                             return;
+
                         }
 
 
@@ -794,7 +996,8 @@ document.addEventListener(
                          * 勤務時間外
                          */
                         if (
-                            cell.dataset.working
+                            cell.dataset
+                                .working
                             !== 'true'
                         ) {
 
@@ -814,7 +1017,8 @@ document.addEventListener(
 
 
                         if (
-                            cell.classList
+                            cell
+                                .classList
                                 .contains(
                                     'table-secondary'
                                 )
@@ -835,6 +1039,7 @@ document.addEventListener(
 
             }
         );
+
 
 
         /*
@@ -858,13 +1063,11 @@ document.addEventListener(
                             item.text;
 
 
-                        item.cell.dataset
-                            .exceptionId =
+                        item.cell.dataset.exceptionId =
                             item.exceptionId;
 
 
-                        item.cell.dataset
-                            .originalUnavailable =
+                        item.cell.dataset.originalUnavailable =
                             item.originalUnavailable;
 
                     }
@@ -875,6 +1078,7 @@ document.addEventListener(
 
             }
         );
+
 
 
         /*
@@ -903,6 +1107,7 @@ document.addEventListener(
                 const createCells =
                     [];
 
+
                 const cancelCells =
                     [];
 
@@ -913,11 +1118,12 @@ document.addEventListener(
                         const wasUnavailable =
                             cell.dataset
                                 .originalUnavailable
-                                === 'true';
+                            === 'true';
 
 
                         const isUnavailable =
-                            cell.classList
+                            cell
+                                .classList
                                 .contains(
                                     'table-secondary'
                                 );
@@ -1057,12 +1263,16 @@ document.addEventListener(
 
                 } catch (error) {
 
-                    console.error(error);
+                    console.error(
+                        error
+                    );
+
 
                     showError(
                         error.message
                         ?? 'Failed to save schedule.'
                     );
+
 
                 } finally {
 
@@ -1073,6 +1283,7 @@ document.addEventListener(
 
             }
         );
+
 
 
         /*
@@ -1108,7 +1319,8 @@ document.addEventListener(
             const end =
                 new Date(
                     start.getTime()
-                    + 30 * 60 * 1000
+                    +
+                    30 * 60 * 1000
                 );
 
 
@@ -1151,6 +1363,7 @@ document.addEventListener(
 
                             'X-CSRF-TOKEN':
                                 token
+
                         },
 
                         body:
@@ -1158,7 +1371,8 @@ document.addEventListener(
 
                                 schedule_id:
                                     Number(
-                                        cell.dataset
+                                        cell
+                                            .dataset
                                             .scheduleId
                                     ),
 
@@ -1174,6 +1388,7 @@ document.addEventListener(
                                     `${date} ${endTime}`
 
                             })
+
                     }
                 );
 
@@ -1198,10 +1413,12 @@ document.addEventListener(
              */
             cell.dataset.exceptionId =
                 result.exception.id
-                ?? result.exception
+                ??
+                result.exception
                     .schedule_exception_id;
 
         }
+
 
 
         /*
@@ -1222,7 +1439,9 @@ document.addEventListener(
 
 
             if (!exceptionId) {
+
                 return;
+
             }
 
 
@@ -1244,6 +1463,7 @@ document.addEventListener(
                                 token
 
                         }
+
                     }
                 );
 
@@ -1268,6 +1488,7 @@ document.addEventListener(
         }
 
 
+
         /*
          * ===============================
          * Finish Editing
@@ -1285,19 +1506,25 @@ document.addEventListener(
             );
 
 
-            editActions.classList.add(
-                'd-none'
-            );
+            editActions
+                .classList
+                .add(
+                    'd-none'
+                );
 
 
-            editActions.classList.remove(
-                'd-flex'
-            );
+            editActions
+                .classList
+                .remove(
+                    'd-flex'
+                );
 
 
-            editMessage.classList.add(
-                'd-none'
-            );
+            editMessage
+                .classList
+                .add(
+                    'd-none'
+                );
 
 
             exceptionType.value =
@@ -1316,6 +1543,7 @@ document.addEventListener(
         }
 
 
+
         /*
          * ===============================
          * Messages
@@ -1324,13 +1552,18 @@ document.addEventListener(
 
         function hideMessages() {
 
-            errorMessage.classList.add(
-                'd-none'
-            );
+            errorMessage
+                .classList
+                .add(
+                    'd-none'
+                );
 
-            successMessage.classList.add(
-                'd-none'
-            );
+
+            successMessage
+                .classList
+                .add(
+                    'd-none'
+                );
 
         }
 
@@ -1342,9 +1575,12 @@ document.addEventListener(
             errorMessage.textContent =
                 message;
 
-            errorMessage.classList.remove(
-                'd-none'
-            );
+
+            errorMessage
+                .classList
+                .remove(
+                    'd-none'
+                );
 
         }
 
@@ -1356,9 +1592,12 @@ document.addEventListener(
             successMessage.textContent =
                 message;
 
-            successMessage.classList.remove(
-                'd-none'
-            );
+
+            successMessage
+                .classList
+                .remove(
+                    'd-none'
+                );
 
         }
 

@@ -23,6 +23,8 @@ Route::view('/reservation-confirm-test','students.reservations.confirm')
 ->name('reservation.confirm.test');
 Route::view('/reservation-teacher-detail-test','students.reservations.teacher-detail')
 ->name('reservations.teacher-detail.test');
+Route::view('/student-history-test','students.history.index')
+->name('student.history.test');
 
 
 // Public routes
