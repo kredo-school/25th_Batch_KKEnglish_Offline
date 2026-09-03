@@ -35,75 +35,48 @@
 
                         <table class="table table-bordered text-center align-middle mb-0">
 
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>月</th>
-                                    <th>火</th>
-                                    <th>水</th>
-                                    <th>木</th>
-                                    <th>金</th>
-                                    <th>土</th>
-                                    <th>日</th>
-                                </tr>
-                            </thead>
+                            {{-- 週ヘッダ --}}
+<tr>
+    <th></th>
+    @foreach($dashboardRows as $row)
+        <th>{{ $row['day_ja'] }}</th>
+    @endforeach
+</tr>
 
-                            <tbody>
-                                <tr>
-                                    <th class="text-start">日付</th>
-                                    <td>8/10</td>
-                                    <td>8/11</td>
-                                    <td>8/12</td>
-                                    <td>8/13</td>
-                                    <td>8/14</td>
-                                    <td>8/15</td>
-                                    <td>8/16</td>
-                                </tr>
+<tr>
+    <th class="text-start">日付</th>
+    @foreach($dashboardRows as $row)
+        <td>{{ $row['label'] }}</td>
+    @endforeach
+</tr>
 
-                                <tr>
-                                    <th class="text-start">全レッスン可能数</th>
-                                    <td>20</td>
-                                    <td>20</td>
-                                    <td>18</td>
-                                    <td>22</td>
-                                    <td>20</td>
-                                    <td>10</td>
-                                    <td>8</td>
-                                </tr>
+<tr>
+    <th class="text-start">全レッスン可能数</th>
+    @foreach($dashboardRows as $row)
+        <td>{{ $row['capacity'] }}</td>
+    @endforeach
+</tr>
 
-                                <tr>
-                                    <th class="text-start">予約数</th>
-                                    <td>12</td>
-                                    <td>15</td>
-                                    <td>11</td>
-                                    <td>14</td>
-                                    <td>16</td>
-                                    <td>7</td>
-                                    <td>5</td>
-                                </tr>
+<tr>
+    <th class="text-start">予約数</th>
+    @foreach($dashboardRows as $row)
+        <td>{{ $row['booked'] }}</td>
+    @endforeach
+</tr>
 
-                                <tr>
-                                    <th class="text-start">自動予約生徒数</th>
-                                    <td>3</td>
-                                    <td>4</td>
-                                    <td>2</td>
-                                    <td>3</td>
-                                    <td>5</td>
-                                    <td>2</td>
-                                    <td>1</td>
-                                </tr>
+<tr>
+    <th class="text-start">自動予約生徒数</th>
+    @foreach($dashboardRows as $row)
+        <td>{{ $row['auto_booked'] }}</td>
+    @endforeach
+</tr>
 
-                                <tr>
-                                    <th class="text-start">先生の出勤数</th>
-                                    <td>5</td>
-                                    <td>5</td>
-                                    <td>4</td>
-                                    <td>5</td>
-                                    <td>5</td>
-                                    <td>3</td>
-                                    <td>2</td>
-                                </tr>
-                            </tbody>
+<tr>
+    <th class="text-start">先生の出勤数</th>
+    @foreach($dashboardRows as $row)
+        <td>{{ $row['working_teachers'] }}</td>
+    @endforeach
+</tr>
 
                         </table>
 
@@ -118,7 +91,18 @@
                     <h5 class="mb-3">
                         お知らせ
                     </h5>
-
+@if($announcements->isEmpty())
+    <p class="text-secondary mb-0">お知らせはありません。</p>
+@else
+    <ul class="list-group list-group-flush">
+        @foreach($announcements as $item)
+            <li class="list-group-item px-0">
+                <div class="fw-semibold">{{ $item->title }}</div>
+                <div class="small text-secondary">{{ \Illuminate\Support\Str::limit($item->body, 120) }}</div>
+            </li>
+        @endforeach
+    </ul>
+@endif
                 </div>
             </div>
 

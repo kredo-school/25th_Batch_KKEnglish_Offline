@@ -94,6 +94,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
         return view('admin.dashboard');
     })->name('dashboard');
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('admin.dashboard');
+
     // Material 編集
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
     Route::get('/materials/create', [AdminMaterialController::class, 'create'])->name('materials.create');
@@ -122,7 +125,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
 
     // Shift Pattern Management
     Route::resource('shift-patterns', ShiftPatternController::class)
-        ->only(['create', 'store', 'edit', 'update']);
+        ->only(['index', 'create', 'store', 'edit', 'update']);
 
     // Shift Pattern Assignment
     Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])

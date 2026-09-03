@@ -26,7 +26,9 @@
         $barClass = 'bg-dark';
         $textClass = 'text-white';
         $accountLabel = 'Admin';
-        $homeHref = route('admin.dashboard');
+        $homeHref = \Illuminate\Support\Facades\Route::has('admin.dashboard')
+        ? route('admin.dashboard')
+        : url('/admins/dashboard');
 
     } else {
 
