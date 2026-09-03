@@ -5,26 +5,7 @@
     </h5>
 
 
-    {{-- Date --}}
-    <div class="mb-4">
-
-        <label for="reservationDate"
-               class="form-label fw-bold">
-            Date
-            <span class="text-danger">*</span>
-        </label>
-
-        <input
-            type="date"
-            id="reservationDate"
-            name="reservation_date"
-            class="form-control w-100"
-        >
-
-    </div>
-
-
-    {{-- Material --}}
+        {{-- Material --}}
     <div class="mb-4">
 
         <label for="reservationMaterial"
@@ -64,6 +45,25 @@
 
     </div>
 
+    {{-- Date --}}
+    <div class="mb-4">
+
+        <label for="reservationDate"
+               class="form-label fw-bold">
+            Date
+        </label>
+
+        <input
+            type="date"
+            id="reservationDate"
+            name="reservation_date"
+            class="form-control w-100">
+
+    </div>
+
+
+
+
 
     {{-- Time --}}
     <div class="mb-4">
@@ -71,10 +71,6 @@
         <label class="form-label fw-bold">
             Time
         </label>
-
-        <p class="text-secondary small mb-2">
-            Select a time to narrow down available teachers.
-        </p>
 
         <div class="row g-2">
 
