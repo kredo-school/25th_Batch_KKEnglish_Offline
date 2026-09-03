@@ -33,7 +33,7 @@ $this->actingAs($user);
             ->actingAs($teacher->user)
             ->getJson(route('teachers.schedule-exceptions.index'));
 
-        $response->dump();
+        // $response->dump();
 
         $response->assertOk();
 
