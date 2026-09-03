@@ -16,8 +16,6 @@ use App\Http\Controllers\Admin\ShiftPatternController;
 use App\Http\Controllers\Teacher\ScheduleExceptionController;
 
 // Test route for frontend testing
-// Route::view('/frontend-test', 'teachers.show')->name('teacher.profile');
-Route::view('/teachers-test', 'teachers.schedule')->name('teachers.schedule');
 Route::view('/reservation-test', 'students.reservations.index')
 ->name('reservation.test');
 Route::view('/reservation-confirm-test','students.reservations.confirm')
@@ -77,6 +75,9 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teachers/dashboard', function () {
         return view('teachers.dashboard');
     })->name('teacher.dashboard');
+
+     // My Schedule 画面
+    Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
 
     Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
     Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
