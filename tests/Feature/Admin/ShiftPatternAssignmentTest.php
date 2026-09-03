@@ -2,51 +2,48 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Role;
 use App\Models\ShiftPattern;
 use App\Models\ShiftPatternBreak;
 use App\Models\ShiftPatternRelated;
 use App\Models\Teacher;
 use App\Models\TeacherSchedule;
 use App\Models\TeacherShiftAssignment;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ShiftPatternAssignmentTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    protected function setUp(): void
+{
+    parent::setUp();
+    $this->withoutMiddleware(\App\Http\Middleware\RoleMiddleware::class);
+}
+
+    #[Test]
     public function 重複割当でreplace_overlapping_falseなら失敗する(): void
     {
-        $adminRoleId = \DB::table('roles')->insertGetId([
-    'role_name' => 'admin',
-    'role_code' => 'admin',
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
-
-$studentRoleId = \DB::table('roles')->insertGetId([
-    'role_name' => 'student',
-    'role_code' => 'student',
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
-
-        $adminRole = Role::query()->firstOrCreate(
-    ['role_code' => 'admin'],
+        $adminRole = \App\Models\Role::firstOrCreate(
+    ['role_code' => 'admin'], // ← RoleMiddlewareの期待値に合わせる
     ['role_name' => 'admin']
 );
 
-$studentRole = Role::query()->firstOrCreate(
-    ['role_code' => 'student'],
-    ['role_name' => 'student']
-);
 
-$admin = User::factory()->for($adminRole, 'role')->create();
-$teacherUser = User::factory()->for($studentRole, 'role')->create();
-$teacher = Teacher::factory()->create(['user_id' => $teacherUser->id]);
+        $studentRole = Role::query()->firstOrCreate(
+            ['role_code' => 'student'],
+            ['role_name' => 'student']
+        );
+
+        $admin = \App\Models\User::factory()->create([
+    'role_id' => $adminRole->id,
+]);
+        $this->actingAs($admin);
+$teacherUser = \App\Models\User::factory()->student()->create();
+$teacher = \App\Models\Teacher::factory()->create(['user_id' => $teacherUser->id]);
 
         $patternA = ShiftPattern::factory()->create(['is_active' => true]);
         $patternB = ShiftPattern::factory()->create(['is_active' => true]);
@@ -74,36 +71,26 @@ $teacher = Teacher::factory()->create(['user_id' => $teacherUser->id]);
         $this->assertDatabaseCount('teacher_shift_assignments', 1);
     }
 
-    /** @test */
+    #[Test]
     public function 正常割当でスロットが生成される(): void
     {
-        $adminRoleId = \DB::table('roles')->insertGetId([
-    'role_name' => 'admin',
-    'role_code' => 'admin',
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
-
-$studentRoleId = \DB::table('roles')->insertGetId([
-    'role_name' => 'student',
-    'role_code' => 'student',
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
-
-        $adminRole = Role::query()->firstOrCreate(
-    ['role_code' => 'admin'],
+        $adminRole = \App\Models\Role::firstOrCreate(
+    ['role_code' => 'admin'], // ← RoleMiddlewareの期待値に合わせる
     ['role_name' => 'admin']
 );
 
-$studentRole = Role::query()->firstOrCreate(
-    ['role_code' => 'student'],
-    ['role_name' => 'student']
-);
 
-$admin = User::factory()->for($adminRole, 'role')->create();
-$teacherUser = User::factory()->for($studentRole, 'role')->create();
-$teacher = Teacher::factory()->create(['user_id' => $teacherUser->id]);
+        $studentRole = Role::query()->firstOrCreate(
+            ['role_code' => 'student'],
+            ['role_name' => 'student']
+        );
+
+        $admin = \App\Models\User::factory()->create([
+    'role_id' => $adminRole->id,
+]);
+        $this->actingAs($admin);
+$teacherUser = \App\Models\User::factory()->student()->create();
+$teacher = \App\Models\Teacher::factory()->create(['user_id' => $teacherUser->id]);
 
         $pattern = ShiftPattern::factory()->create([
             'is_active' => true,
@@ -138,37 +125,26 @@ $teacher = Teacher::factory()->create(['user_id' => $teacherUser->id]);
         $this->assertSame(2, TeacherSchedule::query()->where('teacher_id', $teacher->id)->count());
     }
 
-    /** @test */
+    #[Test]
     public function break時間帯のスロットは生成されない(): void
     {
-        $adminRoleId = \DB::table('roles')->insertGetId([
-    'role_name' => 'admin',
-    'role_code' => 'admin',
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
-
-$studentRoleId = \DB::table('roles')->insertGetId([
-    'role_name' => 'student',
-    'role_code' => 'student',
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
-
-        $adminRole = Role::firstOrCreate(
-    ['role_code' => 'admin'],
+        $adminRole = \App\Models\Role::firstOrCreate(
+    ['role_code' => 'admin'], // ← RoleMiddlewareの期待値に合わせる
     ['role_name' => 'admin']
 );
 
-$studentRole = Role::query()->firstOrCreate(
-    ['role_code' => 'student'],
-    ['role_name' => 'student']
-);
 
-$admin = User::factory()->for($adminRole, 'role')->create();
-$teacherUser = User::factory()->for($studentRole, 'role')->create();
-$teacher = Teacher::factory()->create(['user_id' => $teacherUser->id]);
+        $studentRole = Role::query()->firstOrCreate(
+            ['role_code' => 'student'],
+            ['role_name' => 'student']
+        );
 
+        $admin = \App\Models\User::factory()->create([
+    'role_id' => $adminRole->id,
+]);
+        $this->actingAs($admin);
+$teacherUser = \App\Models\User::factory()->student()->create();
+$teacher = \App\Models\Teacher::factory()->create(['user_id' => $teacherUser->id]);
         $pattern = ShiftPattern::factory()->create([
             'is_active' => true,
             'slot_minutes' => 30,

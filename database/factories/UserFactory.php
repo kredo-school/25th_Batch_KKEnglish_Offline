@@ -13,12 +13,20 @@ class UserFactory extends Factory
 
     private function roleIdByCode(string $code): int
     {
+        $code = strtoupper($code);
+
         $id = Role::query()->where('role_code', $code)->value('id');
-        if ($id) return (int) $id;
+        if ($id) {
+            return (int) $id;
+        }
 
         return (int) Role::query()->create([
-            'role_name' => strtolower($code) === 'adm' ? 'admin' : (strtolower($code) === 'tea' ? 'teacher' : 'student'),
-            'role_code' => strtoupper($code),
+            'role_name' => match ($code) {
+                'ADM' => 'admin',
+                'TEA' => 'teacher',
+                default => 'student',
+            },
+            'role_code' => $code,
         ])->id;
     }
 
@@ -43,7 +51,21 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn () => [
-            'role_id' => 1, // 暫定（テストで上書き前提）
+            'role_id' => $this->roleIdByCode('ADM'),
+        ]);
+    }
+
+    public function teacher(): static
+    {
+        return $this->state(fn () => [
+            'role_id' => $this->roleIdByCode('TEA'),
+        ]);
+    }
+
+    public function student(): static
+    {
+        return $this->state(fn () => [
+            'role_id' => $this->roleIdByCode('STU'),
         ]);
     }
 }
