@@ -21,8 +21,14 @@ class Material extends Model
         'status',
     ];
     public function reservations(): HasMany
-{
-    return $this->hasMany(Reservation::class, 'material_id', 'material_id');
-}
+    {
+        return $this->hasMany(Reservation::class, 'material_id', 'material_id');
+    }
+
+public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'teacher_materials')
+            ->withTimestamps();
+    }
 
 }
