@@ -5,15 +5,23 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $start = now()->startOfWeek(Carbon::MONDAY)->startOfDay();
-        $end   = (clone $start)->addDays(6)->endOfDay();
+        $validated = $request->validate([
+            'week_start' => ['nullable', 'date_format:Y-m-d'],
+        ]);
+
+        $start = !empty($validated['week_start'])
+            ? Carbon::createFromFormat('Y-m-d', $validated['week_start'])->startOfWeek(Carbon::MONDAY)->startOfDay()
+            : now()->startOfWeek(Carbon::MONDAY)->startOfDay();
+
+        $end = (clone $start)->addDays(6)->endOfDay();
 
         $jpDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -31,20 +39,13 @@ class DashboardController extends Controller
             ->pluck('c', 'd');
 
         $bookedByDate = DB::table('reservations')
-    ->selectRaw('DATE(start_at) as d, COUNT(*) as c')
-    ->whereBetween('start_at', [$start, $end])
-    ->groupBy('d')
-    ->pluck('c', 'd');
+            ->selectRaw('DATE(start_at) as d, COUNT(*) as c')
+            ->whereBetween('start_at', [$start, $end])
+            ->groupBy('d')
+            ->pluck('c', 'd');
 
-// 自動予約フラグ列が reservations に無いため暫定 0 扱い
-$autoBookedByDate = collect();
-
-        // $autoBookedByDate = DB::table('reservations')
-        //     ->selectRaw('DATE(start_at) as d, COUNT(*) as c')
-        //     ->where('is_auto_assigned', 1)
-        //     ->whereBetween('start_at', [$start, $end])
-        //     ->groupBy('d')
-        //     ->pluck('c', 'd');
+        // 自動予約フラグ列が reservations に無いため暫定 0 扱い
+        $autoBookedByDate = collect();
 
         $workingTeachersByDate = DB::table('teacher_schedules')
             ->selectRaw('DATE(start_time) as d, COUNT(DISTINCT teacher_id) as c')
@@ -73,6 +74,9 @@ $autoBookedByDate = collect();
         }
 
         return view('admin.dashboard', [
+            'weekStart'     => $start->toDateString(),
+            'weekNo'        => $start->isoWeek(),   // 例: 36
+            'weekYear'      => $start->isoWeekYear(), // 年またぎ対策
             'dashboardRows' => $rows,
             'announcements' => $announcements,
         ]);

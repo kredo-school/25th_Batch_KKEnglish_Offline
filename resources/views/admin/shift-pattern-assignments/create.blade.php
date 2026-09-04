@@ -46,12 +46,12 @@
 
         <div class="row">
             <div class="col-md-4 mb-3">
-                <label>Effective From</label>
-                <input type="date" name="effective_from" class="form-control" value="{{ old('effective_from') }}" required>
+                <label>Start Date</label>
+                <input type="date" name="start_date" class="form-control" value="{{ old('start_date') }}" required>
             </div>
             <div class="col-md-4 mb-3">
-                <label>Effective To (optional)</label>
-                <input type="date" name="effective_to" class="form-control" value="{{ old('effective_to') }}">
+                <label>End Date (optional)</label>
+                <input type="date" name="end_date" class="form-control" value="{{ old('end_date') }}">
             </div>
             <div class="col-md-4 mb-3">
                 <label>Priority</label>
