@@ -18,7 +18,6 @@
         </div>
     @endif
 
-    {{-- route未確定なら一旦URL直指定でも可 --}}
     <form method="POST" action="{{ route('admin.shift-patterns.store') }}">
         @csrf
 
@@ -65,114 +64,70 @@
         </div>
 
         <hr>
-        <h3>Weekly Rules</h3>
-        <p class="text-muted">※対面(in_person/both)を含む行は開始時刻を xx:00 にしてください。</p>
-        <table class="table" id="rules-table">
-            <thead>
-            <tr>
-                <th>Weekday (0=Sun...6=Sat)</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Type</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            @php $oldRules = old('rules', [['weekday'=>1,'start_time'=>'09:00','end_time'=>'18:00','lesson_type'=>'both']]); @endphp
-            @foreach($oldRules as $i => $r)
-                <tr>
-                    <td><input type="number" name="rules[{{ $i }}][weekday]" min="0" max="6" class="form-control" value="{{ $r['weekday'] ?? '' }}" required></td>
-                    <td><input type="time" name="rules[{{ $i }}][start_time]" class="form-control" value="{{ $r['start_time'] ?? '' }}" required></td>
-                    <td><input type="time" name="rules[{{ $i }}][end_time]" class="form-control" value="{{ $r['end_time'] ?? '' }}" required></td>
-                    <td>
-                        <select name="rules[{{ $i }}][lesson_type]" class="form-control" required>
-                            <option value="online" @selected(($r['lesson_type'] ?? '')==='online')>online</option>
-                            <option value="in_person" @selected(($r['lesson_type'] ?? '')==='in_person')>in_person</option>
-                            <option value="both" @selected(($r['lesson_type'] ?? '')==='both')>both</option>
-                        </select>
-                    </td>
-                    <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Delete</button></td>
-                </tr>
+        <h3>勤務曜日（共通時間）</h3>
+        <p class="text-muted mb-2">曜日を選ぶだけ。時間は1回入力で全選択曜日に適用します。</p>
+
+        <div class="mb-3">
+            @php
+                $weekdayLabels = [0=>'Sun',1=>'Mon',2=>'Tue',3=>'Wed',4=>'Thu',5=>'Fri',6=>'Sat'];
+                $oldWeekdays = old('weekdays', [1,2,3,4,5]);
+            @endphp
+            @foreach($weekdayLabels as $num => $label)
+                <label class="me-3">
+                    <input type="checkbox" name="weekdays[]" value="{{ $num }}"
+                        @checked(collect($oldWeekdays)->map(fn($v)=>(int)$v)->contains($num))>
+                    {{ $label }}
+                </label>
             @endforeach
-            </tbody>
-        </table>
-        <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-rule">＋ Add rule</button>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label>勤務 開始</label>
+                <input type="time" name="common_rule_start_time" class="form-control"
+                       value="{{ old('common_rule_start_time', '09:00') }}" required>
+            </div>
+            <div class="col-md-4">
+                <label>勤務 終了</label>
+                <input type="time" name="common_rule_end_time" class="form-control"
+                       value="{{ old('common_rule_end_time', '18:00') }}" required>
+            </div>
+            <div class="col-md-4">
+                <label>Lesson Type</label>
+                <select name="common_rule_lesson_type" class="form-control" required>
+                    <option value="online" @selected(old('common_rule_lesson_type')==='online')>online</option>
+                    <option value="in_person" @selected(old('common_rule_lesson_type')==='in_person')>in_person</option>
+                    <option value="both" @selected(old('common_rule_lesson_type','both')==='both')>both</option>
+                </select>
+            </div>
+        </div>
 
         <hr>
-        <h3>Breaks</h3>
-        <table class="table" id="breaks-table">
-            <thead>
-            <tr>
-                <th>Weekday</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Reason</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            @php $oldBreaks = old('breaks', []); @endphp
-            @foreach($oldBreaks as $i => $b)
-                <tr>
-                    <td><input type="number" name="breaks[{{ $i }}][weekday]" min="0" max="6" class="form-control" value="{{ $b['weekday'] ?? '' }}" required></td>
-                    <td><input type="time" name="breaks[{{ $i }}][start_time]" class="form-control" value="{{ $b['start_time'] ?? '' }}" required></td>
-                    <td><input type="time" name="breaks[{{ $i }}][end_time]" class="form-control" value="{{ $b['end_time'] ?? '' }}" required></td>
-                    <td><input type="text" name="breaks[{{ $i }}][reason]" class="form-control" value="{{ $b['reason'] ?? '' }}"></td>
-                    <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Delete</button></td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-        <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-break">＋ Add break</button>
+        <h3>休憩（1箇所入力で全選択曜日に反映）</h3>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label>休憩 開始</label>
+                <input type="time" name="common_break_start_time" class="form-control"
+                       value="{{ old('common_break_start_time', '13:00') }}">
+            </div>
+            <div class="col-md-4">
+                <label>休憩 終了</label>
+                <input type="time" name="common_break_end_time" class="form-control"
+                       value="{{ old('common_break_end_time', '14:00') }}">
+            </div>
+            <div class="col-md-4">
+                <label>Reason</label>
+                <input type="text" name="common_break_reason" class="form-control"
+                       value="{{ old('common_break_reason', 'Lunch') }}">
+            </div>
+            <small class="text-muted mt-2">
+                ※休憩を使わない場合は開始・終了を空欄にしてください。
+            </small>
+        </div>
 
         <div>
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </form>
 </div>
-
-<script>
-(() => {
-    const rulesTbody = document.querySelector('#rules-table tbody');
-    const breaksTbody = document.querySelector('#breaks-table tbody');
-
-    document.getElementById('add-rule').addEventListener('click', () => {
-        const i = rulesTbody.querySelectorAll('tr').length;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><input type="number" name="rules[${i}][weekday]" min="0" max="6" class="form-control" required></td>
-            <td><input type="time" name="rules[${i}][start_time]" class="form-control" required></td>
-            <td><input type="time" name="rules[${i}][end_time]" class="form-control" required></td>
-            <td>
-              <select name="rules[${i}][lesson_type]" class="form-control" required>
-                <option value="online">online</option>
-                <option value="in_person">in_person</option>
-                <option value="both" selected>both</option>
-              </select>
-            </td>
-            <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Delete</button></td>
-        `;
-        rulesTbody.appendChild(tr);
-    });
-
-    document.getElementById('add-break').addEventListener('click', () => {
-        const i = breaksTbody.querySelectorAll('tr').length;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><input type="number" name="breaks[${i}][weekday]" min="0" max="6" class="form-control" required></td>
-            <td><input type="time" name="breaks[${i}][start_time]" class="form-control" required></td>
-            <td><input type="time" name="breaks[${i}][end_time]" class="form-control" required></td>
-            <td><input type="text" name="breaks[${i}][reason]" class="form-control"></td>
-            <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Delete</button></td>
-        `;
-        breaksTbody.appendChild(tr);
-    });
-
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remove-row')) {
-            e.target.closest('tr')?.remove();
-        }
-    });
-})();
-</script>
 @endsection
