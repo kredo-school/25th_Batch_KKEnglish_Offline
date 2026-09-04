@@ -99,12 +99,9 @@ Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid']
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admins')
     ->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('admin.dashboard');
+    ->name('dashboard');
 
     // Material 編集
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
