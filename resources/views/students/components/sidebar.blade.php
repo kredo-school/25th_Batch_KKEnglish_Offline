@@ -1,18 +1,29 @@
 <aside class="bg-light border-end min-vh-100 p-3">
 
+    {{-- ===============================
+         Title
+    ================================ --}}
     <h5 class="fw-bold mb-4">
         Book a Lesson
     </h5>
 
 
-        {{-- Material --}}
+    {{-- ===============================
+         Material
+    ================================ --}}
     <div class="mb-4">
 
-        <label for="reservationMaterial"
-               class="form-label fw-bold">
+        <label
+            for="reservationMaterial"
+            class="form-label fw-bold"
+        >
             Material
-            <span class="text-danger">*</span>
+
+            <span class="text-danger">
+                *
+            </span>
         </label>
+
 
         <select
             id="reservationMaterial"
@@ -20,61 +31,70 @@
             class="form-select w-100"
         >
 
+            {{-- 未選択 --}}
             <option value="">
                 Select Material
             </option>
 
-            {{-- 仮データ --}}
-            <option value="beginner">
-                Beginner English
-            </option>
 
-            <option value="conversation">
-                Daily Conversation
-            </option>
+            {{-- ===============================
+                 DBの教材一覧
+            ================================ --}}
+            @foreach ($materials as $material)
 
-            <option value="grammar">
-                Grammar
-            </option>
+                <option
+                    value="{{ $material->material_id }}"
+                >
 
-            <option value="business">
-                Business English
-            </option>
+                    {{ $material->name }}
+
+                </option>
+
+            @endforeach
 
         </select>
 
     </div>
 
-    {{-- Date --}}
+
+    {{-- ===============================
+         Date
+    ================================ --}}
     <div class="mb-4">
 
-        <label for="reservationDate"
-               class="form-label fw-bold">
+        <label
+            for="reservationDate"
+            class="form-label fw-bold"
+        >
             Date
         </label>
+
 
         <input
             type="date"
             id="reservationDate"
             name="reservation_date"
-            class="form-control w-100">
+            class="form-control w-100"
+        >
 
     </div>
 
 
-
-
-
-    {{-- Time --}}
+    {{-- ===============================
+         Time
+    ================================ --}}
     <div class="mb-4">
 
         <label class="form-label fw-bold">
             Time
         </label>
 
+
         <div class="row g-2">
 
-            {{-- Hour --}}
+            {{-- ===============================
+                 Hour
+            ================================ --}}
             <div class="col-6">
 
                 <input
@@ -82,15 +102,17 @@
                     id="reservationHour"
                     name="reservation_hour"
                     class="form-control w-100"
-                    min="1"
-                    max="24"
+                    min="0"
+                    max="23"
                     placeholder="Hour"
                 >
 
             </div>
 
 
-            {{-- Minute --}}
+            {{-- ===============================
+                 Minute
+            ================================ --}}
             <div class="col-6">
 
                 <select
@@ -103,9 +125,11 @@
                         Minute
                     </option>
 
+
                     <option value="00">
                         00
                     </option>
+
 
                     <option value="30">
                         30
