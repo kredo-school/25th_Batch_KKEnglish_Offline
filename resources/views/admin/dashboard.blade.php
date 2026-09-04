@@ -66,28 +66,64 @@
                                     <td>{{ $row['label'] ?? '' }}</td>
                                 @endforeach
                             </tr>
+
                             <tr>
                                 <th class="text-start">Total Available Lessons</th>
                                 @foreach(($dashboardRows ?? []) as $row)
-                                    <td>{{ $row['capacity'] ?? 0 }}</td>
+                                    <td>
+                                        @if(($row['capacity'] ?? 0) > 0)
+                                            <a href="{{ route('admin.dashboard.details', ['date' => $row['date'], 'type' => 'capacity']) }}">
+                                                {{ $row['capacity'] }}
+                                            </a>
+                                        @else
+                                            0
+                                        @endif
+                                    </td>
                                 @endforeach
                             </tr>
+
                             <tr>
                                 <th class="text-start">Booked</th>
                                 @foreach(($dashboardRows ?? []) as $row)
-                                    <td>{{ $row['booked'] ?? 0 }}</td>
+                                    <td>
+                                        @if(($row['booked'] ?? 0) > 0)
+                                            <a href="{{ route('admin.dashboard.details', ['date' => $row['date'], 'type' => 'booked']) }}">
+                                                {{ $row['booked'] }}
+                                            </a>
+                                        @else
+                                            0
+                                        @endif
+                                    </td>
                                 @endforeach
                             </tr>
+
                             <tr>
                                 <th class="text-start">Auto-Booked Students</th>
                                 @foreach(($dashboardRows ?? []) as $row)
-                                    <td>{{ $row['auto_booked'] ?? 0 }}</td>
+                                    <td>
+                                        @if(($row['auto_booked'] ?? 0) > 0)
+                                            <a href="{{ route('admin.dashboard.details', ['date' => $row['date'], 'type' => 'auto_booked']) }}">
+                                                {{ $row['auto_booked'] }}
+                                            </a>
+                                        @else
+                                            0
+                                        @endif
+                                    </td>
                                 @endforeach
                             </tr>
+
                             <tr>
                                 <th class="text-start">Working Teachers</th>
                                 @foreach(($dashboardRows ?? []) as $row)
-                                    <td>{{ $row['working_teachers'] ?? 0 }}</td>
+                                    <td>
+                                        @if(($row['working_teachers'] ?? 0) > 0)
+                                            <a href="{{ route('admin.dashboard.details', ['date' => $row['date'], 'type' => 'working_teachers']) }}">
+                                                {{ $row['working_teachers'] }}
+                                            </a>
+                                        @else
+                                            0
+                                        @endif
+                                    </td>
                                 @endforeach
                             </tr>
                         </table>

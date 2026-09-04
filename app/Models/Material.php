@@ -8,6 +8,8 @@ class Material extends Model
 {
     protected $table = 'materials';
     protected $primaryKey = 'material_id';
+    public $incrementing = true;   // UUID等なら false に変更
+    protected $keyType = 'int';    // 文字列キーなら 'string'
 
 
     protected $fillable = [
@@ -27,8 +29,13 @@ class Material extends Model
 
 public function teachers()
     {
-        return $this->belongsToMany(Teacher::class, 'teacher_materials')
-            ->withTimestamps();
+        return $this->belongsToMany(\App\Models\Teacher::class,
+        'teacher_materials',
+        'material_id', // pivot の Material FK
+        'teacher_id',  // pivot の Teacher FK
+        'material_id', // materials 側PK
+        'id'           // teachers 側PK)
+        )->withTimestamps();
     }
 
 }

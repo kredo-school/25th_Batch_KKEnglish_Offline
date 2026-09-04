@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ShiftPatternAssignmentController;
 use App\Http\Controllers\Teacher\ScheduleExceptionController;
 use App\Http\Controllers\Student\AvailabilityController;
 use App\Http\Controllers\Student\ReservationController;
+use App\Http\Controllers\Admin\TeacherMaterialController;
 
 
 // Test route for frontend testing
@@ -108,6 +109,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
+    Route::get('/dashboard/details', [DashboardController::class, 'details'])
+    ->name('dashboard.details');
 
     // Material 編集
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
@@ -134,6 +137,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     Route::get('/teachers/{teacher}/edit', [AdminTeacherController::class, 'edit'])->name('teachers.edit');
     Route::put('/teachers/{teacher}', [AdminTeacherController::class, 'update'])->name('teachers.update');
     Route::delete('/teachers/{teacher}', [AdminTeacherController::class, 'destroy'])->name('teachers.destroy');
+    // Teacher Material Management
+    Route::get('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'edit'])
+        ->name('teachers.materials.edit');
+    Route::put('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'update'])
+        ->name('teachers.materials.update');
+
 
     // Shift Pattern Management
     Route::resource('shift-patterns', ShiftPatternController::class)

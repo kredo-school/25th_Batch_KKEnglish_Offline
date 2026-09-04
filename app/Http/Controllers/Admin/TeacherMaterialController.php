@@ -11,8 +11,8 @@ class TeacherMaterialController extends Controller
 {
     public function edit(Teacher $teacher)
     {
-        $materials = Material::orderBy('id')->get(['id', 'name']);
-        $selectedMaterialIds = $teacher->materials()->pluck('materials.id')->all();
+        $materials = Material::orderBy('material_id')->get(['material_id', 'name']);
+        $selectedMaterialIds = $teacher->materials()->pluck('materials.material_id')->all();
 
         return view('admin.teachers.materials', compact('teacher', 'materials', 'selectedMaterialIds'));
     }
@@ -21,7 +21,7 @@ class TeacherMaterialController extends Controller
     {
         $data = $request->validate([
             'material_ids'   => ['nullable', 'array'],
-            'material_ids.*' => ['integer', 'exists:materials,id'],
+            'material_ids.*' => ['integer', 'exists:materials,material_id'],
         ]);
 
         $teacher->materials()->sync($data['material_ids'] ?? []);

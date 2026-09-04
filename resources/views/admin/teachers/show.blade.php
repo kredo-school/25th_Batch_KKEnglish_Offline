@@ -7,6 +7,7 @@
         <h2 class="fw-bold mb-0">Teacher Details</h2>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+            <a href="{{ route('admin.teachers.materials.edit', $teacher) }}" class="btn btn-outline-info btn-sm">Materials</a>
             <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
         </div>
     </div>
@@ -26,6 +27,21 @@
             <p><strong>About Me:</strong><br>{{ $teacher->about_me ?: '-' }}</p>
             <p><strong>Rating:</strong> {{ $teacher->rating_average }}</p>
             <p><strong>Points Consumed:</strong> {{ $teacher->point_consumed }}</p>
+
+            @if($teacher->materials->isEmpty())
+                <p class="text-secondary">No materials assigned.</p>
+            @else
+                <p><strong>Materials:</strong></p>
+                <ul class="mb-2">
+                    @foreach($teacher->materials as $material)
+                        <li>{{ $material->name }}</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <a href="{{ route('admin.teachers.materials.edit', $teacher) }}" class="btn btn-outline-info btn-sm">
+                Edit Materials
+            </a>
         </div>
     </div>
 </div>

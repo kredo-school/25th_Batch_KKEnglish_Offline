@@ -90,13 +90,13 @@ class TeacherController extends Controller
         return redirect()->route('admin.teachers.index')->with('success', '講師を登録しました。');
     }
 
-    public function edit(\App\Models\Teacher $teacher): \Illuminate\Contracts\View\View
+    public function edit(Teacher $teacher): \Illuminate\Contracts\View\View
     {
         $teacher->load('user');
         return view('admin.teachers.edit', compact('teacher'));
     }
 
-    public function update(\Illuminate\Http\Request $request, \App\Models\Teacher $teacher): \Illuminate\Http\RedirectResponse
+    public function update(\Illuminate\Http\Request $request, Teacher $teacher): \Illuminate\Http\RedirectResponse
     {
         $teacher->load('user');
 
@@ -134,7 +134,7 @@ class TeacherController extends Controller
         return redirect()->route('admin.teachers.index')->with('success', '講師情報を更新しました。');
     }
 
-    public function destroy(\App\Models\Teacher $teacher): \Illuminate\Http\RedirectResponse
+    public function destroy(Teacher $teacher): \Illuminate\Http\RedirectResponse
     {
         $teacher->load('user');
 
@@ -144,9 +144,9 @@ class TeacherController extends Controller
         return redirect()->route('admin.teachers.index')->with('success', '講師アカウントを停止しました。');
     }
 
-    public function show(\App\Models\Teacher $teacher): \Illuminate\Contracts\View\View
+    public function show(Teacher $teacher): \Illuminate\Contracts\View\View
     {
-        $teacher->load('user');
+        $teacher->load('user', 'materials'); //materialsを読み込む
 
         if (!$teacher->user) {
             return redirect()->route('admin.teachers.index')

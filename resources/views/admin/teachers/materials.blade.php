@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h3 class="mb-3">Subject Assignment: {{ $teacher->name ?? 'Teacher' }}</h3>
+    <h3 class="mb-3">Subject Assignment: {{ $teacher->user->last_name ?? 'Teacher' }} {{ $teacher->user->first_name ?? '' }}</h3>
 
     @if(session('status'))
         <div class="alert alert-success">{{ session('status') }}</div>
@@ -32,11 +32,11 @@
                             class="form-check-input"
                             type="checkbox"
                             name="material_ids[]"
-                            value="{{ $material->id }}"
-                            id="material_{{ $material->id }}"
-                            {{ in_array($material->id, $selectedMaterialIds, true) ? 'checked' : '' }}
+                            value="{{ $material->material_id }}"
+                            id="material_{{ $material->material_id }}"
+                            {{ in_array($material->material_id, $selectedMaterialIds, true) ? 'checked' : '' }}
                         >
-                        <label class="form-check-label" for="material_{{ $material->id }}">
+                        <label class="form-check-label" for="material_{{ $material->material_id }}">
                             {{ $material->name }}
                         </label>
                     </div>

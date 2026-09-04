@@ -62,8 +62,13 @@ class Teacher extends Model
     }
     public function materials()
     {
-        return $this->belongsToMany(Material::class, 'teacher_materials')
-            ->withTimestamps();
+        return $this->belongsToMany(\App\Models\Material::class,
+        'teacher_materials', // pivot table
+        'teacher_id',        // pivot の Teacher FK
+        'material_id',       // pivot の Material FK
+        'id',                // teachers 側PK
+        'material_id'        // materials 側PK)
+        )->withTimestamps();
     }
 
 }
