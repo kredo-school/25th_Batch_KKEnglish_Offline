@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             ExceptionTypeSeeder::class,
             ShiftPatternSeeder::class,
             TeacherScheduleSeeder::class,
+            MaterialTeacherSeeder::class,
 
         ]);
 
