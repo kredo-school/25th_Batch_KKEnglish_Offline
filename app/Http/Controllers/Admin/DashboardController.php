@@ -81,4 +81,64 @@ class DashboardController extends Controller
             'announcements' => $announcements,
         ]);
     }
+
+    public function details(Request $request)
+    {
+        $data = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d'],
+            'type' => ['required', 'in:capacity,booked,working_teachers,auto_booked'],
+        ]);
+
+        $date = $data['date'];
+        $type = $data['type'];
+
+        $items = collect();
+
+        if ($type === 'capacity') {
+    $items = DB::table('teacher_schedules as ts')
+        ->leftJoin('teachers as t', 't.id', '=', 'ts.teacher_id')
+        ->leftJoin('users as u', 'u.id', '=', 't.user_id')
+        ->whereDate('ts.start_time', $date)
+        ->select([
+            'ts.start_time',
+            'ts.end_time',
+            DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as teacher_name"),
+        ])
+        ->orderBy('ts.start_time')
+        ->get();
+} elseif ($type === 'booked') {
+    $items = DB::table('reservations as r')
+        ->leftJoin('teachers as t', 't.id', '=', 'r.teacher_id')
+        ->leftJoin('users as u', 'u.id', '=', 't.user_id')
+        ->whereDate('r.start_at', $date)
+        ->select([
+            'r.id',
+            'r.student_id',
+            'r.start_at',
+            DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as teacher_name"),
+        ])
+        ->orderBy('r.start_at')
+        ->get();
+} elseif ($type === 'working_teachers') {
+    $items = DB::table('teacher_schedules as ts')
+        ->leftJoin('teachers as t', 't.id', '=', 'ts.teacher_id')
+        ->leftJoin('users as u', 'u.id', '=', 't.user_id')
+        ->whereDate('ts.start_time', $date)
+        ->select([
+            DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as teacher_name"),
+        ])
+        ->distinct()
+        ->orderBy('teacher_name')
+        ->get();
+} elseif ($type === 'auto_booked') {
+    // 現状仕様では0想定。列が無いので空
+    $items = collect();
+}
+
+        return view('admin.dashboard_details', [
+            'date' => $date,
+            'type' => $type,
+            'items' => $items,
+        ]);
+    }
 }
