@@ -51,20 +51,6 @@ class Teacher extends Model
         return $this->hasMany(Reservation::class);
     }
 
-
-    public function materials(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Material::class,
-            'teacher_materials',
-            'teacher_id',
-            'material_id',
-            'id',
-            'material_id'
-        )->withTimestamps();
-    }
-
-
     public function shiftAssignments(): HasMany
     {
         return $this->hasMany(TeacherShiftAssignment::class);
