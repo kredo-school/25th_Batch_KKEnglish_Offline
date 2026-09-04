@@ -7,7 +7,7 @@
             Dashboard
         </a>
 
-        <a href="{{ route('reservation.test') }}"
+        <a href="{{ route('students.reservations.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
            {{ request()->routeIs('reservation.test') ? 'student-active fw-semibold' : '' }}">
             Book a lesson

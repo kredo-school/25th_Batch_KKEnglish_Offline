@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\ShiftPatternController;
 use App\Http\Controllers\Admin\ShiftPatternAssignmentController;
 use App\Http\Controllers\Teacher\ScheduleExceptionController;
 use App\Http\Controllers\Student\AvailabilityController;
+use App\Http\Controllers\Student\ReservationController;
+
 
 // Test route for frontend testing
 Route::view('/reservation-test', 'students.reservations.index')
@@ -57,11 +59,15 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
+
 // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
     Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
         ->name('student.lessons.cancel');
-// Teacher reservations/
+    // Student reservations
+    Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
+
+    // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
 });
 
