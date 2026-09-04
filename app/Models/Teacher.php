@@ -77,10 +77,10 @@ class Teacher extends Model
             ->withPivot(['effective_from', 'effective_to', 'priority'])
             ->withTimestamps();
     }
-    public function materials()
-    {
-        return $this->belongsToMany(Material::class, 'teacher_materials')
-            ->withTimestamps();
-    }
+    // public function materials()
+    // {
+    //     return $this->belongsToMany(Material::class, 'teacher_materials')
+    //         ->withTimestamps();
+    // }
 
 }
