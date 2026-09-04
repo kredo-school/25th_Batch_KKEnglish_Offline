@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Material;
+
 use App\Models\User;
 use App\Models\TeacherSchedule;
 use App\Models\ScheduleException;
 use App\Models\Reservation;
+
 
 class Teacher extends Model
 {
@@ -43,16 +46,30 @@ class Teacher extends Model
         return $this->hasMany(ScheduleException::class);
     }
 
-
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
     }
 
+
+    public function materials(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Material::class,
+            'teacher_materials',
+            'teacher_id',
+            'material_id',
+            'id',
+            'material_id'
+        )->withTimestamps();
+    }
+
+
     public function shiftAssignments(): HasMany
     {
         return $this->hasMany(TeacherShiftAssignment::class);
     }
+
 
     public function shiftPatterns(): BelongsToMany
     {
@@ -70,5 +87,10 @@ class Teacher extends Model
         'material_id'        // materials 側PK)
         )->withTimestamps();
     }
+    // public function materials()
+    // {
+    //     return $this->belongsToMany(Material::class, 'teacher_materials')
+    //         ->withTimestamps();
+    // }
 
 }

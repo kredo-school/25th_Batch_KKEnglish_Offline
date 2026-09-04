@@ -21,8 +21,6 @@ use App\Http\Controllers\Admin\TeacherMaterialController;
 
 
 // Test route for frontend testing
-Route::view('/reservation-test', 'students.reservations.index')
-->name('reservation.test');
 Route::view('/reservation-confirm-test','students.reservations.confirm')
 ->name('reservation.confirm.test');
 Route::view('/reservation-teacher-detail-test','students.reservations.teacher-detail')

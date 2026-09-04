@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Teacher;
+use App\Models\Reservation;
 class Material extends Model
 {
     protected $table = 'materials';
@@ -27,14 +30,15 @@ class Material extends Model
         return $this->hasMany(Reservation::class, 'material_id', 'material_id');
     }
 
-public function teachers()
+    public function teachers(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Teacher::class,
-        'teacher_materials',
-        'material_id', // pivot の Material FK
-        'teacher_id',  // pivot の Teacher FK
-        'material_id', // materials 側PK
-        'id'           // teachers 側PK)
+        return $this->belongsToMany(
+            Teacher::class,
+            'teacher_materials',
+            'material_id',
+            'teacher_id',
+            'material_id',
+            'id'
         )->withTimestamps();
     }
 
