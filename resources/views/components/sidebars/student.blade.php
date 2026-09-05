@@ -19,13 +19,15 @@
             Teacher list
         </a>
 
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+        <a href="{{ route('students.reservations.upcoming.test') }}"
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('students.reservations.upcoming.test') ? 'student-active fw-semibold' : '' }}">
             My lessons
         </a>
 
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+        <a href="{{ route('student.history.test') }}"
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('student.history.test') ? 'student-active fw-semibold' : '' }}">
             Learning history
         </a>
 

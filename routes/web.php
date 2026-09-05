@@ -21,12 +21,12 @@ use App\Http\Controllers\Admin\TeacherMaterialController;
 
 
 // Test route for frontend testing
-Route::view('/reservation-confirm-test','students.reservations.confirm')
-->name('reservation.confirm.test');
 Route::view('/reservation-teacher-detail-test','students.reservations.teacher-detail')
 ->name('reservations.teacher-detail.test');
 Route::view('/student-history-test','students.history.index')
 ->name('student.history.test');
+Route::view('/upcoming-test','students.reservations.upcoming')
+->name('students.reservations.upcoming.test');
 
 
 // Public routes
@@ -69,10 +69,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 
     //　予約確認画面
-    Route::get('/students/reservations/confirm', [ReservationController::class, 'confirm'])->name('students.reservations.confirm');
+    Route::post('/students/reservations/confirm', [ReservationController::class, 'confirm'])->name('students.reservations.confirm');
 
     //  予約確定
-    Route::post('/students/reservations/', [ReservationController::class, 'store'])->name('students.reservations.store');
+    Route::post('/students/reservations', [ReservationController::class, 'store'])->name('students.reservations.store');
     // キャンセル
     Route::patch('/students/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('students.reservations.cancel');
 
