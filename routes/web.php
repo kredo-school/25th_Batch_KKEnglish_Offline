@@ -64,7 +64,21 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
         ->name('student.lessons.cancel');
     // Student reservations
+     // 予約一覧・検索画面
     Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
+
+
+    //　予約確認画面
+    Route::get('/students/reservations/confirm', [ReservationController::class, 'confirm'])->name('students.reservations.confirm');
+
+    //  予約確定
+    Route::post('/students/reservations/', [ReservationController::class, 'store'])->name('students.reservations.store');
+    // キャンセル
+    Route::patch('/students/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('students.reservations.cancel');
+
+    //先生詳細
+    Route::get('/students/reservations/detail', [ReservationController::class, 'show'])->name('students.reservations.teacher-detail');
+
 
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');

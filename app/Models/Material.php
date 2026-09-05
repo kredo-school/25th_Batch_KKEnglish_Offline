@@ -9,10 +9,8 @@ use App\Models\Teacher;
 use App\Models\Reservation;
 class Material extends Model
 {
-    protected $table = 'materials';
+
     protected $primaryKey = 'material_id';
-    public $incrementing = true;   // UUID等なら false に変更
-    protected $keyType = 'int';    // 文字列キーなら 'string'
 
 
     protected $fillable = [
