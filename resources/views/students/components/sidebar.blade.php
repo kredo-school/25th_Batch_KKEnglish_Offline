@@ -1,5 +1,11 @@
 <aside class="bg-light border-end min-vh-100 p-3">
 
+    <a
+    href="{{ route('student.dashboard') }}"
+    class="btn btn-link text-secondary p-0 mb-3 text-decoration-none">
+    ← Back to Dashboard
+    </a>
+
     {{-- ===============================
          Title
     ================================ --}}

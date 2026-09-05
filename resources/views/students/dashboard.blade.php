@@ -43,7 +43,7 @@
       </div>
 
     {{-- レッスン予約ボタン --}}
-    <a href="#" class="btn btn-primary">
+    <a href="{{ route('students.reservations.index') }}" class="btn btn-primary">
         レッスンを予約
     </a>
 

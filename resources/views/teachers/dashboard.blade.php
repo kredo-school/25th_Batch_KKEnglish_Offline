@@ -14,7 +14,7 @@
             {{-- Hello Header --}}
             <div class="bg-light p-4 mb-4">
                 <h2 class="fw-bold mb-1">
-                    Hello, Name
+                    Hello, {{ auth()->user()->first_name }}
                 </h2>
 
                   <p class="text-secondary mb-0">
