@@ -23,6 +23,30 @@
 
 
     {{-- ===============================
+         Validation Errors
+    ================================ --}}
+    @if ($errors->any())
+
+        <div class="alert alert-danger">
+
+            <ul class="mb-0">
+
+                @foreach ($errors->all() as $error)
+
+                    <li>
+                        {{ $error }}
+                    </li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    {{-- ===============================
          Message
     ================================ --}}
     <div
@@ -90,6 +114,10 @@
                 data-materials="{{ $teacher->materials
                     ->pluck('material_id')
                     ->implode(',') }}"
+
+                data-schedule-id=""
+                data-start-at=""
+                data-end-at=""
             >
 
                 <div class="card h-100 shadow-sm">
@@ -98,7 +126,11 @@
                     {{-- ===============================
                          Teacher Image
                     ================================ --}}
-                    @if ($teacher->user && $teacher->user->profile_image)
+                    @if (
+                        $teacher->user
+                        &&
+                        $teacher->user->profile_image
+                    )
 
                         <img
                             src="{{ $teacher->user->profile_image }}"
@@ -106,9 +138,7 @@
                             class="card-img-top"
                             style="
                                 height: 180px;
-                                object-fit: cover;
-                            "
-                        >
+                                object-fit: cover;">
 
                     @else
 
@@ -118,10 +148,8 @@
                                 d-flex
                                 justify-content-center
                                 align-items-center
-                                text-secondary
-                            "
-                            style="height: 180px;"
-                        >
+                                text-secondary"
+                            style="height: 180px;">
                             No Image
                         </div>
 
@@ -240,6 +268,57 @@
 
     </div>
 
+
+    {{-- ===============================
+         Booking Form
+         Book押下時にConfirmへ送信
+    ================================ --}}
+    <form
+        id="bookingForm"
+        action="{{ route('students.reservations.confirm') }}"
+        method="POST"
+        class="d-none"
+    >
+
+        @csrf
+
+
+        <input
+            type="hidden"
+            name="teacher_id"
+            id="bookingTeacherId"
+        >
+
+
+        <input
+            type="hidden"
+            name="material_id"
+            id="bookingMaterialId"
+        >
+
+
+        <input
+            type="hidden"
+            name="schedule_id"
+            id="bookingScheduleId"
+        >
+
+
+        <input
+            type="hidden"
+            name="start_at"
+            id="bookingStartAt"
+        >
+
+
+        <input
+            type="hidden"
+            name="end_at"
+            id="bookingEndAt"
+        >
+
+    </form>
+
 </div>
 
 
@@ -320,6 +399,43 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
+        | Booking Form
+        |--------------------------------------------------------------------------
+        */
+
+        const bookingForm =
+            document.getElementById(
+                'bookingForm'
+            );
+
+        const bookingTeacherId =
+            document.getElementById(
+                'bookingTeacherId'
+            );
+
+        const bookingMaterialId =
+            document.getElementById(
+                'bookingMaterialId'
+            );
+
+        const bookingScheduleId =
+            document.getElementById(
+                'bookingScheduleId'
+            );
+
+        const bookingStartAt =
+            document.getElementById(
+                'bookingStartAt'
+            );
+
+        const bookingEndAt =
+            document.getElementById(
+                'bookingEndAt'
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
         | 古いAPI結果を使わないため
         |--------------------------------------------------------------------------
         */
@@ -383,6 +499,7 @@ document.addEventListener(
                         date
                 });
 
+
             const response =
                 await fetch(
                     '/students/availability'
@@ -400,6 +517,7 @@ document.addEventListener(
                     }
                 );
 
+
             if (!response.ok) {
 
                 throw new Error(
@@ -410,6 +528,7 @@ document.addEventListener(
 
             }
 
+
             return await response.json();
 
         }
@@ -417,7 +536,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | 指定時間のSlot
+        | 指定時間のSlotを取得
         |--------------------------------------------------------------------------
         */
 
@@ -435,12 +554,28 @@ document.addEventListener(
 
                     }
 
+
+                    /*
+                     * 例
+                     *
+                     * 2026-09-10 09:00:00
+                     *
+                     * または
+                     *
+                     * 2026-09-10T09:00:00
+                     *
+                     * ↓
+                     *
+                     * 09:00
+                     */
+
                     const slotTime =
                         slot.start_at
                             .substring(
                                 11,
                                 16
                             );
+
 
                     return (
                         slotTime === time
@@ -456,15 +591,6 @@ document.addEventListener(
         |--------------------------------------------------------------------------
         | Material判定
         |--------------------------------------------------------------------------
-        |
-        | 例:
-        |
-        | selectedMaterial = "1"
-        |
-        | data-materials = "1,3,5"
-        |
-        | → true
-        |
         */
 
         function matchesMaterial(
@@ -478,15 +604,78 @@ document.addEventListener(
 
             }
 
+
             const materials =
                 card.dataset.materials
                     ? card.dataset.materials
                         .split(',')
                     : [];
 
+
             return materials.includes(
                 String(material)
             );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 選択した予約Slotをカードに保存
+        |--------------------------------------------------------------------------
+        */
+
+        function setBookingSlot(
+            card,
+            slot
+        ) {
+
+            if (!slot) {
+
+                clearBookingSlot(
+                    card
+                );
+
+                return;
+
+            }
+
+
+            card.dataset.scheduleId =
+                slot.schedule_id
+                ?? '';
+
+
+            card.dataset.startAt =
+                slot.start_at
+                ?? '';
+
+
+            card.dataset.endAt =
+                slot.end_at
+                ?? '';
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 保存していたSlotを削除
+        |--------------------------------------------------------------------------
+        */
+
+        function clearBookingSlot(
+            card
+        ) {
+
+            card.dataset.scheduleId =
+                '';
+
+            card.dataset.startAt =
+                '';
+
+            card.dataset.endAt =
+                '';
 
         }
 
@@ -507,14 +696,17 @@ document.addEventListener(
                     '.book-btn'
                 );
 
+
             if (!button) {
 
                 return;
 
             }
 
+
             button.disabled =
                 !enabled;
+
 
             if (enabled) {
 
@@ -559,6 +751,7 @@ document.addEventListener(
                 card.querySelector(
                     '.view-schedule-btn'
                 );
+
 
             if (!button) {
 
@@ -741,7 +934,8 @@ document.addEventListener(
              * Material
              */
             if (
-                material &&
+                material
+                &&
                 materialInput
             ) {
 
@@ -752,6 +946,7 @@ document.addEventListener(
                                 .selectedIndex
                         ]
                         .text;
+
 
                 selectedMaterial
                     .classList
@@ -823,8 +1018,10 @@ document.addEventListener(
              * Material + Date + Time
              */
             if (
-                material &&
-                date &&
+                material
+                &&
+                date
+                &&
                 time
             ) {
 
@@ -843,7 +1040,8 @@ document.addEventListener(
              * Material + Date
              */
             if (
-                material &&
+                material
+                &&
                 date
             ) {
 
@@ -887,8 +1085,10 @@ document.addEventListener(
                     ? dateInput.value
                     : '';
 
+
             const time =
                 getSelectedTime();
+
 
             const material =
                 materialInput
@@ -900,6 +1100,21 @@ document.addEventListener(
                 date,
                 time,
                 material
+            );
+
+
+            /*
+             * 条件が変更されたので
+             * 前回保存したSlot情報を一旦削除
+             */
+            teacherCards.forEach(
+                function (card) {
+
+                    clearBookingSlot(
+                        card
+                    );
+
+                }
             );
 
 
@@ -918,10 +1133,12 @@ document.addEventListener(
                             'd-none'
                         );
 
+
                         updateBookButton(
                             card,
                             false
                         );
+
 
                         updateViewScheduleButton(
                             card,
@@ -949,6 +1166,7 @@ document.addEventListener(
                     0
                 );
 
+
                 return;
 
             }
@@ -958,10 +1176,6 @@ document.addEventListener(
              * ===============================
              * Material Only
              * ===============================
-             *
-             * 日付なしなら
-             * 教材だけで先生を絞る
-             *
              */
 
             if (!date) {
@@ -1002,6 +1216,10 @@ document.addEventListener(
                         }
 
 
+                        /*
+                         * 日付・時間がないので
+                         * Bookはできない
+                         */
                         updateBookButton(
                             card,
                             false
@@ -1075,7 +1293,7 @@ document.addEventListener(
 
 
                 /*
-                 * まず教材判定
+                 * Material判定
                  */
                 const matchMaterial =
                     matchesMaterial(
@@ -1086,7 +1304,7 @@ document.addEventListener(
 
                 /*
                  * 教材が一致しない先生は
-                 * Availabilityを呼ばない
+                 * Availability APIを呼ばない
                  */
                 if (!matchMaterial) {
 
@@ -1110,6 +1328,11 @@ document.addEventListener(
                     );
 
 
+                    clearBookingSlot(
+                        card
+                    );
+
+
                     continue;
 
                 }
@@ -1118,7 +1341,7 @@ document.addEventListener(
                 try {
 
                     /*
-                     * Availability
+                     * Availability取得
                      */
                     const data =
                         await fetchAvailability(
@@ -1127,6 +1350,10 @@ document.addEventListener(
                         );
 
 
+                    /*
+                     * 条件変更後に
+                     * 古いAPI結果が返ってきた場合
+                     */
                     if (
                         myVersion
                         !==
@@ -1147,12 +1374,18 @@ document.addEventListener(
                         false;
 
 
+                    let targetSlot =
+                        null;
+
+
                     /*
+                     * ===============================
                      * Date + Time
+                     * ===============================
                      */
                     if (time) {
 
-                        const targetSlot =
+                        targetSlot =
                             findTargetSlot(
                                 slots,
                                 time
@@ -1169,8 +1402,35 @@ document.addEventListener(
                             );
 
 
+                        /*
+                         * 予約可能なら
+                         *
+                         * schedule_id
+                         * start_at
+                         * end_at
+                         *
+                         * をカードに保存
+                         */
+                        if (isAvailable) {
+
+                            setBookingSlot(
+                                card,
+                                targetSlot
+                            );
+
+                        } else {
+
+                            clearBookingSlot(
+                                card
+                            );
+
+                        }
+
+
                     /*
+                     * ===============================
                      * Date Only
+                     * ===============================
                      */
                     } else {
 
@@ -1187,12 +1447,24 @@ document.addEventListener(
                                 }
                             );
 
+
+                        /*
+                         * 時間未選択なので
+                         * Book用Slotは保存しない
+                         */
+                        clearBookingSlot(
+                            card
+                        );
+
                     }
 
 
                     /*
-                     * 表示
+                     * ===============================
+                     * Teacher表示
+                     * ===============================
                      */
+
                     if (isAvailable) {
 
                         card.classList.remove(
@@ -1211,8 +1483,11 @@ document.addEventListener(
 
 
                     /*
-                     * Schedule
+                     * ===============================
+                     * View Schedule
+                     * ===============================
                      */
+
                     updateViewScheduleButton(
                         card,
                         isAvailable,
@@ -1223,8 +1498,11 @@ document.addEventListener(
 
 
                     /*
+                     * ===============================
                      * Book
+                     * ===============================
                      */
+
                     const canBook =
                         Boolean(
                             material
@@ -1236,6 +1514,12 @@ document.addEventListener(
                             matchMaterial
                             &&
                             isAvailable
+                            &&
+                            card.dataset.scheduleId
+                            &&
+                            card.dataset.startAt
+                            &&
+                            card.dataset.endAt
                         );
 
 
@@ -1267,9 +1551,23 @@ document.addEventListener(
                     );
 
 
+                    clearBookingSlot(
+                        card
+                    );
+
+
                     updateBookButton(
                         card,
                         false
+                    );
+
+
+                    updateViewScheduleButton(
+                        card,
+                        false,
+                        teacherId,
+                        date,
+                        material
                     );
 
                 }
@@ -1278,8 +1576,11 @@ document.addEventListener(
 
 
             /*
-             * 先生0件
+             * ===============================
+             * Teacher 0件
+             * ===============================
              */
+
             if (
                 visibleCount === 0
             ) {
@@ -1348,38 +1649,126 @@ document.addEventListener(
                                     .teacherId;
 
 
-                            const date =
-                                dateInput
-                                    ? dateInput.value
-                                    : '';
-
-
-                            const time =
-                                getSelectedTime();
-
-
-                            const material =
+                            const materialId =
                                 materialInput
                                     ? materialInput.value
                                     : '';
 
 
+                            const scheduleId =
+                                card.dataset
+                                    .scheduleId;
+
+
+                            const startAt =
+                                card.dataset
+                                    .startAt;
+
+
+                            const endAt =
+                                card.dataset
+                                    .endAt;
+
+
+                            /*
+                             * 必要な予約情報が
+                             * 全て揃っているか確認
+                             */
+                            if (
+                                !teacherId
+                                ||
+                                !materialId
+                                ||
+                                !scheduleId
+                                ||
+                                !startAt
+                                ||
+                                !endAt
+                            ) {
+
+                                console.error(
+                                    '予約情報が不足しています。',
+                                    {
+                                        teacher_id:
+                                            teacherId,
+
+                                        material_id:
+                                            materialId,
+
+                                        schedule_id:
+                                            scheduleId,
+
+                                        start_at:
+                                            startAt,
+
+                                        end_at:
+                                            endAt
+                                    }
+                                );
+
+
+                                alert(
+                                    '予約情報を取得できませんでした。もう一度時間を選択してください。'
+                                );
+
+
+                                return;
+
+                            }
+
+
+                            /*
+                             * Confirm Controllerへ送る値
+                             */
+                            bookingTeacherId.value =
+                                teacherId;
+
+
+                            bookingMaterialId.value =
+                                materialId;
+
+
+                            bookingScheduleId.value =
+                                scheduleId;
+
+
+                            bookingStartAt.value =
+                                startAt;
+
+
+                            bookingEndAt.value =
+                                endAt;
+
+
+                            /*
+                             * 確認用
+                             */
                             console.log(
-                                'Book selected',
+                                'Booking Confirm',
                                 {
                                     teacher_id:
                                         teacherId,
 
                                     material_id:
-                                        material,
+                                        materialId,
 
-                                    date:
-                                        date,
+                                    schedule_id:
+                                        scheduleId,
 
-                                    time:
-                                        time
+                                    start_at:
+                                        startAt,
+
+                                    end_at:
+                                        endAt
                                 }
                             );
+
+
+                            /*
+                             * ReservationController
+                             * confirm() へPOST
+                             */
+                            bookingForm.submit();
 
                         }
                     );
