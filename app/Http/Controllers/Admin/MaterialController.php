@@ -45,7 +45,7 @@ class MaterialController extends Controller
 
         \App\Models\Material::create($data);
 
-        return redirect()->route('admin.materials.index')->with('success', '教材を登録しました。');
+        return redirect()->route('admin.materials.index')->with('success', 'Successfully created the material.');
     }
 
     public function show(Material $material): View
@@ -73,7 +73,7 @@ class MaterialController extends Controller
 
         $material->update($data);
 
-        return redirect()->route('admin.materials.index')->with('success', '教材を更新しました。');
+        return redirect()->route('admin.materials.index')->with('success', 'Successfully updated the material.');
     }
 
     public function suspend(Material $material): RedirectResponse
@@ -81,7 +81,15 @@ class MaterialController extends Controller
         $material->update(['status' => 'inactive']);
 
         return redirect()->route('admin.materials.index')
-            ->with('success', '教材を一時停止しました。');
+            ->with('success', 'Successfully suspended the material.');
+    }
+
+    public function activate(Material $material): RedirectResponse
+    {
+        $material->update(['status' => 'active']);
+
+        return redirect()->route('admin.materials.index')
+            ->with('success', 'Successfully activated the material.');
     }
 
     public function destroy(Material $material): RedirectResponse
@@ -94,6 +102,6 @@ class MaterialController extends Controller
         $material->delete();
 
         return redirect()->route('admin.materials.index')
-            ->with('success', '教材を削除しました。');
+            ->with('success', 'Successfully deleted the material.');
     }
 }

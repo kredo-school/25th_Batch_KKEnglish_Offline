@@ -43,14 +43,20 @@
                 <a href="{{ route('admin.materials.edit', $material) }}" class="btn btn-outline-primary btn-sm">Edit</a>
 
                 @if($material->status === 'active')
-                    <form method="POST" action="{{ route('admin.materials.suspend', $material) }}" onsubmit="return confirm('この教材を一時停止しますか？');">
+                    <form method="POST" action="{{ route('admin.materials.suspend', $material) }}" onsubmit="return confirm('Would you like to suspend this material?');">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="btn btn-outline-warning btn-sm">Suspend</button>
                     </form>
+                @elseif($material->status === 'inactive')
+                    <form method="POST" action="{{ route('admin.materials.activate', $material) }}" onsubmit="return confirm('Would you like to activate this material?');">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-outline-success btn-sm">Activate</button>
+                    </form>
                 @endif
 
-                <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('この教材を削除しますか？');">
+                <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('Would you like to delete this material?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>

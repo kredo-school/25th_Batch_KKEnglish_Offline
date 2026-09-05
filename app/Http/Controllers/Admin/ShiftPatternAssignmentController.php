@@ -37,16 +37,20 @@ class ShiftPatternAssignmentController extends Controller
             'shift_pattern_id'    => ['required', 'integer', 'exists:shift_patterns,id'],
             'teacher_ids'         => ['required', 'array', 'min:1'],
             'teacher_ids.*'       => ['integer', 'exists:teachers,id'],
+            'weekdays'            => ['required', 'array', 'min:1'],
+            'weekdays.*'          => ['integer', 'in:0,1,2,3,4,5,6'],
             'start_date'          => ['required', 'date'],
             'end_date'            => ['nullable', 'date', 'after_or_equal:start_date'],
             'priority'            => ['nullable', 'integer', 'min:0'],
             'replace_overlapping' => ['nullable', 'boolean'],
         ]);
 
-        $teacherIds = collect($data['teacher_ids'])->unique()->values();
+        $teacherIds = collect($data['teacher_ids'])->map(fn($v)=>(int)$v)->value ?? (int)$v;
+        $teacherIds = collect($data['teacher_ids'])->map(fn($v)=>(int)$v)->unique()->values();
+        $weekdays   = collect($data['weekdays'])->map(fn($v)=>(int)$v)->unique()->values();
         $now = now();
 
-        DB::transaction(function () use ($data, $teacherIds, $now) {
+        DB::transaction(function () use ($data, $teacherIds, $weekdays, $now) {
             // チェック時: 期間が重なる既存割当を削除
             if (!empty($data['replace_overlapping'])) {
                 $newStart = $data['start_date'];
@@ -54,6 +58,7 @@ class ShiftPatternAssignmentController extends Controller
 
                 DB::table('teacher_shift_pattern_assignments')
                     ->whereIn('teacher_id', $teacherIds)
+                    ->whereIn('weekday', $weekdays)
                     ->where(function ($q) use ($newStart, $newEnd) {
                         $q->where('start_date', '<=', $newEnd)
                         ->where(function ($qq) use ($newStart) {
@@ -64,21 +69,29 @@ class ShiftPatternAssignmentController extends Controller
                     ->delete();
             }
 
-            $rows = $teacherIds->map(fn ($teacherId) => [
-                'shift_pattern_id' => $data['shift_pattern_id'],
-                'teacher_id'       => $teacherId,
-                'start_date'       => $data['start_date'],
-                'end_date'         => $data['end_date'] ?? null,
-                'priority'         => (int)($data['priority'] ?? 0),
-                'created_at'       => $now,
-                'updated_at'       => $now,
-            ])->all();
+            $rows = [];
+            foreach ($teacherIds as $teacherId) {
+                foreach ($weekdays as $weekday) {
+                    $rows[] = [
+                        'shift_pattern_id' => $data['shift_pattern_id'],
+                        'teacher_id'       => $teacherId,
+                        'weekday'          => $weekday,
+                        'start_date'       => $data['start_date'],
+                        'end_date'         => $data['end_date'] ?? null,
+                        'priority'         => (int)($data['priority'] ?? 0),
+                        'created_at'       => $now,
+                        'updated_at'       => $now,
+                    ];
+                }
+            }
 
             DB::table('teacher_shift_pattern_assignments')->insert($rows);
         });
 
+        $count = $teacherIds->count() * $weekdays->count();
+
         return redirect()
             ->route('admin.shift-pattern-assignments.create', ['menu' => 'schedule'])
-            ->with('status', $teacherIds->count().'件のTeacher assignmentを作成しました。');
+            ->with('status', $count.'件のTeacher assignmentを作成しました。');
     }
 }

@@ -20,7 +20,7 @@
 
             {{-- Hello Header --}}
             <div class="bg-light p-4 mb-3">
-                <h2 class="fw-bold mb-1">Hello, Name</h2>
+                <h2 class="fw-bold mb-1">Hello, {{ auth()->user()->first_name ?? '' }}</h2>
                 <p class="text-secondary mb-0">{{ now()->format('Y-m-d') }}</p>
                 <p class="fw-semibold mb-0">
                     <i class="fa-regular fa-clock me-1"></i>
