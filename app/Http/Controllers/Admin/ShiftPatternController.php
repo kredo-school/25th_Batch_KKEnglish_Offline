@@ -15,6 +15,7 @@ class ShiftPatternController extends Controller
     public function index()
     {
         $patterns = \App\Models\ShiftPattern::query()
+            ->withCount('teachers')
             ->latest('id')
             ->paginate(20);
 
@@ -38,7 +39,7 @@ class ShiftPatternController extends Controller
 
         return redirect()
             ->route('admin.shift-patterns.edit', $pattern)
-            ->with('status', 'シフトパターンを作成しました。');
+            ->with('status', 'Successfully created the shift pattern.');
     }
 
     public function edit(ShiftPattern $shiftPattern): View
@@ -58,6 +59,15 @@ class ShiftPatternController extends Controller
             (int) $request->user()->id
         );
 
-        return back()->with('status', 'シフトパターンを更新しました。');
+        return back()->with('status', 'Successfully updated the shift pattern.');
+    }
+
+    public function destroy(ShiftPattern $shiftPattern, ShiftPatternAdminService $service): RedirectResponse
+    {
+        $service->delete($shiftPattern);
+
+        return redirect()
+            ->route('admin.shift-patterns.index')
+            ->with('status', 'Successfully deleted the shift pattern.');
     }
 }

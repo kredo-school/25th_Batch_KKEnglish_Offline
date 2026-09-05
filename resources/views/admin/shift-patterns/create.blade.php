@@ -63,7 +63,7 @@
             <label class="form-check-label" for="is_active">Active</label>
         </div>
 
-        <hr>
+        {{-- <hr>
         <h3>勤務曜日（共通時間）</h3>
         <p class="text-muted mb-2">曜日を選ぶだけ。時間は1回入力で全選択曜日に適用します。</p>
 
@@ -100,10 +100,10 @@
                     <option value="both" @selected(old('common_rule_lesson_type','both')==='both')>both</option>
                 </select>
             </div>
-        </div>
+        </div> --}}
 
         <hr>
-        <h3>休憩（1箇所入力で全選択曜日に反映）</h3>
+        <h3>休憩</h3>
         <div class="row mb-4">
             <div class="col-md-4">
                 <label>休憩 開始</label>

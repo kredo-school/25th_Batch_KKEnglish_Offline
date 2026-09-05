@@ -119,6 +119,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     Route::put('/materials/{material}', [AdminMaterialController::class, 'update'])->name('materials.update');
     Route::delete('/materials/{material}', [AdminMaterialController::class, 'destroy'])->name('materials.destroy');
     Route::patch('/materials/{material}/suspend',[AdminMaterialController::class, 'suspend'])->name('materials.suspend');
+    Route::patch('/materials/{material}/activate',[AdminMaterialController::class, 'activate'])->name('materials.activate');
 
     // User 編集
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
@@ -135,20 +136,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     Route::get('/teachers/{teacher}/edit', [AdminTeacherController::class, 'edit'])->name('teachers.edit');
     Route::put('/teachers/{teacher}', [AdminTeacherController::class, 'update'])->name('teachers.update');
     Route::delete('/teachers/{teacher}', [AdminTeacherController::class, 'destroy'])->name('teachers.destroy');
-    // Teacher Material Management
-    Route::get('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'edit'])
-        ->name('teachers.materials.edit');
-    Route::put('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'update'])
-        ->name('teachers.materials.update');
 
+    // Teacher Material Management
+    Route::get('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'edit'])->name('teachers.materials.edit');
+    Route::put('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'update'])->name('teachers.materials.update');
 
     // Shift Pattern Management
-    Route::resource('shift-patterns', ShiftPatternController::class)
-        ->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::resource('shift-patterns', ShiftPatternController::class)->only(['index', 'create', 'store','show', 'edit', 'update', 'destroy']);
 
     // Shift Pattern Assignment
-    Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])
-        ->name('shift-pattern-assignments.create');
-    Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])
-        ->name('shift-pattern-assignments.store');
+    Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])->name('shift-pattern-assignments.create');
+    Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])->name('shift-pattern-assignments.store');
+    Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');  
 });

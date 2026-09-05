@@ -71,7 +71,7 @@
             <label class="form-check-label" for="is_active">Active</label>
         </div>
 
-        <hr>
+        {{-- <hr>
         <h3>Weekly Rules</h3>
         <p class="text-muted">※Rows including in-person (in_person/both) should have the start time set to xx:00.</p>
         <table class="table" id="rules-table">
@@ -113,14 +113,14 @@
             @endforeach
             </tbody>
         </table>
-        <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-rule">＋ Add Rule</button>
+        <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-rule">＋ Add Rule</button> --}}
 
         <hr>
         <h3>Breaks</h3>
         <table class="table" id="breaks-table">
             <thead>
                 <tr>
-                    <th>Weekday</th>
+                    {{-- <th>Weekday</th> --}}
                     <th>Start</th>
                     <th>End</th>
                     <th>Reason</th>
@@ -141,7 +141,7 @@
 
             @foreach($oldBreaks as $i => $b)
                 <tr>
-                    <td><input type="number" name="breaks[{{ $i }}][weekday]" min="0" max="6" class="form-control" value="{{ $b['weekday'] ?? '' }}" required></td>
+                    {{-- <td><input type="number" name="breaks[{{ $i }}][weekday]" min="0" max="6" class="form-control" value="{{ $b['weekday'] ?? '' }}" required></td> --}}
                     <td><input type="time" name="breaks[{{ $i }}][start_time]" class="form-control" value="{{ $b['start_time'] ?? '' }}" required></td>
                     <td><input type="time" name="breaks[{{ $i }}][end_time]" class="form-control" value="{{ $b['end_time'] ?? '' }}" required></td>
                     <td><input type="text" name="breaks[{{ $i }}][reason]" class="form-control" value="{{ $b['reason'] ?? '' }}"></td>

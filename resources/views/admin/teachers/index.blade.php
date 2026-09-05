@@ -23,8 +23,19 @@
 
     <div class="table-responsive">
         <table class="table table-striped">
-            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Specialty</th><th>Career</th><th>Status</th>
-                    <th class="text-nowrap">Actions</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                {{-- <th>Email</th><th>Specialty</th><th>Career</th> --}}
+                    <th>Booked</th>
+                    <th>Number of Slots</th>
+                    <th>Shift Pattern</th>
+                    <th>Status</th>
+                    <th>Today</th>
+                    <th class="text-nowrap">Actions</th>
+                </tr>
+            </thead>
             <tbody>
             @forelse($teachers as $teacher)
                 @php
@@ -34,18 +45,23 @@
                 <tr>
                     <td>{{ $teacher->id }}</td>
                     <td>{{ $teacher->user->first_name ?? '' }} {{ $teacher->user->last_name ?? '' }}</td>
-                    <td>{{ $teacher->user->email ?? '-' }}</td>
+                    {{-- <td>{{ $teacher->user->email ?? '-' }}</td>
                     <td>{{ $teacher->specialty ?? '-' }}</td>
-                    <td>{{ $teacher->career ?? '-' }}</td>
+                    <td>{{ $teacher->career ?? '-' }}</td> --}}
+                    <td>{{ $teacher->booked ?? '-' }}</td> {{-- 未解決 --}}
+                    <td>{{ $teacher->slots_number ?? '-' }}</td> {{-- 未解決 --}}
+                    <td>{{ $teacher->pattern_id?->pattern_name ?? '-' }}</td> {{-- 未解決 --}}
                     <td>
                         <span class="badge {{ $status === 'active' ? 'bg-success' : 'bg-secondary' }}">
                             {{ $status }}
                         </span>
                     </td>
+                    <td>{{ $teacher->today ?? '-' }}</td> {{-- 未解決 --}}
                     <td class="text-nowrap">
                         <a href="{{ route('admin.teachers.show', $teacher) }}" class="btn btn-sm btn-outline-secondary">Details</a>
                         <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                         <a href="{{ route('admin.teachers.materials.edit', $teacher) }}" class="btn btn-sm btn-outline-info">Materials</a>
+                        {{-- <a href="{{ route('admin.teachers.shift-patterns.edit', $teacher) }}" class="btn btn-sm btn-outline-success">Shift pattern/assign</a> --}}
                         {{-- @if($status === 'active')
                             <form action="{{ route('admin.teachers.destroy', $teacher) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('この講師アカウントを停止しますか？');">

@@ -14,8 +14,10 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
+                        <th>Pattern Name</th>
                         <th>Timezone</th>
                         <th>Slot(min)</th>
+                        <th>Teacher</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -23,12 +25,19 @@
                 @forelse($patterns as $pattern)
                     <tr>
                         <td>{{ $pattern->id }}</td>
-                        <td>{{ $pattern->name }}</td>
+                        <td>{{ $pattern->pattern_code }}</td>
+                        <td>{{ $pattern->pattern_name }}</td>
                         <td>{{ $pattern->timezone ?? 'UTC' }}</td>
                         <td>{{ $pattern->slot_minutes ?? '-' }}</td>
+                        <td>{{ $pattern->teachers_count ?? 0 }}</td>  {{-- 未解決 --}}
                         <td class="text-end">
                             <a href="{{ route('admin.shift-patterns.edit', $pattern) }}" class="btn btn-outline-primary btn-sm">Edit</a>
                             <a href="{{ route('admin.shift-pattern-assignments.create', ['pattern_id' => $pattern->id]) }}" class="btn btn-outline-secondary btn-sm">Assign</a>
+                            <form action="{{ route('admin.shift-patterns.destroy', $pattern) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 @empty

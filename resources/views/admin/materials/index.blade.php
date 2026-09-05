@@ -45,6 +45,13 @@
                                 {{ $material->level ?? 'N/A' }}
                             </span>
 
+                            {{-- 教師数 --}}
+                            <div class="mb-2">
+                                <span class="badge bg-info">
+                                    {{ $material->teachers_count ?? 0 }} Teachers {{-- 未解決 --}}
+                                </span>
+                            </div>
+
                             {{-- 教材名 --}}
                             <a href="{{ route('admin.materials.show', $material) }}" class="text-decoration-none text-dark">
                                 <h5 class="fw-bold mb-2">{{ $material->name }}</h5>
@@ -62,14 +69,20 @@
                                 </a>
 
                                 @if($material->status === 'active')
-                                    <form method="POST" action="{{ route('admin.materials.suspend', $material) }}" onsubmit="return confirm('この教材を一時停止しますか？');">
+                                    <form method="POST" action="{{ route('admin.materials.suspend', $material) }}" onsubmit="return confirm('Would you like to suspend this material?');">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="btn btn-outline-warning btn-sm">Suspend</button>
                                     </form>
+                                @elseif($material->status === 'inactive')
+                                    <form method="POST" action="{{ route('admin.materials.activate', $material) }}" onsubmit="return confirm('Would you like to activate this material?');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-outline-success btn-sm">Activate</button>
+                                    </form>
                                 @endif
 
-                                <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('この教材を削除しますか？');">
+                                <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('Would you like to delete this material?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>

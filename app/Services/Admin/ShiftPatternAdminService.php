@@ -41,7 +41,7 @@ class ShiftPatternAdminService
 
             // 全置換（シンプル・安全）
             $pattern->rules()->delete();
-            foreach ($data['rules'] as $row) {
+            foreach (($data['rules'] ?? []) as $row) {
                 $this->assertRuleConsistency($row, (int)$data['slot_minutes']);
                 $pattern->rules()->create($row);
             }
@@ -98,5 +98,14 @@ class ShiftPatternAdminService
                 throw new DomainException("休憩({$break->weekday} {$break->start_time}-{$break->end_time})が勤務時間外です。");
             }
         }
+    }
+
+    /**
+     * シフトパターンを削除
+     */
+    public function delete(ShiftPattern $shiftPattern): bool
+    {
+        // 関連データ（割り当て等）の整合性チェックや外部キーのケアが必要な場合はここに記述
+        return $shiftPattern->delete();
     }
 }
