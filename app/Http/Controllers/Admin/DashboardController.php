@@ -11,7 +11,122 @@ use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
+    /**
+     * Dashboard: 当日の先生/場所切替タイムライン画面 (admin/dashboard.blade.php)
+     */
     public function index(Request $request)
+    {
+        $today = Carbon::today();
+        $todayStr = $today->toDateString();
+        // 1. サマリー数値
+        $capacity = DB::table('teacher_schedules')
+            ->whereDate('start_time', $todayStr)
+            ->count();
+        $booked = DB::table('reservations')
+            ->whereDate('start_at', $todayStr)
+            ->whereNull('cancelled_at')
+            ->count();
+        $autoBooked = DB::table('reservations')
+            ->whereDate('start_at', $todayStr)
+            ->where('is_auto_assigned', 1)
+            ->whereNull('cancelled_at')
+            ->count();
+        // 2. 先生データ & 予約データ
+        $teachers = DB::table('teachers as t')
+            ->join('users as u', 'u.id', '=', 't.user_id')
+            ->select([
+                't.id',
+                't.user_id',
+                DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as name"),
+                't.specialty as role',
+            ])
+            ->get();
+        $reservations = DB::table('reservations as r')
+            ->join('students as s', 's.id', '=', 'r.student_id')
+            ->join('users as su', 'su.id', '=', 's.user_id')
+            ->join('materials as m', 'm.material_id', '=', 'r.material_id')
+            ->whereDate('r.start_at', $todayStr)
+            ->whereNull('r.cancelled_at')
+            ->select([
+                'r.id',
+                'r.teacher_id',
+                'r.start_at',
+                'r.end_at',
+                DB::raw("CONCAT(COALESCE(su.last_name,''), ' ', COALESCE(su.first_name,'')) as student_name"),
+                'm.name as material_name'
+            ])
+            ->get();
+        // 先生モード用タイムライン
+        $teacherTimeline = $teachers->map(function ($teacher) use ($reservations) {
+            $teacherReservations = $reservations->where('teacher_id', $teacher->id)->map(function ($res) {
+                $start = Carbon::parse($res->start_at);
+                $end = Carbon::parse($res->end_at);
+                return [
+                    'id' => $res->id,
+                    'title' => $res->student_name . ' (' . $res->material_name . ')',
+                    'start_time' => $start->format('H:i'),
+                    'end_time' => $end->format('H:i'),
+                    'start_minutes' => $start->hour * 60 + $start->minute,
+                    'duration_minutes' => $end->diffInMinutes($start),
+                    'type' => 'booked'
+                ];
+            })->values();
+            return [
+                'id' => 'teacher_' . $teacher->id,
+                'name' => $teacher->name ?: 'Teacher #' . $teacher->id,
+                'role' => $teacher->role ?: 'Instructor',
+                'blocks' => $teacherReservations
+            ];
+        });
+        // 3. 場所（教室）モード用タイムライン
+        $rooms = collect([
+            ['id' => 'room_1', 'name' => 'Station A (Room 101)', 'role' => 'Main Building'],
+            ['id' => 'room_2', 'name' => 'Station B (Room 102)', 'role' => 'Main Building'],
+            ['id' => 'room_3', 'name' => 'Station C (Room 103)', 'role' => 'Annex'],
+            ['id' => 'room_4', 'name' => 'Online Booth 1', 'role' => 'Remote'],
+            ['id' => 'room_5', 'name' => 'Online Booth 2', 'role' => 'Remote'],
+        ]);
+        $roomCount = $rooms->count();
+        $locationTimeline = $rooms->map(function ($room, $index) use ($reservations, $roomCount) {
+            $assignedReservations = $reservations->filter(function ($res, $key) use ($index, $roomCount) {
+                return $roomCount > 0 && ($key % $roomCount) === $index;
+            })->map(function ($res) {
+                $start = Carbon::parse($res->start_at);
+                $end = Carbon::parse($res->end_at);
+                return [
+                    'id' => $res->id,
+                    'title' => $res->student_name . ' - Lesson',
+                    'start_time' => $start->format('H:i'),
+                    'end_time' => $end->format('H:i'),
+                    'start_minutes' => $start->hour * 60 + $start->minute,
+                    'duration_minutes' => $end->diffInMinutes($start),
+                    'type' => 'room_used'
+                ];
+            })->values();
+            return [
+                'id' => $room['id'],
+                'name' => $room['name'],
+                'role' => $room['role'],
+                'blocks' => $assignedReservations
+            ];
+        });
+        $now = Carbon::now();
+        return view('admin.dashboard', [
+            'todayDate' => $today->format('Y/m/d'),
+            'capacity' => $capacity,
+            'booked' => $booked,
+            'autoBooked' => $autoBooked,
+            'teacherTimeline' => $teacherTimeline,
+            'locationTimeline' => $locationTimeline,
+            'currentTimeMinutes' => $now->hour * 60 + $now->minute,
+            'currentTimeStr' => $now->format('H:i'),
+        ]);
+    }
+
+    /**
+     * Schedule Management: 週間予定表画面 (admin/schedules/index.blade.php)
+     */ 
+    public function schedulesIndex(Request $request)
     {
         $validated = $request->validate([
             'week_start' => ['nullable', 'date_format:Y-m-d'],
@@ -73,7 +188,7 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        return view('admin.dashboard', [
+        return view('admin.schedules/index', [
             'weekStart'     => $start->toDateString(),
             'weekNo'        => $start->isoWeek(),   // 例: 36
             'weekYear'      => $start->isoWeekYear(), // 年またぎ対策
@@ -82,7 +197,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function details(Request $request)
+    public function ScheduleDetails(Request $request)
     {
         $data = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
@@ -135,7 +250,7 @@ class DashboardController extends Controller
     $items = collect();
 }
 
-        return view('admin.dashboard_details', [
+        return view('admin.schedules.index_details', [
             'date' => $date,
             'type' => $type,
             'items' => $items,

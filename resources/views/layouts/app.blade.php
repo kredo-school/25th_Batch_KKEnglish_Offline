@@ -102,7 +102,7 @@
 @endauth
 
             {{-- 各ページの内容 --}}
-            <main class="col py-4 px-4">
+            <main class="col py-4 px-4" style="min-width: 0;">
                 @yield('content')
             </main>
 
