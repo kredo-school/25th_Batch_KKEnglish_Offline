@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Student;
 
 use App\Services\ReservationService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\Material;
 use App\Models\TeacherSchedule;
+use App\Models\Reservation;
+use App\Models\ReservationStatus;
+use App\Models\ReservationHistory;
 use Illuminate\Contracts\View\View;
 
 use Illuminate\Http\Request;
@@ -17,8 +21,8 @@ class ReservationController extends Controller
 {
     public function __construct(
         private ReservationService $reservationService
-    ) {
-    }
+    ) {}
+
     public function index(): View
     {
         /**
@@ -45,8 +49,8 @@ class ReservationController extends Controller
          * Bladeへ
          * $teachers
          * $materials
-         *
          * を渡す
+
          */
         return view(
             'students.reservations.index',
@@ -198,7 +202,7 @@ class ReservationController extends Controller
         );
     }
 
-    public function store(Request $request):RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
 
@@ -222,10 +226,10 @@ class ReservationController extends Controller
 
         $reservation =
             $this->reservationService
-                ->createForStudent(
-                    $student,
-                    $validated
-                );
+            ->createForStudent(
+                $student,
+                $validated
+            );
 
 
         return redirect()
@@ -235,6 +239,245 @@ class ReservationController extends Controller
                 '予約が完了しました。'
             );
     }
+    public function cancel(
+        Request $request,
+        Reservation $reservation
+    ): RedirectResponse {
+
+        /*
+     * ========================================
+     * ログイン中Student取得
+     * ========================================
+     */
+        $student = $request
+            ->user()
+            ->student;
+
+        abort_unless(
+            $student,
+            403,
+            '生徒ユーザーではありません。'
+        );
 
 
+        /*
+     * ========================================
+     * キャンセル理由
+     * ========================================
+     */
+        $validated = $request->validate([
+            'cancellation_reason' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
+        ]);
+
+
+        /*
+     * ========================================
+     * Transaction
+     * ========================================
+     */
+        DB::transaction(function () use (
+            $request,
+            $reservation,
+            $student,
+            $validated
+        ) {
+
+            /*
+         * =====================================
+         * Reservationを最新状態で再取得
+         * + ロック
+         * =====================================
+         */
+            $reservation = Reservation::query()
+                ->with('status')
+                ->whereKey(
+                    $reservation->getKey()
+                )
+                ->lockForUpdate()
+                ->firstOrFail();
+
+
+            /*
+         * =====================================
+         * 自分の予約か確認
+         * =====================================
+         */
+            abort_unless(
+                (int) $reservation->student_id
+                    ===
+                    (int) $student->id,
+                403,
+                '他の生徒の予約はキャンセルできません。'
+            );
+
+
+            /*
+         * =====================================
+         * キャンセル可能statusか
+         * =====================================
+         */
+            if (
+                !in_array(
+                    $reservation->status->status_code,
+                    [
+                        'pending',
+                        'confirmed',
+                    ],
+                    true
+                )
+            ) {
+
+                throw ValidationException::withMessages([
+                    'reservation' =>
+                    'この予約はキャンセルできません。',
+                ]);
+            }
+
+
+            /*
+         * =====================================
+         * cancelled status取得
+         * =====================================
+         */
+            $cancelledStatus =
+                ReservationStatus::query()
+                ->where(
+                    'status_code',
+                    'cancelled'
+                )
+                ->firstOrFail();
+
+
+            /*
+         * =====================================
+         * 変更前status
+         * =====================================
+         */
+            $fromStatusId =
+                $reservation->status_id;
+
+
+            /*
+         * =====================================
+         * Reservation更新
+         * =====================================
+         */
+            $reservation->update([
+
+                'status_id' =>
+                $cancelledStatus->status_id,
+
+                'cancelled_by' =>
+                $request->user()->id,
+
+                'cancelled_at' =>
+                now(),
+
+                'cancellation_reason' =>
+                $validated['cancellation_reason'] ?? null,
+            ]);
+
+
+            /*
+         * =====================================
+         * History作成
+         * =====================================
+         */
+            ReservationHistory::create([
+
+                'reservation_id' =>
+                $reservation->id,
+
+                'from_status_id' =>
+                $fromStatusId,
+
+                'to_status_id' =>
+                $cancelledStatus->status_id,
+
+                'changed_by' =>
+                $request->user()->id,
+
+                'reason' =>
+                $validated['cancellation_reason'] ?? null,
+            ]);
+        });
+
+
+        /*
+     * ========================================
+     * 完了
+     * ========================================
+     */
+        return redirect()
+            ->route(
+                'students.reservations.index'
+            )
+            ->with(
+                'success',
+                '予約をキャンセルしました。'
+            );
+    }
+
+    public function myReservations(
+        Request $request
+    ): View {
+
+        /*
+     * ========================================
+     * ログイン中Student取得
+     * ========================================
+     */
+        $student = $request
+            ->user()
+            ->student;
+
+
+        abort_unless(
+            $student,
+            403,
+            '生徒ユーザーではありません。'
+        );
+
+
+        /*
+     * ========================================
+     * 自分のReservationだけ取得
+     * ========================================
+     */
+        $reservations = Reservation::query()
+
+            ->where(
+                'student_id',
+                $student->id
+            )
+
+            ->with([
+                'teacher.user',
+                'material',
+                'status',
+            ])
+
+            ->orderByDesc(
+                'start_at'
+            )
+
+            ->get();
+
+
+        /*
+     * ========================================
+     * Bladeへ渡す
+     * ========================================
+     */
+        return view(
+            'students.reservations.my-reservations',
+            compact(
+                'reservations'
+            )
+        );
+    }
 }
