@@ -45,7 +45,6 @@ class ShiftPatternAssignmentController extends Controller
             'replace_overlapping' => ['nullable', 'boolean'],
         ]);
 
-        $teacherIds = collect($data['teacher_ids'])->map(fn($v)=>(int)$v)->value ?? (int)$v;
         $teacherIds = collect($data['teacher_ids'])->map(fn($v)=>(int)$v)->unique()->values();
         $weekdays   = collect($data['weekdays'])->map(fn($v)=>(int)$v)->unique()->values();
         $now = now();

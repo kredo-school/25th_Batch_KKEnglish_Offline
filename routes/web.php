@@ -116,13 +116,10 @@ Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid']
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admins')
-    ->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard');
-    Route::get('/dashboard/details', [DashboardController::class, 'details'])
-    ->name('dashboard.details');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Route::get('/dashboard/details', [DashboardController::class, 'details'])->name('dashboard.details');
 
     // Material 編集
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
@@ -155,11 +152,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')
     Route::get('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'edit'])->name('teachers.materials.edit');
     Route::put('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'update'])->name('teachers.materials.update');
 
+    // Schedule Management
+    Route::get('/schedules', [DashboardController::class, 'schedulesIndex'])->name('schedules.index');
+    Route::get('/schedules/details', [DashboardController::class, 'details'])->name('schedules.index_details');
+
     // Shift Pattern Management
     Route::resource('shift-patterns', ShiftPatternController::class)->only(['index', 'create', 'store','show', 'edit', 'update', 'destroy']);
 
     // Shift Pattern Assignment
     Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])->name('shift-pattern-assignments.create');
     Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])->name('shift-pattern-assignments.store');
-    Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');  
+    Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');
 });
