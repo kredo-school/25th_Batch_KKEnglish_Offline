@@ -233,7 +233,7 @@ class ReservationController extends Controller
 
 
         return redirect()
-            ->route('students.reservations.index')
+            ->route('students.reservations.upcoming')
             ->with(
                 'success',
                 '予約が完了しました。'
@@ -474,7 +474,7 @@ class ReservationController extends Controller
      * ========================================
      */
         return view(
-            'students.reservations.my-reservations',
+            'students.reservations.upcoming',
             compact(
                 'reservations'
             )
