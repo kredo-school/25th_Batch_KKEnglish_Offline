@@ -120,11 +120,7 @@
                                         <div class="d-flex align-items-center">
 
                                             <img
-                                                src="{{
-                                                    $reservation->teacher->user->profile_image
-                                                        ? asset('storage/' . $reservation->teacher->user->profile_image)
-                                                        : asset('images/no-image.png')
-                                                }}"
+                                                src="{{ $reservation->teacher->user->profile_image }}"
                                                 alt="{{ $reservation->teacher->user->first_name }}"
                                                 width="45"
                                                 height="45"
