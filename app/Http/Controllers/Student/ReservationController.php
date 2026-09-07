@@ -414,7 +414,7 @@ class ReservationController extends Controller
      */
         return redirect()
             ->route(
-                'students.reservations.index'
+                'students.reservations.upcoming'
             )
             ->with(
                 'success',
@@ -461,9 +461,7 @@ class ReservationController extends Controller
                 'status',
             ])
 
-            ->orderByDesc(
-                'start_at'
-            )
+            ->orderBy('start_at')
 
             ->get();
 
