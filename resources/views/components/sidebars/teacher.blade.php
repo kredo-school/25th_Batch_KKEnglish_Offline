@@ -10,7 +10,7 @@
         <a href="{{ route('teachers.schedule') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
            {{ request()->routeIs('teachers.schedule') ? 'bg-warning-subtle' : '' }}">
-            Booked lessons
+            My Schedule
         </a>
 
         <a href="#"
@@ -18,20 +18,20 @@
             Lesson History
         </a>
 
-        <a href="{{ route('materials.index') }}"
+        <a href="#"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            Teaching Materials
+            My Materials
         </a>
 
         <a href="#"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            Notifications
+            (Notifications)
         </a>
 
-        <a href="{{ route('teacher.schedules.index') }}"
+        {{-- <a href="{{ route('teacher.schedules.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
             Schedule Settings
-        </a>
+        </a> --}}
 
     </nav>
 </aside>

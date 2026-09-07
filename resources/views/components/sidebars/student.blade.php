@@ -9,8 +9,14 @@
 
         <a href="{{ route('students.reservations.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('reservation.test') ? 'student-active fw-semibold' : '' }}">
+           {{ request()->routeIs('students.reservations.index') ? 'student-active fw-semibold' : '' }}">
             Book a lesson
+        </a>
+
+         <a href="{{ route('students.reservations.upcoming.test') }}"
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+           {{ request()->routeIs('students.reservations.upcoming.test') ? 'student-active fw-semibold' : '' }}">
+            My lessons
         </a>
 
          <a href="{{ route('students.teacher-list') }}"
@@ -19,21 +25,10 @@
             Teacher list
         </a>
 
-        <a href="{{ route('students.reservations.upcoming.test') }}"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('students.reservations.upcoming.test') ? 'student-active fw-semibold' : '' }}">
-            My lessons
-        </a>
-
         <a href="{{ route('student.history.test') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
            {{ request()->routeIs('student.history.test') ? 'student-active fw-semibold' : '' }}">
             Learning history
-        </a>
-
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            Learning Progress
         </a>
 
         <a href="{{ route('materials.index') }}"
@@ -44,17 +39,22 @@
 
         <a href="#"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            Notifications
+            (Learning Progress)
         </a>
 
         <a href="#"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            User Guide
+            (Notifications)
         </a>
 
         <a href="#"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            AI customized Lesson
+            (User Guide)
+        </a>
+
+        <a href="#"
+           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+            (AI customized Lesson)
         </a>
 
     </nav>

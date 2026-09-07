@@ -7,7 +7,7 @@ use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Student\LessonController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Teacher\TeacherController;
-use App\Http\Controllers\Teacher\ScheduleController;
+// use App\Http\Controllers\Teacher\ScheduleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
@@ -85,18 +85,16 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 });
 
 // Teacher/Admin 共通（Schedule編集）
-Route::middleware(['auth', 'role:teacher,admin'])->group(function () {
-    Route::get('/teachers/schedules', [ScheduleController::class, 'index'])->name('teacher.schedules.index');
-    Route::get('/teachers/schedules/create', [ScheduleController::class, 'create'])->name('teacher.schedules.create');
+// Route::middleware(['auth', 'role:teacher,admin'])->group(function () {
+//     Route::get('/teachers/schedules', [ScheduleController::class, 'index'])->name('teacher.schedules.index');
+//     Route::get('/teachers/schedules/create', [ScheduleController::class, 'create'])->name('teacher.schedules.create');
         // グリッド選択保存（create画面から送信）
-    Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])->name('teacher.schedules.storeGrid');
-
-    Route::post('/teachers/schedules', [ScheduleController::class, 'store'])->name('teacher.schedules.store');
-
-    Route::get('/teachers/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('teacher.schedules.edit');
-    Route::put('/teachers/schedules/{schedule}', [ScheduleController::class, 'update'])->name('teacher.schedules.update');
-    Route::delete('/teachers/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('teacher.schedules.destroy');
-});
+//     Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])->name('teacher.schedules.storeGrid');
+//     Route::post('/teachers/schedules', [ScheduleController::class, 'store'])->name('teacher.schedules.store');
+//     Route::get('/teachers/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('teacher.schedules.edit');
+//     Route::put('/teachers/schedules/{schedule}', [ScheduleController::class, 'update'])->name('teacher.schedules.update');
+//     Route::delete('/teachers/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('teacher.schedules.destroy');
+// });
 
 // Teacher Dashboard
 Route::middleware(['auth', 'role:teacher'])->group(function () {
@@ -111,8 +109,8 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
     Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teacher.schedule-exceptions.destroy');
 
-Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
-    ->name('teacher.schedules.storeGrid');
+// Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
+//     ->name('teacher.schedules.storeGrid');
 });
 
 // Admin Routes
