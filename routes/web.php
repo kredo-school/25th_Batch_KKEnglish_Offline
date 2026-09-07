@@ -76,9 +76,12 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     // キャンセル
     Route::patch('/students/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('students.reservations.cancel');
 
+    // My Reservations
+    Route::get('/students/my-reservations',
+    [ReservationController::class, 'myReservations'])->name('students.reservations.upcoming');
+
     //先生詳細
     Route::get('/students/reservations/detail', [ReservationController::class, 'show'])->name('students.reservations.teacher-detail');
-
 
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
