@@ -9,6 +9,7 @@ use App\Services\Admin\ShiftPatternAdminService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use App\Models\Teacher;
 
 class ShiftPatternController extends Controller
 {
@@ -22,9 +23,20 @@ class ShiftPatternController extends Controller
         return view('admin.shift-patterns.index', compact('patterns'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('admin.shift-patterns.create');
+        $patterns = ShiftPattern::query()
+            ->orderBy('id', 'desc')
+            ->get(['id', 'pattern_name', 'pattern_code']);
+        $teachers = Teacher::query()
+            ->with(['user:id,first_name,last_name'])
+            ->orderBy('id', 'desc')
+            ->get(['id', 'user_id']);
+        return view('admin.shift-pattern-assignments.create', [
+            'patterns' => $patterns,
+            'teachers' => $teachers,
+            'defaultPatternId' => $request->integer('pattern_id') ?: null,
+        ]);
     }
 
     public function store(

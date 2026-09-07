@@ -197,7 +197,10 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function ScheduleDetails(Request $request)
+    /**
+     * Dashboard / Schedule Details (詳細表示画面)
+     */
+    public function details(Request $request)
     {
         $data = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],

@@ -160,6 +160,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::resource('shift-patterns', ShiftPatternController::class)->only(['index', 'create', 'store','show', 'edit', 'update', 'destroy']);
 
     // Shift Pattern Assignment
+    Route::get('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'index'])->name('shift-pattern-assignments.index');
     Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])->name('shift-pattern-assignments.create');
     Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])->name('shift-pattern-assignments.store');
     Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');

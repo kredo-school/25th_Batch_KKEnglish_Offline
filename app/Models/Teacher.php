@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\TeacherSchedule;
 use App\Models\ScheduleException;
 use App\Models\Reservation;
+use App\Models\TeacherShiftPatternAssignment;
 
 
 class Teacher extends Model
@@ -53,7 +54,7 @@ class Teacher extends Model
 
     public function shiftAssignments(): HasMany
     {
-        return $this->hasMany(TeacherShiftAssignment::class);
+        return $this->hasMany(TeacherShiftPatternAssignment::class);
     }
 
 
@@ -72,6 +73,14 @@ class Teacher extends Model
         'id',                // teachers 側PK
         'material_id'        // materials 側PK)
         )->withTimestamps();
+    }
+
+    /**
+     * 先生のシフトパターン割り当て一覧
+     */
+    public function shiftPatternAssignments(): HasMany
+    {
+        return $this->hasMany(TeacherShiftPatternAssignment::class);
     }
 
 }
