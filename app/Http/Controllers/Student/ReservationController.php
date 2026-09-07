@@ -338,6 +338,13 @@ class ReservationController extends Controller
             }
 
 
+            if ($reservation->start_at->lte(now())) {
+                throw ValidationException::withMessages([
+                    'reservation' =>
+                    '開始済みまたは過去の予約はキャンセルできません。',
+                ]);
+            }
+
             /*
          * =====================================
          * cancelled status取得
@@ -422,19 +429,12 @@ class ReservationController extends Controller
             );
     }
 
-    public function myReservations(
-        Request $request
-    ): View {
-
+    public function myReservations(Request $request): View
+    {
         /*
-     * ========================================
-     * ログイン中Student取得
-     * ========================================
+     * ログイン中のStudent取得
      */
-        $student = $request
-            ->user()
-            ->student;
-
+        $student = $request->user()->student;
 
         abort_unless(
             $student,
@@ -442,40 +442,109 @@ class ReservationController extends Controller
             '生徒ユーザーではありません。'
         );
 
-
         /*
-     * ========================================
-     * 自分のReservationだけ取得
-     * ========================================
+     * 現在の予約
+     *
+     * ・未来の予約
+     * ・pendingまたはconfirmed
      */
-        $reservations = Reservation::query()
-
-            ->where(
-                'student_id',
-                $student->id
-            )
-
+        $upcomingReservations = Reservation::query()
+            ->where('student_id', $student->id)
+            ->where('start_at', '>=', now())
+            ->whereHas('status', function ($query) {
+                $query->whereIn('status_code', [
+                    'pending',
+                    'confirmed',
+                ]);
+            })
             ->with([
                 'teacher.user',
                 'material',
                 'status',
             ])
-
             ->orderBy('start_at')
-
             ->get();
 
+        /*
+     * 予約履歴
+     *
+     * ・開始日時を過ぎている
+     * または
+     * ・pending、confirmed以外
+     */
+        $historyReservations = Reservation::query()
+            ->where('student_id', $student->id)
+            ->where(function ($query) {
+                $query
+                    ->where('start_at', '<', now())
+                    ->orWhereHas('status', function ($statusQuery) {
+                        $statusQuery->whereNotIn('status_code', [
+                            'pending',
+                            'confirmed',
+                        ]);
+                    });
+            })
+            ->with([
+                'teacher.user',
+                'material',
+                'status',
+            ])
+            ->orderByDesc('start_at')
+            ->get();
 
         /*
-     * ========================================
-     * Bladeへ渡す
-     * ========================================
+     * 既存Bladeとの互換性を残す
      */
+        $reservations = $upcomingReservations;
+
         return view(
             'students.reservations.upcoming',
             compact(
-                'reservations'
+                'reservations',
+                'upcomingReservations',
+                'historyReservations'
             )
+        );
+    }
+
+
+    public function showReservation(
+        Request $request,
+        Reservation $reservation
+    ): View {
+
+        $student = $request->user()->student;
+
+        abort_unless(
+            $student,
+            403,
+            '生徒ユーザーではありません。'
+        );
+
+        /*
+     * 他の生徒の予約を表示させない
+     */
+        abort_unless(
+            (int) $reservation->student_id === (int) $student->id,
+            403,
+            'この予約を表示する権限がありません。'
+        );
+
+        /*
+     * 詳細画面で必要な関連データを取得
+     */
+        $reservation->load([
+            'teacher.user',
+            'material',
+            'status',
+            'schedule',
+            'histories',
+            'lessonRecord',
+        ]);
+
+        return view(
+            'students.reservations.show',
+            compact('reservation')
         );
     }
 }
