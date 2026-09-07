@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShiftPattern;
 use App\Models\Teacher;
 use App\Models\TeacherShiftPatternAssignment;
+use App\Services\Admin\GenerateTeacherSchedulesService; // スケジュール生成サービス
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -14,6 +15,11 @@ use Illuminate\Support\Facades\Log;
 
 class ShiftPatternAssignmentController extends Controller
 {
+    // スケジュール生成サービスを注入
+    public function __construct(
+        private readonly GenerateTeacherSchedulesService $scheduleGenerator
+    ) {}
+
     public function index(Request $request): View
     {
         // 割り当てが存在する先生を1人1行で取得（全先生を表示対象とする場合は whereHas を外してください）
@@ -48,7 +54,7 @@ class ShiftPatternAssignmentController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+        public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'shift_pattern_id'    => ['required', 'integer', 'exists:shift_patterns,id'],
@@ -68,10 +74,12 @@ class ShiftPatternAssignmentController extends Controller
         $now        = now();
 
         try {
-            DB::transaction(function () use ($data, $teacherIds, $weekdays, $endDate, $now) {
+            // トランザクション処理の戻り値として生成件数を取得
+            $generatedSlotsCount = DB::transaction(function () use ($data, $teacherIds, $weekdays, $endDate, $now) {
                 $newStart = $data['start_date'];
                 $newEnd   = $endDate ?? '9999-12-31';
 
+                // 重複判定＆上書き削除
                 $overlapQuery = DB::table('teacher_shift_pattern_assignments')
                     ->whereIn('teacher_id', $teacherIds)
                     ->whereIn('weekday', $weekdays)
@@ -91,7 +99,7 @@ class ShiftPatternAssignmentController extends Controller
                     }
                 }
 
-                // 一括挿入用レコード配列の生成
+                // 1. teacher_shift_pattern_assignments（割り当て情報）の保存
                 $rows = [];
                 foreach ($teacherIds as $teacherId) {
                     foreach ($weekdays as $weekday) {
@@ -111,13 +119,26 @@ class ShiftPatternAssignmentController extends Controller
                 if (!empty($rows)) {
                     DB::table('teacher_shift_pattern_assignments')->insert($rows);
                 }
-            });
 
-            $count = $teacherIds->count() * $weekdays->count();
+                // 2. teacher_schedules（実スケジュール枠）への生成・反映
+                $count = 0;
+                $pattern = ShiftPattern::findOrFail($data['shift_pattern_id']);
+                foreach ($teacherIds as $teacherId) {
+                    $count += $this->scheduleGenerator->generate(
+                        teacherId: (int)$teacherId,
+                        pattern: $pattern,
+                        effectiveFrom: $data['start_date'],
+                        effectiveTo: $endDate,
+                        createdBy: (int)auth()->id()
+                    );
+                }
+
+                return $count;
+            });
 
             return redirect()
                 ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
-                ->with('status', $count . '件のTeacher assignmentを正常に作成・保存しました。');
+                ->with('status', "シフト割当の登録完了。同時に {$generatedSlotsCount} 件のレッスン枠をスケジュールに反映しました。");
 
         } catch (\Exception $e) {
             Log::error('ShiftPatternAssignment Store Error: ' . $e->getMessage());

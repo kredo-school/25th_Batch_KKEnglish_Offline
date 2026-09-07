@@ -32,7 +32,7 @@ class ShiftPatternController extends Controller
             ->with(['user:id,first_name,last_name'])
             ->orderBy('id', 'desc')
             ->get(['id', 'user_id']);
-        return view('admin.shift-pattern-assignments.create', [
+        return view('admin.shift-patterns.create', [
             'patterns' => $patterns,
             'teachers' => $teachers,
             'defaultPatternId' => $request->integer('pattern_id') ?: null,
@@ -50,7 +50,7 @@ class ShiftPatternController extends Controller
         );
 
         return redirect()
-            ->route('admin.shift-patterns.edit', $pattern)
+            ->route('admin.shift-patterns.index', $pattern)
             ->with('status', 'Successfully created the shift pattern.');
     }
 
