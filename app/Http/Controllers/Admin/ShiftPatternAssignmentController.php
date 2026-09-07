@@ -5,24 +5,41 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ShiftPattern;
 use App\Models\Teacher;
+use App\Models\TeacherShiftPatternAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ShiftPatternAssignmentController extends Controller
 {
+    public function index(Request $request): View
+    {
+        // 割り当てが存在する先生を1人1行で取得（全先生を表示対象とする場合は whereHas を外してください）
+        $teachers = Teacher::query()
+            ->whereHas('shiftPatternAssignments')
+            ->with([
+                'user:id,first_name,last_name',
+                'shiftPatternAssignments.shiftPattern'
+            ])
+            ->orderBy('id', 'desc')
+            ->paginate(15);
+        return view('admin.shift-pattern-assignments.index', [
+            'teachers' => $teachers,
+        ]);
+    }
 
     public function create(Request $request): View
     {
         $patterns = ShiftPattern::query()
             ->orderBy('id', 'desc')
-            ->get(['id']); // name を外す
+            ->get(['id', 'pattern_name', 'pattern_code']);
 
         $teachers = Teacher::query()
-            ->with(['user:id,first_name,last_name']) // users から表示名取得
+            ->with(['user:id,first_name,last_name'])
             ->orderBy('id', 'desc')
-            ->get(['id', 'user_id']); // ここも name が無いなら同様に id のみに
+            ->get(['id', 'user_id']);
 
         return view('admin.shift-pattern-assignments.create', [
             'patterns' => $patterns,
@@ -42,55 +59,81 @@ class ShiftPatternAssignmentController extends Controller
             'start_date'          => ['required', 'date'],
             'end_date'            => ['nullable', 'date', 'after_or_equal:start_date'],
             'priority'            => ['nullable', 'integer', 'min:0'],
-            'replace_overlapping' => ['nullable', 'boolean'],
+            'replace_overlapping' => ['nullable'],
         ]);
 
-        $teacherIds = collect($data['teacher_ids'])->map(fn($v)=>(int)$v)->unique()->values();
-        $weekdays   = collect($data['weekdays'])->map(fn($v)=>(int)$v)->unique()->values();
-        $now = now();
+        $teacherIds = collect($data['teacher_ids'])->map(fn($v) => (int)$v)->unique()->values();
+        $weekdays   = collect($data['weekdays'])->map(fn($v) => (int)$v)->unique()->values();
+        $endDate    = !empty($data['end_date']) ? $data['end_date'] : null;
+        $now        = now();
 
-        DB::transaction(function () use ($data, $teacherIds, $weekdays, $now) {
-            // チェック時: 期間が重なる既存割当を削除
-            if (!empty($data['replace_overlapping'])) {
+        try {
+            DB::transaction(function () use ($data, $teacherIds, $weekdays, $endDate, $now) {
                 $newStart = $data['start_date'];
-                $newEnd   = $data['end_date'] ?? '9999-12-31';
+                $newEnd   = $endDate ?? '9999-12-31';
 
-                DB::table('teacher_shift_pattern_assignments')
+                $overlapQuery = DB::table('teacher_shift_pattern_assignments')
                     ->whereIn('teacher_id', $teacherIds)
                     ->whereIn('weekday', $weekdays)
                     ->where(function ($q) use ($newStart, $newEnd) {
                         $q->where('start_date', '<=', $newEnd)
-                        ->where(function ($qq) use ($newStart) {
-                            $qq->whereNull('end_date')
-                                ->orWhere('end_date', '>=', $newStart);
-                        });
-                    })
-                    ->delete();
-            }
+                          ->where(function ($qq) use ($newStart) {
+                              $qq->whereNull('end_date')
+                                 ->orWhere('end_date', '>=', $newStart);
+                          });
+                    });
 
-            $rows = [];
-            foreach ($teacherIds as $teacherId) {
-                foreach ($weekdays as $weekday) {
-                    $rows[] = [
-                        'shift_pattern_id' => $data['shift_pattern_id'],
-                        'teacher_id'       => $teacherId,
-                        'weekday'          => $weekday,
-                        'start_date'       => $data['start_date'],
-                        'end_date'         => $data['end_date'] ?? null,
-                        'priority'         => (int)($data['priority'] ?? 0),
-                        'created_at'       => $now,
-                        'updated_at'       => $now,
-                    ];
+                if ($overlapQuery->exists()) {
+                    if (!empty($data['replace_overlapping'])) {
+                        $overlapQuery->delete();
+                    } else {
+                        throw new \InvalidArgumentException('重複するシフトパターン割り当てが存在します。');
+                    }
                 }
-            }
 
-            DB::table('teacher_shift_pattern_assignments')->insert($rows);
-        });
+                // 一括挿入用レコード配列の生成
+                $rows = [];
+                foreach ($teacherIds as $teacherId) {
+                    foreach ($weekdays as $weekday) {
+                        $rows[] = [
+                            'shift_pattern_id' => (int)$data['shift_pattern_id'],
+                            'teacher_id'       => (int)$teacherId,
+                            'weekday'          => (int)$weekday,
+                            'start_date'       => $data['start_date'],
+                            'end_date'         => $endDate,
+                            'priority'         => (int)($data['priority'] ?? 0),
+                            'created_at'       => $now,
+                            'updated_at'       => $now,
+                        ];
+                    }
+                }
 
-        $count = $teacherIds->count() * $weekdays->count();
+                if (!empty($rows)) {
+                    DB::table('teacher_shift_pattern_assignments')->insert($rows);
+                }
+            });
+
+            $count = $teacherIds->count() * $weekdays->count();
+
+            return redirect()
+                ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
+                ->with('status', $count . '件のTeacher assignmentを正常に作成・保存しました。');
+
+        } catch (\Exception $e) {
+            Log::error('ShiftPatternAssignment Store Error: ' . $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => '保存中にエラーが発生しました: ' . $e->getMessage()]);
+        }
+    }
+
+    public function destroy(TeacherShiftPatternAssignment $assignment): RedirectResponse
+    {
+        $assignment->delete();
 
         return redirect()
-            ->route('admin.shift-pattern-assignments.create', ['menu' => 'schedule'])
-            ->with('status', $count.'件のTeacher assignmentを作成しました。');
+            ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
+            ->with('status', 'Teacher assignmentを削除しました。');
     }
 }

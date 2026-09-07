@@ -20,12 +20,12 @@
         @csrf
 
         <div class="mb-3">
-            <label>Shift Pattern</label>
-            <select name="shift_pattern_id" class="form-control" required>
-                <option value="">Select</option>
+            <label class="form-label fw-semibold">Shift Pattern</label>
+            <select name="shift_pattern_id" class="form-select" required>
+                <option value="">Select Shift Pattern</option>
                 @foreach($patterns as $p)
-                    <option value="{{ $p->id }}" @selected(old('shift_pattern_id')==$p->id)>
-                        Pattern #{{ $p->id }}
+                    <option value="{{ $p->id }}" @selected(old('shift_pattern_id', $defaultPatternId ?? null)==$p->id)>
+                        {{ $p->pattern_name ?? $p->pattern_code ?? ('Pattern #' . $p->id) }}
                     </option>
                 @endforeach
             </select>
@@ -41,7 +41,7 @@
             </option>
         @endforeach
     </select>
-    <small class="text-muted">Ctrl(⌘)+クリックで複数選択</small>
+    <small class="text-muted">Ctrl(⌘)+Click to select multiple</small>
 </div>
 
     <div class="mb-3">
@@ -58,7 +58,7 @@
                 </label>
             @endforeach
         </div>
-        <small class="text-muted">少なくとも1曜日を選択してください。</small>
+        <small class="text-muted">Select at least one weekday.</small>
     </div>
 
         <div class="row">

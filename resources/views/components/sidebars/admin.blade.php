@@ -32,7 +32,7 @@
             </a>
 
             {{-- 先生割り当て --}}
-            <a href="{{ route('admin.shift-pattern-assignments.create', ['menu' => 'schedule']) }}"
+            <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.shift-pattern-assignments.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Teacher assignment
             </a>
