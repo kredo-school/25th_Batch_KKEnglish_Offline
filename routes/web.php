@@ -25,8 +25,8 @@ Route::view('/reservation-teacher-detail-test','students.reservations.teacher-de
 ->name('reservations.teacher-detail.test');
 Route::view('/student-history-test','students.history.index')
 ->name('student.history.test');
-Route::view('/upcoming-test','students.reservations.upcoming')
-->name('students.reservations.upcoming.test');
+// Route::view('/upcoming-test','students.reservations.upcoming')
+// ->name('students.reservations.upcoming.test');
 
 
 // Public routes

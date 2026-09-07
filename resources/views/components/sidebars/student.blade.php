@@ -13,9 +13,9 @@
             Book a lesson
         </a>
 
-         <a href="{{ route('students.reservations.upcoming.test') }}"
+         <a href="{{ route('students.reservations.upcoming') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('students.reservations.upcoming.test') ? 'student-active fw-semibold' : '' }}">
+           {{ request()->routeIs('students.reservations.upcoming') ? 'student-active fw-semibold' : '' }}">
             My lessons
         </a>
 
