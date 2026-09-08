@@ -105,13 +105,13 @@ class ShiftPatternAssignmentTest extends TestCase
             'slot_minutes' => 30,
         ]);
 
-        ShiftPatternRelated::query()->create([
-            'shift_pattern_id' => $pattern->id,
-            'weekday' => 1, // Monday
-            'start_time' => '09:00:00',
-            'end_time' => '10:00:00',
-            'lesson_type' => 'online',
-        ]);
+        // ShiftPatternRelated::query()->create([
+        //     'shift_pattern_id' => $pattern->id,
+        //     'weekday' => 1, // Monday
+        //     'start_time' => '09:00:00',
+        //     'end_time' => '10:00:00',
+        //     'lesson_type' => 'online',
+        // ]);
 
         $payload = [
             'teacher_ids' => [$teacher->id],

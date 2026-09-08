@@ -56,7 +56,7 @@ class ShiftPatternController extends Controller
 
     public function edit(ShiftPattern $shiftPattern): View
     {
-        $shiftPattern->load(['rules', 'breaks']);
+        $shiftPattern->load(['breaks']);
         return view('admin.shift-patterns.edit', compact('shiftPattern'));
     }
 

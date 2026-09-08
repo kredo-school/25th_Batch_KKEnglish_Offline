@@ -40,40 +40,43 @@ class ShiftPatternAdminService
             $pattern->save();
 
             // 全置換（シンプル・安全）
-            $pattern->rules()->delete();
-            foreach (($data['rules'] ?? []) as $row) {
-                $this->assertRuleConsistency($row, (int)$data['slot_minutes']);
-                $pattern->rules()->create($row);
-            }
+            // $pattern->rules()->delete();
+            // foreach (($data['rules'] ?? []) as $row) {
+            //     $this->assertRuleConsistency($row, (int)$data['slot_minutes']);
+            //     $pattern->rules()->create($row);
+            // }
 
             $pattern->breaks()->delete();
             foreach (($data['breaks'] ?? []) as $row) {
+                if (empty($row['start_time']) || empty($row['end_time'])) {
+                    continue;
+                }
                 $this->assertBreakConsistency($row);
                 $pattern->breaks()->create($row);
             }
 
             // 休憩が勤務帯内か、ざっくり検証（同一曜日）
-            $this->assertBreaksInsideRules($pattern);
+            // $this->assertBreaksInsideRules($pattern);
 
-            return $pattern->fresh(['rules', 'breaks']);
+            return $pattern->fresh(['breaks']);
         });
     }
 
-    private function assertRuleConsistency(array $rule, int $slotMinutes): void
-    {
-        // 要件: in_person は 60分かつ xx:00 開始
-        if ($rule['lesson_type'] === 'in_person' || $rule['lesson_type'] === 'both') {
-            if (substr($rule['start_time'], 3, 2) !== '00') {
-                throw new DomainException('対面授業を含むルールの開始は xx:00 のみです。');
-            }
-        }
+    // private function assertRuleConsistency(array $rule, int $slotMinutes): void
+    // {
+    //     // 要件: in_person は 60分かつ xx:00 開始
+    //     if ($rule['lesson_type'] === 'in_person' || $rule['lesson_type'] === 'both') {
+    //         if (substr($rule['start_time'], 3, 2) !== '00') {
+    //             throw new DomainException('対面授業を含むルールの開始は xx:00 のみです。');
+    //         }
+    //     }
 
-        // パターンのslot_minutesとの整合（運用ポリシー）
-        // ※ online30 / in_person60を厳密分離するなら将来ここを拡張
-        if (!in_array($slotMinutes, [30, 60], true)) {
-            throw new DomainException('slot_minutes は 30 または 60 である必要があります。');
-        }
-    }
+    //     // パターンのslot_minutesとの整合（運用ポリシー）
+    //     // ※ online30 / in_person60を厳密分離するなら将来ここを拡張
+    //     if (!in_array($slotMinutes, [30, 60], true)) {
+    //         throw new DomainException('slot_minutes は 30 または 60 である必要があります。');
+    //     }
+    // }
 
     private function assertBreakConsistency(array $break): void
     {
@@ -82,23 +85,23 @@ class ShiftPatternAdminService
         }
     }
 
-    private function assertBreaksInsideRules(ShiftPattern $pattern): void
-    {
-        $rulesByWeekday = $pattern->rules->groupBy('weekday');
+    // private function assertBreaksInsideRules(ShiftPattern $pattern): void
+    // {
+    //     $rulesByWeekday = $pattern->rules->groupBy('weekday');
 
-        foreach ($pattern->breaks as $break) {
-            $rules = $rulesByWeekday->get($break->weekday, collect());
+    //     foreach ($pattern->breaks as $break) {
+    //         $rules = $rulesByWeekday->get($break->weekday, collect());
 
-            $covered = $rules->contains(function ($rule) use ($break) {
-                return $rule->start_time <= $break->start_time
-                    && $rule->end_time >= $break->end_time;
-            });
+    //         $covered = $rules->contains(function ($rule) use ($break) {
+    //             return $rule->start_time <= $break->start_time
+    //                 && $rule->end_time >= $break->end_time;
+    //         });
 
-            if (!$covered) {
-                throw new DomainException("休憩({$break->weekday} {$break->start_time}-{$break->end_time})が勤務時間外です。");
-            }
-        }
-    }
+    //         if (!$covered) {
+    //             throw new DomainException("休憩({$break->weekday} {$break->start_time}-{$break->end_time})が勤務時間外です。");
+    //         }
+    //     }
+    // }
 
     /**
      * シフトパターンを削除

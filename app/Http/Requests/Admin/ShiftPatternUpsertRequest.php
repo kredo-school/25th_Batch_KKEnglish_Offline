@@ -51,8 +51,8 @@ class ShiftPatternUpsertRequest extends FormRequest
         return [
             'pattern_code' => ['required','string','max:50'],
             'pattern_name' => ['required','string','max:255'],
-            'start_time' => ['required'],
-            'end_time' => ['required'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i'],
             'end_day_offset' => ['required','integer','min:0','max:1'],
             'slot_minutes' => ['required','integer','in:30,60'],
             'display_order' => ['nullable','integer','min:0'],
@@ -77,8 +77,8 @@ class ShiftPatternUpsertRequest extends FormRequest
 
             'breaks' => ['nullable','array'],
             // 'breaks.*.weekday' => ['required','integer','min:0','max:6'],
-            'breaks.*.start_time' => ['nullable'],
-            'breaks.*.end_time' => ['nullable'],
+            'breaks.*.start_time' => ['nullable', 'date_format:H:i'],
+            'breaks.*.end_time' => ['nullable', 'date_format:H:i'],
             'breaks.*.reason' => ['nullable','string','max:255'],
         ];
     }

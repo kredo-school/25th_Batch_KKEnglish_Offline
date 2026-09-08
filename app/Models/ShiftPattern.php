@@ -38,10 +38,10 @@ class ShiftPattern extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function rules(): HasMany
-    {
-        return $this->hasMany(ShiftPatternRelated::class, 'shift_pattern_id');
-    }
+    // public function rules(): HasMany
+    // {
+    //     return $this->hasMany(ShiftPatternRelated::class, 'shift_pattern_id');
+    // }
 
     public function breaks(): HasMany
     {
