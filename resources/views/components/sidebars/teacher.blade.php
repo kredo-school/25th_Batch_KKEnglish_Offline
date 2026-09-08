@@ -13,9 +13,9 @@
             My Schedule
         </a>
 
-         <a href="{{ route('teachers.reservations.test') }}"
+         <a href="{{ route('teachers.reservations.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('teachers.reservations.test') ? 'bg-warning-subtle' : '' }}">
+           {{ request()->routeIs('teachers.reservations.index') ? 'bg-warning-subtle' : '' }}">
             My Lessons
         </a>
 

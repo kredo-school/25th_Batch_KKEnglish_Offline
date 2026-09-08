@@ -45,9 +45,13 @@
                 ================================ --}}
                 @if($user?->profile_image)
 
+                {{--　profile_image の保存形式がロールによって異なるため分岐
+    　　　　　　　　　　Student: storage内の相対パス
+   　　　　　　　　　　　Teacher: Seederで設定した外部URL--}}
                     <img
-                        src="{{ asset('storage/' . $user->profile_image) }}"
-                        alt="{{ $user->first_name }}"
+                        src="{{ str_starts_with($user->profile_image, 'http')
+                            ? $user->profile_image
+                            : asset('storage/' . $user->profile_image) }}"
                         width="40"
                         height="40"
                         class="rounded-circle me-2"

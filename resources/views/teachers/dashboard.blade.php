@@ -136,7 +136,7 @@
 
                 {{-- My Lessons --}}
                 <a
-                    href="{{ route('teachers.reservations.test') }}"
+                    href="{{ route('teachers.reservations.index') }}"
                     class="btn btn-outline-primary btn-sm"
                 >
                     View My Lessons
