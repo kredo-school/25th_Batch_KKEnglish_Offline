@@ -507,7 +507,55 @@ class ReservationController extends Controller
         );
     }
 
+public function teacherDetail(Request $request): View
+{
+    $validated = $request->validate([
+        'teacher_id' => [
+            'required',
+            'integer',
+            'exists:teachers,id',
+        ],
 
+        'material_id' => [
+            'required',
+            'integer',
+            'exists:materials,material_id',
+        ],
+
+        'date' => [
+            'nullable',
+            'date',
+        ],
+
+        'mode' => [
+            'required',
+            'in:material,date',
+        ],
+    ]);
+
+    $teacher = Teacher::query()
+        ->with([
+            'user',
+            'materials',
+        ])
+        ->findOrFail(
+            $validated['teacher_id']
+        );
+
+    $material = Material::query()
+        ->findOrFail(
+            $validated['material_id']
+        );
+
+    return view(
+        'students.reservations.teacher-detail',
+        compact(
+            'teacher',
+            'material',
+            'validated'
+        )
+    );
+}
     public function showReservation(
         Request $request,
         Reservation $reservation
@@ -543,7 +591,7 @@ class ReservationController extends Controller
         ]);
 
         return view(
-            'students.reservations.show',
+            'students.reservations.teacher-detail',
             compact('reservation')
         );
     }

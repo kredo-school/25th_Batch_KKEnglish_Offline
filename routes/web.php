@@ -84,7 +84,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     [ReservationController::class, 'myReservations'])->name('students.reservations.upcoming');
 
     //先生詳細
-    Route::get('/students/reservations/detail', [ReservationController::class, 'show'])->name('students.reservations.teacher-detail');
+    Route::get('/students/reservations/teacher-detail', [ReservationController::class, 'teacherDetail'])->name('students.reservations.teacher-detail');
 
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
