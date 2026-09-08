@@ -4,98 +4,6 @@
 
 @section('content')
 
-@php
-
-    /*
-    |--------------------------------------------------------------------------
-    | Dummy Data
-    |--------------------------------------------------------------------------
-    |
-    | 現在はフロント表示確認用。
-    |
-    | 最終的には
-    | Teacher\ReservationController@index()
-    | から
-    | $upcomingReservations
-    | を受け取る。
-    |
-    */
-
-    $upcomingReservations = collect([
-
-        (object) [
-            'id' => 1,
-
-            'start_at' => '2026-09-10 09:00:00',
-            'end_at' => '2026-09-10 09:30:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Ayako',
-                    'last_name' => 'Kobayashi',
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Daily Conversation',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'confirmed',
-            ],
-        ],
-
-
-        (object) [
-            'id' => 2,
-
-            'start_at' => '2026-09-12 13:30:00',
-            'end_at' => '2026-09-12 14:00:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Taro',
-                    'last_name' => 'Yamada',
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Business English',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'confirmed',
-            ],
-        ],
-
-
-        (object) [
-            'id' => 3,
-
-            'start_at' => '2026-09-15 16:00:00',
-            'end_at' => '2026-09-15 16:30:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Mika',
-                    'last_name' => 'Sato',
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Pronunciation',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'pending',
-            ],
-        ],
-
-    ]);
-
-@endphp
-
-
 <div class="container-fluid py-4">
 
     {{-- ===============================
@@ -175,15 +83,13 @@
 
                             @php
 
-                                $startAt =
-                                    \Carbon\Carbon::parse(
-                                        $reservation->start_at
-                                    );
+                                $startAt = \Carbon\Carbon::parse(
+                                    $reservation->start_at
+                                );
 
-                                $endAt =
-                                    \Carbon\Carbon::parse(
-                                        $reservation->end_at
-                                    );
+                                $endAt = \Carbon\Carbon::parse(
+                                    $reservation->end_at
+                                );
 
                             @endphp
 
@@ -261,6 +167,15 @@
                                             Pending
                                         </span>
 
+                                    @elseif (
+                                        $reservation->status->status_code
+                                        === 'cancelled'
+                                    )
+
+                                        <span class="badge text-bg-danger">
+                                            Cancelled
+                                        </span>
+
                                     @else
 
                                         <span class="badge text-bg-secondary">
@@ -283,9 +198,11 @@
                                 {{-- Action --}}
                                 <td class="text-end pe-4">
 
-                                    {{-- 今はダミー --}}
                                     <a
-                                        href="{{ route('teachers.reservations.show.test') }}"
+                                        href="{{ route(
+                                            'teachers.reservations.show',
+                                            $reservation->id
+                                        ) }}"
                                         class="btn btn-outline-primary btn-sm"
                                     >
                                         Details
@@ -322,56 +239,6 @@
         </div>
 
     </div>
-
-
-    {{-- ===============================
-         TODO
-    ================================ --}}
-    {{--
-
-        TODO:
-
-        現在は表示確認用のダミーデータ。
-
-
-        最終的には
-
-        Teacher\ReservationController@index()
-
-        から
-
-        $upcomingReservations
-
-        を取得して表示する。
-
-
-        表示対象:
-
-        ・ログイン中Teacherの予約
-        ・未来の予約
-        ・pending / confirmed
-
-
-        Details:
-
-        最終的には
-
-        teachers.reservations.show
-
-        に接続する。
-
-
-        本日のレッスンは
-        Teacher Dashboardに表示する。
-
-
-        レッスン終了後は
-        statusをcompletedに変更し、
-
-        Lesson History側に
-        表示する予定。
-
-    --}}
 
 </div>
 

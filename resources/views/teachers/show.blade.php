@@ -51,7 +51,7 @@
                 @if($teacher->user->profile_image)
 
                     <img
-                        src="{{ asset('storage/' . $teacher->user->profile_image) }}"
+                        src="{{ $teacher->user->profile_image }}"
                         alt="{{ $teacher->user->first_name }}"
                         width="100"
                         height="100"
