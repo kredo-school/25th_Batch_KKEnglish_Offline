@@ -792,7 +792,7 @@ document.addEventListener(
             if (material) {
 
                 params.append(
-                    'material',
+                    'material_id',
                     material
                 );
 
