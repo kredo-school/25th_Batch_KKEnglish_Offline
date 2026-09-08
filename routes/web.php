@@ -7,7 +7,8 @@ use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Student\LessonController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Teacher\TeacherController;
-// use App\Http\Controllers\Teacher\ScheduleController;
+use App\Http\Controllers\Teacher\ScheduleController;
+use App\Http\Controllers\Teacher\ReservationController as TeacherReservationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
@@ -18,7 +19,7 @@ use App\Http\Controllers\Teacher\ScheduleExceptionController;
 use App\Http\Controllers\Student\AvailabilityController;
 use App\Http\Controllers\Student\ReservationController;
 use App\Http\Controllers\Admin\TeacherMaterialController;
-
+use App\Models\Teacher;
 
 // Test route for frontend testing
 Route::view('/reservation-teacher-detail-test','students.reservations.teacher-detail')
@@ -109,10 +110,14 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
 
      // My Schedule 画面
     Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
-
+    // Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teacher.schedules.index');
     Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
     Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
     Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teacher.schedule-exceptions.destroy');
+
+    // My Lessons　画面
+    Route::get('/teachers/lessons', [TeacherReservationController::class, 'index'])->name('teachers.reservations.index');
+    Route::get('/teachers/lessons/{lesson}', [TeacherReservationController::class, 'show'])->name('teachers.reservations.show');
 
 // Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
 //     ->name('teacher.schedules.storeGrid');
