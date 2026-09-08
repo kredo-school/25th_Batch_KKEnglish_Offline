@@ -107,18 +107,18 @@
         <div class="row mb-4">
             <div class="col-md-4">
                 <label>休憩 開始</label>
-                <input type="time" name="common_break_start_time" class="form-control"
-                       value="{{ old('common_break_start_time', '13:00') }}">
+                <input type="time" name="breaks[0][start_time]" class="form-control"
+                       value="{{ old('breaks.0.start_time') }}">
             </div>
             <div class="col-md-4">
                 <label>休憩 終了</label>
-                <input type="time" name="common_break_end_time" class="form-control"
-                       value="{{ old('common_break_end_time', '14:00') }}">
+                <input type="time" name="breaks[0][end_time]" class="form-control"
+                       value="{{ old('breaks.0.end_time') }}">
             </div>
             <div class="col-md-4">
                 <label>Reason</label>
-                <input type="text" name="common_break_reason" class="form-control"
-                       value="{{ old('common_break_reason', 'Lunch') }}">
+                <input type="text" name="breaks[0][reason]" class="form-control"
+                       value="{{ old('breaks.0.reason') }}">
             </div>
             <small class="text-muted mt-2">
                 ※休憩を使わない場合は開始・終了を空欄にしてください。

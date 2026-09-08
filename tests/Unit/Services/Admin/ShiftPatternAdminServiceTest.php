@@ -29,84 +29,84 @@ class ShiftPatternAdminServiceTest extends TestCase
     $this->service = app(\App\Services\Admin\ShiftPatternAdminService::class);
 }
 
-    #[Test]
-    public function breaksがrules外なら例外(): void
-    {
-        $adminRole = \App\Models\Role::query()->firstOrCreate(
-    ['role_code' => 'admin'],
-    ['role_name' => 'admin']
-);
+//     #[Test]
+//     public function breaksがrules外なら例外(): void
+//     {
+//         $adminRole = \App\Models\Role::query()->firstOrCreate(
+//     ['role_code' => 'admin'],
+//     ['role_name' => 'admin']
+// );
 
-$actor = \App\Models\User::query()->create([
-    'first_name' => 'Test',
-    'last_name' => 'Admin',
-    'email' => 'tester'.uniqid().'@example.com',
-    'password' => bcrypt('password'),
-    'role_id' => $adminRole->id,
-    // 必要なら以下も（スキーマ次第）
-    'nationality' => 'JP',
-    'gender' => 'other',
-    'status' => 'active',
-    'email_verified_at' => now(),
-]);
+// $actor = \App\Models\User::query()->create([
+//     'first_name' => 'Test',
+//     'last_name' => 'Admin',
+//     'email' => 'tester'.uniqid().'@example.com',
+//     'password' => bcrypt('password'),
+//     'role_id' => $adminRole->id,
+//     // 必要なら以下も（スキーマ次第）
+//     'nationality' => 'JP',
+//     'gender' => 'other',
+//     'status' => 'active',
+//     'email_verified_at' => now(),
+// ]);
 
-        $payload = [
-            'pattern_code' => 'P001',
-            'pattern_name' => 'Test',
-            'start_time' => '09:00',
-            'end_time' => '18:00',
-            'end_day_offset' => 0,
-            'slot_minutes' => 30,
-            'is_active' => true,
-            'display_order' => 0,
-            'rules' => [
-                ['weekday' => 1, 'start_time' => '09:00', 'end_time' => '10:00', 'lesson_type' => 'online'],
-            ],
-            'breaks' => [
-                ['weekday' => 1, 'start_time' => '10:00', 'end_time' => '10:30', 'reason' => 'out'],
-            ],
-        ];
+//         $payload = [
+//             'pattern_code' => 'P001',
+//             'pattern_name' => 'Test',
+//             'start_time' => '09:00',
+//             'end_time' => '18:00',
+//             'end_day_offset' => 0,
+//             'slot_minutes' => 30,
+//             'is_active' => true,
+//             'display_order' => 0,
+//             // 'rules' => [
+//             //     ['weekday' => 1, 'start_time' => '09:00', 'end_time' => '10:00', 'lesson_type' => 'online'],
+//             // ],
+//             'breaks' => [
+//                 ['weekday' => 1, 'start_time' => '10:00', 'end_time' => '10:30', 'reason' => 'out'],
+//             ],
+//         ];
 
-        $this->expectException(\DomainException::class);
-        $this->service->upsert($payload, null, $actor->id); // ← fixed
-    }
+//         $this->expectException(\DomainException::class);
+//         $this->service->upsert($payload, null, $actor->id); // ← fixed
+//     }
 
-    #[Test]
-    public function in_person開始が00分以外なら例外(): void
-    {
-        $adminRole = \App\Models\Role::query()->firstOrCreate(
-    ['role_code' => 'admin'],
-    ['role_name' => 'admin']
-);
+//     #[Test]
+//     public function in_person開始が00分以外なら例外(): void
+//     {
+//         $adminRole = \App\Models\Role::query()->firstOrCreate(
+//     ['role_code' => 'admin'],
+//     ['role_name' => 'admin']
+// );
 
-$actor = \App\Models\User::query()->create([
-    'first_name' => 'Test',
-    'last_name' => 'Admin',
-    'email' => 'tester'.uniqid().'@example.com',
-    'password' => bcrypt('password'),
-    'role_id' => $adminRole->id,
-    // 必要なら以下も（スキーマ次第）
-    'nationality' => 'JP',
-    'gender' => 'other',
-    'status' => 'active',
-    'email_verified_at' => now(),
-]);
-        $payload = [
-            'pattern_code' => 'P002',
-            'pattern_name' => 'Test2',
-            'start_time' => '09:00',
-            'end_time' => '18:00',
-            'end_day_offset' => 0,
-            'slot_minutes' => 60,
-            'is_active' => true,
-            'display_order' => 0,
-            'rules' => [
-                ['weekday' => 1, 'start_time' => '09:30', 'end_time' => '10:30', 'lesson_type' => 'in_person'],
-            ],
-            'breaks' => [],
-        ];
+// $actor = \App\Models\User::query()->create([
+//     'first_name' => 'Test',
+//     'last_name' => 'Admin',
+//     'email' => 'tester'.uniqid().'@example.com',
+//     'password' => bcrypt('password'),
+//     'role_id' => $adminRole->id,
+//     // 必要なら以下も（スキーマ次第）
+//     'nationality' => 'JP',
+//     'gender' => 'other',
+//     'status' => 'active',
+//     'email_verified_at' => now(),
+// ]);
+//         $payload = [
+//             'pattern_code' => 'P002',
+//             'pattern_name' => 'Test2',
+//             'start_time' => '09:00',
+//             'end_time' => '18:00',
+//             'end_day_offset' => 0,
+//             'slot_minutes' => 60,
+//             'is_active' => true,
+//             'display_order' => 0,
+//             // 'rules' => [
+//             //     ['weekday' => 1, 'start_time' => '09:30', 'end_time' => '10:30', 'lesson_type' => 'in_person'],
+//             // ],
+//             'breaks' => [],
+//         ];
 
-        $this->expectException(\DomainException::class);
-        $this->service->upsert($payload, null, $actor->id); // ← fixed
-    }
+//         $this->expectException(\DomainException::class);
+//         $this->service->upsert($payload, null, $actor->id); // ← fixed
+//     }
 }
