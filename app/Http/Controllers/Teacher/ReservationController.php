@@ -68,7 +68,7 @@ class ReservationController extends Controller
             ->get();
 
         /*
-         * 担当BのBladeへ渡す
+         * Bladeへ渡す
          */
         return view(
             'teachers.reservations.index',
@@ -124,7 +124,7 @@ class ReservationController extends Controller
         ]);
 
         /*
-         * 担当BのBladeへ渡す
+         * Bladeへ渡す
          */
         return view(
             'teachers.reservations.show',

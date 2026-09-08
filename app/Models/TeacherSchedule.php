@@ -2,19 +2,27 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TeacherSchedule extends Model
 {
     protected $primaryKey = 'schedule_id';
 
     protected $fillable = [
-        'teacher_id', 'shift_pattern_id', 'available_date',
-        'start_time', 'end_time', 'status', 'created_by',
-        'confirmed_by', 'confirmed_at', 'cancelled_by', 'cancelled_at',
+        'teacher_id',
+        'shift_pattern_id',
+        'available_date',
+        'start_time',
+        'end_time',
+        'status',
+        'created_by',
+        'confirmed_by',
+        'confirmed_at',
+        'cancelled_by',
+        'cancelled_at',
     ];
 
     protected function casts(): array
@@ -71,9 +79,15 @@ class TeacherSchedule extends Model
 
     public function endAtJst(): CarbonImmutable
     {
-        return CarbonImmutable::parse(
-            $this->available_date->format('Y-m-d') . ' ' . $this->end_time,
+        $endAt = CarbonImmutable::parse(
+            $this->available_date->format('Y-m-d')
+                . ' '
+                . $this->end_time,
             \App\Support\AppTime::BUSINESS_TZ
+        );
+
+        return $endAt->addDays(
+            (int) ($this->shiftPattern?->end_day_offset ?? 0)
         );
     }
 }
