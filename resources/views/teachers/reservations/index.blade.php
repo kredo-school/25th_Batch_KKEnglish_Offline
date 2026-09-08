@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Teacher Dashboard')
+@section('title', 'My Lessons')
 
 @section('content')
 
@@ -14,22 +14,20 @@
     | 現在はフロント表示確認用。
     |
     | 最終的には
-    | Teacher\ReservationController
-    | または DashboardController から
-    |
-    | $todayReservations
-    |
+    | Teacher\ReservationController@index()
+    | から
+    | $upcomingReservations
     | を受け取る。
     |
     */
 
-    $todayReservations = collect([
+    $upcomingReservations = collect([
 
         (object) [
             'id' => 1,
 
-            'start_at' => '2026-09-07 10:00:00',
-            'end_at' => '2026-09-07 10:30:00',
+            'start_at' => '2026-09-10 09:00:00',
+            'end_at' => '2026-09-10 09:30:00',
 
             'student' => (object) [
                 'user' => (object) [
@@ -51,8 +49,8 @@
         (object) [
             'id' => 2,
 
-            'start_at' => '2026-09-07 14:00:00',
-            'end_at' => '2026-09-07 14:30:00',
+            'start_at' => '2026-09-12 13:30:00',
+            'end_at' => '2026-09-12 14:00:00',
 
             'student' => (object) [
                 'user' => (object) [
@@ -70,6 +68,29 @@
             ],
         ],
 
+
+        (object) [
+            'id' => 3,
+
+            'start_at' => '2026-09-15 16:00:00',
+            'end_at' => '2026-09-15 16:30:00',
+
+            'student' => (object) [
+                'user' => (object) [
+                    'first_name' => 'Mika',
+                    'last_name' => 'Sato',
+                ],
+            ],
+
+            'material' => (object) [
+                'name' => 'Pronunciation',
+            ],
+
+            'status' => (object) [
+                'status_code' => 'pending',
+            ],
+        ],
+
     ]);
 
 @endphp
@@ -78,71 +99,31 @@
 <div class="container-fluid py-4">
 
     {{-- ===============================
-         Hello Header
+         Title
     ================================ --}}
-    <div class="bg-light p-4 mb-4">
+    <div class="mb-4">
 
         <h2 class="fw-bold mb-1">
-
-            Hello,
-            {{ auth()->user()->first_name }}
-
+            My Lessons
         </h2>
 
-
-        <p class="text-secondary mb-1">
-
-            {{ now()->format('l, F j') }}
-
-        </p>
-
-
-        <p class="fw-semibold mb-0">
-
-            <i class="fa-regular fa-clock me-1"></i>
-
-            {{ now()->format('H:i') }}
-
+        <p class="text-secondary mb-0">
+            View your upcoming scheduled lessons.
         </p>
 
     </div>
 
 
     {{-- ===============================
-         Today's Lessons
+         Upcoming Lessons
     ================================ --}}
     <div class="card">
 
         <div class="card-header bg-white py-3">
 
-            <div class="
-                d-flex
-                justify-content-between
-                align-items-center
-            ">
-
-                <div>
-
-                    <h5 class="fw-bold mb-1">
-                        Today's Lessons
-                    </h5>
-
-                    <small class="text-secondary">
-                        {{ now()->format('F j, Y') }}
-                    </small>
-
-                </div>
-
-
-                {{-- My Lessons --}}
-                <a
-                    href="{{ route('teachers.reservations.test') }}"
-                    class="btn btn-outline-primary btn-sm"
-                >
-                    View My Lessons
-                </a>
-
-            </div>
+            <h5 class="fw-bold mb-0">
+                Upcoming Lessons
+            </h5>
 
         </div>
 
@@ -159,6 +140,10 @@
                         <tr>
 
                             <th class="px-4 py-3">
+                                Date
+                            </th>
+
+                            <th class="py-3">
                                 Time
                             </th>
 
@@ -186,7 +171,7 @@
                     {{-- Body --}}
                     <tbody>
 
-                        @forelse ($todayReservations as $reservation)
+                        @forelse ($upcomingReservations as $reservation)
 
                             @php
 
@@ -205,18 +190,32 @@
 
                             <tr>
 
-                                {{-- Time --}}
+                                {{-- Date --}}
                                 <td class="px-4">
 
                                     <div class="fw-bold">
 
-                                        {{ $startAt->format('h:i A') }}
-
-                                        -
-
-                                        {{ $endAt->format('h:i A') }}
+                                        {{ $startAt->format('M d, Y') }}
 
                                     </div>
+
+                                    <small class="text-secondary">
+
+                                        {{ $startAt->format('l') }}
+
+                                    </small>
+
+                                </td>
+
+
+                                {{-- Time --}}
+                                <td>
+
+                                    {{ $startAt->format('h:i A') }}
+
+                                    -
+
+                                    {{ $endAt->format('h:i A') }}
 
                                 </td>
 
@@ -302,11 +301,11 @@
                             <tr>
 
                                 <td
-                                    colspan="5"
+                                    colspan="6"
                                     class="text-center py-5 text-secondary"
                                 >
 
-                                    No lessons scheduled for today.
+                                    No upcoming lessons.
 
                                 </td>
 
@@ -337,22 +336,20 @@
 
         最終的には
 
-        ログイン中Teacherの
+        Teacher\ReservationController@index()
 
-        今日の
+        から
 
-        pending / confirmed
+        $upcomingReservations
 
-        の予約を取得して表示する。
+        を取得して表示する。
 
 
-        表示内容:
+        表示対象:
 
-        ・Time
-        ・Student
-        ・Material
-        ・Status
-        ・Details
+        ・ログイン中Teacherの予約
+        ・未来の予約
+        ・pending / confirmed
 
 
         Details:
@@ -364,18 +361,14 @@
         に接続する。
 
 
-        My Lessons:
+        本日のレッスンは
+        Teacher Dashboardに表示する。
 
-        今日以降の予約一覧を表示する。
 
-
-        Lesson終了後:
-
+        レッスン終了後は
         statusをcompletedに変更し、
 
-        生徒側のLearning Historyや
-
-        先生側のLesson Historyに
+        Lesson History側に
         表示する予定。
 
     --}}
