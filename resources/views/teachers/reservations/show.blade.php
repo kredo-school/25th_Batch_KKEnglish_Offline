@@ -8,48 +8,14 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Dummy Data
+    | Reservation Date / Time
     |--------------------------------------------------------------------------
-    |
-    | 現在はフロント表示確認用。
-    |
-    | 最終的には
-    | Teacher\ReservationController@show()
-    |
-    | から
-    | $reservation
-    | を受け取る。
-    |
     */
-
-    $reservation = (object) [
-
-        'start_at' => '2026-09-10 09:00:00',
-        'end_at' => '2026-09-10 09:30:00',
-
-        'student' => (object) [
-            'user' => (object) [
-                'first_name' => 'Ayako',
-                'last_name' => 'Kobayashi',
-            ],
-        ],
-
-        'material' => (object) [
-            'name' => 'Daily Conversation',
-        ],
-
-        'status' => (object) [
-            'status_code' => 'confirmed',
-        ],
-
-    ];
-
 
     $startAt =
         \Carbon\Carbon::parse(
             $reservation->start_at
         );
-
 
     $endAt =
         \Carbon\Carbon::parse(
@@ -78,9 +44,18 @@
 
 
     {{-- ===============================
-         Details
+         Lesson Details
     ================================ --}}
     <div class="card">
+
+        <div class="card-header bg-white py-3">
+
+            <h5 class="fw-bold mb-0">
+                Reservation Details
+            </h5>
+
+        </div>
+
 
         <div class="card-body p-4">
 
@@ -131,74 +106,55 @@
                     Student
                 </div>
 
-                <div class="col-md-8">
-
-                    <i class="fa-solid fa-circle-user me-2"></i>
-
-                    {{ $reservation->student->user->first_name }}
-
-                    {{ $reservation->student->user->last_name }}
-
-                </div>
-
-            </div>
-
-
-            {{-- Material --}}
-            <div class="row border-bottom py-3">
-
-                <div class="col-md-4 fw-bold">
-                    Material
-                </div>
-
-                <div class="col-md-8">
-
-                    {{ $reservation->material->name }}
-
-                </div>
-
-            </div>
-
-
-            {{-- Status --}}
-            <div class="row py-3">
-
-                <div class="col-md-4 fw-bold">
-                    Status
-                </div>
-
-                <div class="col-md-8">
+                <div class="col-md-8 d-flex align-items-center">
 
                     @if (
-                        $reservation->status->status_code
-                        === 'confirmed'
+                        $reservation->student
+                        &&
+                        $reservation->student->user
                     )
 
-                        <span class="badge text-bg-primary">
-                            Confirmed
-                        </span>
+                        @if (
+                            $reservation
+                                ->student
+                                ->user
+                                ->profile_image
+                        )
 
-                    @elseif (
-                        $reservation->status->status_code
-                        === 'pending'
-                    )
+                            <img
+                                src="{{ $reservation->student->user->profile_image }}"
+                                alt="{{ $reservation->student->user->first_name }}"
+                                width="45"
+                                height="45"
+                                class="rounded-circle me-2"
+                                style="object-fit: cover;"
+                            >
 
-                        <span class="badge text-bg-warning">
-                            Pending
+                        @else
+
+                            <i
+                                class="
+                                    fa-solid
+                                    fa-circle-user
+                                    me-2
+                                "
+                            ></i>
+
+                        @endif
+
+
+                        <span>
+
+                            {{ $reservation->student->user->first_name }}
+
+                            {{ $reservation->student->user->last_name }}
+
                         </span>
 
                     @else
 
-                        <span class="badge text-bg-secondary">
-
-                            {{
-                                ucfirst(
-                                    $reservation
-                                        ->status
-                                        ->status_code
-                                )
-                            }}
-
+                        <span class="text-secondary">
+                            -
                         </span>
 
                     @endif
@@ -206,6 +162,124 @@
                 </div>
 
             </div>
+
+
+            {{-- Material --}}
+            <div class="row py-3">
+
+                <div class="col-md-4 fw-bold">
+                    Material
+                </div>
+
+                <div class="col-md-8">
+
+                    {{
+                        $reservation->material->name
+                        ?? '-'
+                    }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- ===============================
+         Lesson Result
+    ================================ --}}
+    <div class="card mt-4">
+
+        <div class="card-header bg-white py-3">
+
+            <h5 class="fw-bold mb-0">
+                Lesson Result
+            </h5>
+
+        </div>
+
+
+        <div class="card-body p-4">
+
+            <form
+                method="POST"
+                action="#"
+            >
+
+                @csrf
+
+
+                {{-- Result --}}
+                <div class="mb-4">
+
+                    <label
+                        for="lessonResult"
+                        class="form-label fw-bold"
+                    >
+                        Result
+                    </label>
+
+
+                    <select
+                        id="lessonResult"
+                        name="result"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Select result
+                        </option>
+
+                        <option value="completed">
+                            Completed
+                        </option>
+
+                        <option value="absent">
+                            Absent
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                {{-- Comment --}}
+                <div class="mb-4">
+
+                    <label
+                        for="lessonComment"
+                        class="form-label fw-bold"
+                    >
+                        Comment
+                    </label>
+
+
+                    <textarea
+                        id="lessonComment"
+                        name="comment"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Enter lesson notes..."
+                    ></textarea>
+
+                </div>
+
+
+                {{-- Save --}}
+                <div class="text-end">
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                    >
+                        Save Result
+                    </button>
+
+                </div>
+
+            </form>
 
         </div>
 
@@ -218,7 +292,7 @@
     <div class="mt-4">
 
         <a
-            href="{{ route('teachers.reservations.test') }}"
+            href="{{ route('teachers.reservations.index') }}"
             class="btn btn-outline-secondary"
         >
             Back
@@ -226,47 +300,6 @@
 
     </div>
 
-
-    {{-- ===============================
-         TODO
-    ================================ --}}
-    {{--
-
-        TODO:
-
-        現在はダミーデータ。
-
-
-        最終的には
-
-        Teacher\ReservationController@show()
-
-        から
-
-        $reservation
-
-        を受け取る。
-
-
-        今後追加予定:
-
-        ・Completed
-        ・Absent
-
-        などのレッスン結果登録。
-
-
-        Completedになった場合は
-
-        生徒側のLearning History
-
-        先生側のLesson History
-
-        に表示する。
-
-    --}}
-
 </div>
 
 @endsection
-

@@ -120,7 +120,7 @@ class ReservationController extends Controller
             'status',
             'schedule',
             'histories',
-            'lessonRecord',
+            // 'lessonRecord',
         ]);
 
         /*

@@ -58,34 +58,34 @@
 
 
     {{-- ===============================
-         Selected Conditions
+         Selected Material
     ================================ --}}
     <div
         id="selectedConditions"
         class="mb-4 d-none"
     >
 
-        <span class="text-secondary me-2">
-            Selected:
-        </span>
-
-        <span
-            id="selectedDate"
-            class="badge text-bg-light border me-1 d-none"
+        <div
+            class="
+                bg-light
+                border
+                rounded
+                px-3
+                py-2
+            "
         >
-        </span>
 
-        <span
-            id="selectedTime"
-            class="badge text-bg-light border me-1 d-none"
-        >
-        </span>
+            <span class="text-secondary small me-2">
+                Material
+            </span>
 
-        <span
-            id="selectedMaterial"
-            class="badge text-bg-light border me-1 d-none"
-        >
-        </span>
+            <span
+                id="selectedMaterial"
+                class="fw-semibold"
+            >
+            </span>
+
+        </div>
 
     </div>
 
@@ -111,9 +111,11 @@
 
                 data-teacher-id="{{ $teacher->id }}"
 
-                data-materials="{{ $teacher->materials
-                    ->pluck('material_id')
-                    ->implode(',') }}"
+                data-materials="{{
+                    $teacher->materials
+                        ->pluck('material_id')
+                        ->implode(',')
+                }}"
 
                 data-schedule-id=""
                 data-start-at=""
@@ -123,9 +125,7 @@
                 <div class="card h-100 shadow-sm">
 
 
-                    {{-- ===============================
-                         Teacher Image
-                    ================================ --}}
+                    {{-- Teacher Image --}}
                     @if (
                         $teacher->user
                         &&
@@ -138,7 +138,9 @@
                             class="card-img-top"
                             style="
                                 height: 180px;
-                                object-fit: cover;">
+                                object-fit: cover;
+                            "
+                        >
 
                     @else
 
@@ -148,9 +150,13 @@
                                 d-flex
                                 justify-content-center
                                 align-items-center
-                                text-secondary"
-                            style="height: 180px;">
+                                text-secondary
+                            "
+                            style="height: 180px;"
+                        >
+
                             No Image
+
                         </div>
 
                     @endif
@@ -167,9 +173,15 @@
                         {{-- Name --}}
                         <h5 class="fw-bold mb-2">
 
-                            {{ $teacher->user?->first_name ?? 'Teacher' }}
+                            {{
+                                $teacher->user?->first_name
+                                ?? 'Teacher'
+                            }}
 
-                            {{ $teacher->user?->last_name ?? '' }}
+                            {{
+                                $teacher->user?->last_name
+                                ?? ''
+                            }}
 
                         </h5>
 
@@ -181,7 +193,10 @@
                                 Nationality:
                             </span>
 
-                            {{ $teacher->user?->nationality ?? '-' }}
+                            {{
+                                $teacher->user?->nationality
+                                ?? '-'
+                            }}
 
                         </p>
 
@@ -193,7 +208,10 @@
                                 Specialty:
                             </span>
 
-                            {{ $teacher->specialty ?? '-' }}
+                            {{
+                                $teacher->specialty
+                                ?? '-'
+                            }}
 
                         </p>
 
@@ -201,6 +219,7 @@
                         <div class="mt-auto">
 
                             {{-- ===============================
+                                 Method 1:
                                  View Schedule
                             ================================ --}}
                             <a
@@ -221,7 +240,8 @@
 
 
                             {{-- ===============================
-                                 Book
+                                 Method 2:
+                                 Direct Book
                             ================================ --}}
                             <button
                                 type="button"
@@ -271,7 +291,6 @@
 
     {{-- ===============================
          Booking Form
-         Book押下時にConfirmへ送信
     ================================ --}}
     <form
         id="bookingForm"
@@ -339,15 +358,18 @@ document.addEventListener(
                 'reservationDate'
             );
 
+
         const hourInput =
             document.getElementById(
                 'reservationHour'
             );
 
+
         const minuteInput =
             document.getElementById(
                 'reservationMinute'
             );
+
 
         const materialInput =
             document.getElementById(
@@ -366,30 +388,24 @@ document.addEventListener(
                 '.teacher-card'
             );
 
+
         const noTeachers =
             document.getElementById(
                 'noTeachers'
             );
+
 
         const selectionMessage =
             document.getElementById(
                 'selectionMessage'
             );
 
+
         const selectedConditions =
             document.getElementById(
                 'selectedConditions'
             );
 
-        const selectedDate =
-            document.getElementById(
-                'selectedDate'
-            );
-
-        const selectedTime =
-            document.getElementById(
-                'selectedTime'
-            );
 
         const selectedMaterial =
             document.getElementById(
@@ -408,25 +424,30 @@ document.addEventListener(
                 'bookingForm'
             );
 
+
         const bookingTeacherId =
             document.getElementById(
                 'bookingTeacherId'
             );
+
 
         const bookingMaterialId =
             document.getElementById(
                 'bookingMaterialId'
             );
 
+
         const bookingScheduleId =
             document.getElementById(
                 'bookingScheduleId'
             );
 
+
         const bookingStartAt =
             document.getElementById(
                 'bookingStartAt'
             );
+
 
         const bookingEndAt =
             document.getElementById(
@@ -436,7 +457,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | 古いAPI結果を使わないため
+        | 古いAPI結果を使用しない
         |--------------------------------------------------------------------------
         */
 
@@ -445,7 +466,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | Time
+        | Selected Time
         |--------------------------------------------------------------------------
         */
 
@@ -456,20 +477,30 @@ document.addEventListener(
                     ? hourInput.value
                     : '';
 
+
             const minute =
                 minuteInput
                     ? minuteInput.value
                     : '';
 
-            if (!hour || !minute) {
+
+            if (
+                !hour
+                ||
+                !minute
+            ) {
 
                 return '';
 
             }
 
+
             return (
                 String(hour)
-                    .padStart(2, '0')
+                    .padStart(
+                        2,
+                        '0'
+                    )
                 +
                 ':'
                 +
@@ -508,7 +539,8 @@ document.addEventListener(
                     +
                     params.toString(),
                     {
-                        method: 'GET',
+                        method:
+                            'GET',
 
                         headers: {
                             'Accept':
@@ -536,7 +568,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | 指定時間のSlotを取得
+        | 指定時間のSlot取得
         |--------------------------------------------------------------------------
         */
 
@@ -555,20 +587,6 @@ document.addEventListener(
                     }
 
 
-                    /*
-                     * 例
-                     *
-                     * 2026-09-10 09:00:00
-                     *
-                     * または
-                     *
-                     * 2026-09-10T09:00:00
-                     *
-                     * ↓
-                     *
-                     * 09:00
-                     */
-
                     const slotTime =
                         slot.start_at
                             .substring(
@@ -578,7 +596,9 @@ document.addEventListener(
 
 
                     return (
-                        slotTime === time
+                        slotTime
+                        ===
+                        time
                     );
 
                 }
@@ -621,7 +641,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | 選択した予約Slotをカードに保存
+        | Slot保存
         |--------------------------------------------------------------------------
         */
 
@@ -660,7 +680,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | 保存していたSlotを削除
+        | Slot削除
         |--------------------------------------------------------------------------
         */
 
@@ -671,8 +691,10 @@ document.addEventListener(
             card.dataset.scheduleId =
                 '';
 
+
             card.dataset.startAt =
                 '';
+
 
             card.dataset.endAt =
                 '';
@@ -714,6 +736,7 @@ document.addEventListener(
                     'btn-secondary'
                 );
 
+
                 button.classList.add(
                     'btn-primary'
                 );
@@ -723,6 +746,7 @@ document.addEventListener(
                 button.classList.remove(
                     'btn-primary'
                 );
+
 
                 button.classList.add(
                     'btn-secondary'
@@ -735,7 +759,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | View Schedule
+        | View Schedule Button
         |--------------------------------------------------------------------------
         */
 
@@ -765,14 +789,17 @@ document.addEventListener(
                 button.href =
                     '#';
 
+
                 button.classList.add(
                     'disabled'
                 );
+
 
                 button.setAttribute(
                     'aria-disabled',
                     'true'
                 );
+
 
                 return;
 
@@ -789,22 +816,23 @@ document.addEventListener(
             );
 
 
-            if (material) {
-
-                params.append(
-                    'material_id',
-                    material
-                );
-
-            }
+            params.append(
+                'material_id',
+                material
+            );
 
 
+            /*
+             * Dateが選択されていたら
+             * その日を含む週を最初に表示
+             */
             if (date) {
 
                 params.append(
                     'date',
                     date
                 );
+
 
                 params.append(
                     'mode',
@@ -822,7 +850,7 @@ document.addEventListener(
 
 
             button.href =
-                "{{ route('reservations.teacher-detail.test') }}"
+                "{{ route('students.reservations.teacher-detail') }}"
                 +
                 '?'
                 +
@@ -843,101 +871,26 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | Selected Conditions
+        | Selected Material
         |--------------------------------------------------------------------------
         */
 
         function updateSelectedConditions(
-            date,
-            time,
             material
         ) {
 
-            const hasCondition =
-                Boolean(
-                    date ||
-                    time ||
-                    material
-                );
-
-
-            if (hasCondition) {
-
-                selectedConditions
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
-
-            } else {
-
-                selectedConditions
-                    .classList
-                    .add(
-                        'd-none'
-                    );
-
-            }
-
-
-            /*
-             * Date
-             */
-            if (date) {
-
-                selectedDate.textContent =
-                    date;
-
-                selectedDate
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
-
-            } else {
-
-                selectedDate
-                    .classList
-                    .add(
-                        'd-none'
-                    );
-
-            }
-
-
-            /*
-             * Time
-             */
-            if (time) {
-
-                selectedTime.textContent =
-                    time;
-
-                selectedTime
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
-
-            } else {
-
-                selectedTime
-                    .classList
-                    .add(
-                        'd-none'
-                    );
-
-            }
-
-
-            /*
-             * Material
-             */
             if (
                 material
                 &&
                 materialInput
             ) {
+
+                selectedConditions
+                    .classList
+                    .remove(
+                        'd-none'
+                    );
+
 
                 selectedMaterial.textContent =
                     materialInput
@@ -948,21 +901,20 @@ document.addEventListener(
                         .text;
 
 
-                selectedMaterial
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
-
-            } else {
-
-                selectedMaterial
-                    .classList
-                    .add(
-                        'd-none'
-                    );
+                return;
 
             }
+
+
+            selectedConditions
+                .classList
+                .add(
+                    'd-none'
+                );
+
+
+            selectedMaterial.textContent =
+                '';
 
         }
 
@@ -988,8 +940,10 @@ document.addEventListener(
                 selectionMessage.className =
                     'alert alert-light border';
 
+
                 selectionMessage.textContent =
                     'Please select a material.';
+
 
                 return;
 
@@ -1000,14 +954,18 @@ document.addEventListener(
              * 0件
              */
             if (
-                visibleCount === 0
+                visibleCount
+                ===
+                0
             ) {
 
                 selectionMessage.className =
                     'alert alert-warning';
 
+
                 selectionMessage.textContent =
                     'No teachers are available for the selected conditions.';
+
 
                 return;
 
@@ -1018,8 +976,6 @@ document.addEventListener(
              * Material + Date + Time
              */
             if (
-                material
-                &&
                 date
                 &&
                 time
@@ -1028,8 +984,10 @@ document.addEventListener(
                 selectionMessage.className =
                     'alert alert-success';
 
+
                 selectionMessage.textContent =
-                    'These teachers can teach the selected material and are available at the selected time.';
+                    'Available teachers for the selected date and time. You can book directly or view their schedule.';
+
 
                 return;
 
@@ -1039,17 +997,15 @@ document.addEventListener(
             /*
              * Material + Date
              */
-            if (
-                material
-                &&
-                date
-            ) {
+            if (date) {
 
                 selectionMessage.className =
-                    'alert alert-info';
+                    'alert alert-light border';
+
 
                 selectionMessage.textContent =
-                    'These teachers can teach the selected material and have available slots on this date.';
+                    'These teachers have available lesson times on the selected date.';
+
 
                 return;
 
@@ -1060,10 +1016,11 @@ document.addEventListener(
              * Material only
              */
             selectionMessage.className =
-                'alert alert-info';
+                'alert alert-light border';
+
 
             selectionMessage.textContent =
-                'These teachers can teach the selected material.';
+                'Select a teacher to view their weekly schedule, or choose a date and time for direct booking.';
 
         }
 
@@ -1073,7 +1030,7 @@ document.addEventListener(
         | Teacher一覧更新
         |--------------------------------------------------------------------------
         */
-
+    //    updateTeachers()がこの画面の中心
         async function updateTeachers() {
 
             const myVersion =
@@ -1097,15 +1054,13 @@ document.addEventListener(
 
 
             updateSelectedConditions(
-                date,
-                time,
                 material
             );
 
 
             /*
-             * 条件が変更されたので
-             * 前回保存したSlot情報を一旦削除
+             * 条件変更時
+             * 古いSlot情報を削除
              */
             teacherCards.forEach(
                 function (card) {
@@ -1175,6 +1130,10 @@ document.addEventListener(
             /*
              * ===============================
              * Material Only
+             *
+             * 教材を教えられる先生を表示
+             * View Schedule可能
+             * Book不可
              * ===============================
              */
 
@@ -1205,6 +1164,7 @@ document.addEventListener(
                                 'd-none'
                             );
 
+
                             visibleCount++;
 
                         } else {
@@ -1216,10 +1176,6 @@ document.addEventListener(
                         }
 
 
-                        /*
-                         * 日付・時間がないので
-                         * Bookはできない
-                         */
                         updateBookButton(
                             card,
                             false
@@ -1239,7 +1195,9 @@ document.addEventListener(
 
 
                 if (
-                    visibleCount === 0
+                    visibleCount
+                    ===
+                    0
                 ) {
 
                     noTeachers
@@ -1275,6 +1233,8 @@ document.addEventListener(
             /*
              * ===============================
              * Material + Date
+             * または
+             * Material + Date + Time
              * ===============================
              */
 
@@ -1292,9 +1252,6 @@ document.addEventListener(
                         .teacherId;
 
 
-                /*
-                 * Material判定
-                 */
                 const matchMaterial =
                     matchesMaterial(
                         card,
@@ -1303,13 +1260,17 @@ document.addEventListener(
 
 
                 /*
-                 * 教材が一致しない先生は
-                 * Availability APIを呼ばない
+                 * 教材を教えられない先生
                  */
                 if (!matchMaterial) {
 
                     card.classList.add(
                         'd-none'
+                    );
+
+
+                    clearBookingSlot(
+                        card
                     );
 
 
@@ -1328,11 +1289,6 @@ document.addEventListener(
                     );
 
 
-                    clearBookingSlot(
-                        card
-                    );
-
-
                     continue;
 
                 }
@@ -1340,9 +1296,6 @@ document.addEventListener(
 
                 try {
 
-                    /*
-                     * Availability取得
-                     */
                     const data =
                         await fetchAvailability(
                             teacherId,
@@ -1351,8 +1304,8 @@ document.addEventListener(
 
 
                     /*
-                     * 条件変更後に
-                     * 古いAPI結果が返ってきた場合
+                     * 条件変更後に返った
+                     * 古いAPI結果は使用しない
                      */
                     if (
                         myVersion
@@ -1381,6 +1334,8 @@ document.addEventListener(
                     /*
                      * ===============================
                      * Date + Time
+                     *
+                     * 指定時間の空き確認
                      * ===============================
                      */
                     if (time) {
@@ -1402,15 +1357,6 @@ document.addEventListener(
                             );
 
 
-                        /*
-                         * 予約可能なら
-                         *
-                         * schedule_id
-                         * start_at
-                         * end_at
-                         *
-                         * をカードに保存
-                         */
                         if (isAvailable) {
 
                             setBookingSlot(
@@ -1430,6 +1376,9 @@ document.addEventListener(
                     /*
                      * ===============================
                      * Date Only
+                     *
+                     * その日に1枠でも
+                     * 空きがあるか
                      * ===============================
                      */
                     } else {
@@ -1448,10 +1397,6 @@ document.addEventListener(
                             );
 
 
-                        /*
-                         * 時間未選択なので
-                         * Book用Slotは保存しない
-                         */
                         clearBookingSlot(
                             card
                         );
@@ -1460,16 +1405,14 @@ document.addEventListener(
 
 
                     /*
-                     * ===============================
                      * Teacher表示
-                     * ===============================
                      */
-
                     if (isAvailable) {
 
                         card.classList.remove(
                             'd-none'
                         );
+
 
                         visibleCount++;
 
@@ -1483,11 +1426,8 @@ document.addEventListener(
 
 
                     /*
-                     * ===============================
                      * View Schedule
-                     * ===============================
                      */
-
                     updateViewScheduleButton(
                         card,
                         isAvailable,
@@ -1498,11 +1438,15 @@ document.addEventListener(
 
 
                     /*
-                     * ===============================
-                     * Book
-                     * ===============================
+                     * Direct Book
+                     *
+                     * Material
+                     * Date
+                     * Time
+                     * 空きSlot
+                     *
+                     * 全部揃ったときのみ
                      */
-
                     const canBook =
                         Boolean(
                             material
@@ -1510,8 +1454,6 @@ document.addEventListener(
                             date
                             &&
                             time
-                            &&
-                            matchMaterial
                             &&
                             isAvailable
                             &&
@@ -1576,13 +1518,12 @@ document.addEventListener(
 
 
             /*
-             * ===============================
              * Teacher 0件
-             * ===============================
              */
-
             if (
-                visibleCount === 0
+                visibleCount
+                ===
+                0
             ) {
 
                 noTeachers
@@ -1614,7 +1555,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | Book
+        | Direct Book
         |--------------------------------------------------------------------------
         */
 
@@ -1671,8 +1612,7 @@ document.addEventListener(
 
 
                             /*
-                             * 必要な予約情報が
-                             * 全て揃っているか確認
+                             * 必要情報確認
                              */
                             if (
                                 !teacherId
@@ -1717,9 +1657,6 @@ document.addEventListener(
                             }
 
 
-                            /*
-                             * Confirm Controllerへ送る値
-                             */
                             bookingTeacherId.value =
                                 teacherId;
 
@@ -1741,32 +1678,7 @@ document.addEventListener(
 
 
                             /*
-                             * 確認用
-                             */
-                            console.log(
-                                'Booking Confirm',
-                                {
-                                    teacher_id:
-                                        teacherId,
-
-                                    material_id:
-                                        materialId,
-
-                                    schedule_id:
-                                        scheduleId,
-
-                                    start_at:
-                                        startAt,
-
-                                    end_at:
-                                        endAt
-                                }
-                            );
-
-
-                            /*
-                             * ReservationController
-                             * confirm() へPOST
+                             * confirm()へ
                              */
                             bookingForm.submit();
 
@@ -1779,7 +1691,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | Disabled Schedule Link
+        | Disabled View Schedule
         |--------------------------------------------------------------------------
         */
 

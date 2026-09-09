@@ -286,7 +286,7 @@
 
                                     {{-- 今はダミー --}}
                                     <a
-                                        href="{{ route('teachers.reservations.show.test') }}"
+                                        href="#"
                                         class="btn btn-outline-primary btn-sm"
                                     >
                                         Details
