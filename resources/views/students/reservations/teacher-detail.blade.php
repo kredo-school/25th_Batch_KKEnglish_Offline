@@ -5,117 +5,189 @@
 @section('content')
 
 @php
+
     /*
     |--------------------------------------------------------------------------
-    | URLから受け取る条件
+    | Controllerから受け取った条件
+    |--------------------------------------------------------------------------
+    */
+
+    $selectedDate =
+        $validated['date']
+        ?? null;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 週間表示
     |--------------------------------------------------------------------------
     |
-    | 例:
-    | ?teacher_id=2
-    | &material_id=1
-    | &date=2026-09-10
+    | date がある場合
+    | → その日を含む週
+    |
+    | date がない場合
+    | → 今週
     |
     */
 
-    $teacherId = request('teacher_id');
-   $materialId = request('material_id') ?? request('material');
-    $selectedDate = request('date');
+    $baseDate =
+        $selectedDate
+            ? \Carbon\Carbon::parse($selectedDate)
+            : now();
+
+
+    $startOfWeek =
+        $baseDate
+            ->copy()
+            ->startOfWeek(
+                \Carbon\Carbon::MONDAY
+            );
+
+
+    $days =
+        collect(range(0, 6))
+            ->map(function ($i) use ($startOfWeek) {
+
+                $date =
+                    $startOfWeek
+                        ->copy()
+                        ->addDays($i);
+
+                return [
+                    'day' =>
+                        $date->format('D'),
+
+                    'date' =>
+                        $date->format('Y-m-d'),
+
+                    'display' =>
+                        $date->format('m/d'),
+                ];
+
+            });
+
 
     /*
     |--------------------------------------------------------------------------
-    | ダミーTeacher Profile
+    | 06:00〜22:00
+    | 30分単位
     |--------------------------------------------------------------------------
-    |
-    | 先生情報は後でControllerから
-    | $teacher を受け取る形に変更予定
-    |
-    */
-
-    $teacherName = 'John Smith';
-    $teacherNationality = 'Philippines';
-    $teacherCareer = '5 years';
-    $teacherSpecialty = 'Daily Conversation';
-    $teacherCertification = 'TESOL';
-    $teacherGraduationSchool = 'Cebu Normal University';
-
-    $teacherAboutMe =
-        "Hello! I'm John. I enjoy helping students improve "
-        . "their English through practical conversation lessons.";
-
-    /*
-    |--------------------------------------------------------------------------
-    | Material
-    |--------------------------------------------------------------------------
-    |
-    | 今は表示確認用
-    | material_id自体はURLから受け取る
-    |
-    */
-
-    $selectedMaterial = 'Daily Conversation';
-
-    /*
-    |--------------------------------------------------------------------------
-    | 週間表示の開始日
-    |--------------------------------------------------------------------------
-    |
-    | selectedDateがある場合:
-    | その日を含む週の月曜日
-    |
-    | selectedDateがない場合:
-    | 今週の月曜日
-    |
-    */
-
-    $baseDate = $selectedDate
-        ? \Carbon\Carbon::parse($selectedDate)
-        : now();
-
-    $startOfWeek = $baseDate
-        ->copy()
-        ->startOfWeek(\Carbon\Carbon::MONDAY);
-
-    $days = collect(range(0, 6))
-        ->map(function ($i) use ($startOfWeek) {
-
-            $date = $startOfWeek
-                ->copy()
-                ->addDays($i);
-
-            return [
-                'day' => $date->format('D'),
-                'date' => $date->format('Y-m-d'),
-                'display' => $date->format('m/d'),
-            ];
-        });
-
-    /*
-    |--------------------------------------------------------------------------
-    | 時間
-    |--------------------------------------------------------------------------
-    |
-    | 現在は06:00〜22:00を30分刻みで表示
-    |
     */
 
     $times = [];
 
-    $time = \Carbon\Carbon::createFromTime(6, 0);
-    $endTime = \Carbon\Carbon::createFromTime(22, 0);
+    $time =
+        \Carbon\Carbon::createFromTime(
+            6,
+            0
+        );
+
+    $endTime =
+        \Carbon\Carbon::createFromTime(
+            22,
+            0
+        );
+
 
     while ($time < $endTime) {
 
-        $times[] = $time->format('H:i');
+        $times[] =
+            $time->format('H:i');
 
         $time->addMinutes(30);
+
     }
+
 @endphp
 
-<div class="alert alert-warning">
-    teacher_id: {{ $teacherId ?? 'null' }}<br>
-    material_id: {{ $materialId ?? 'null' }}<br>
-    date: {{ $selectedDate ?? 'null' }}
-</div>
+
+<style>
+
+    /*
+    |--------------------------------------------------------------------------
+    | 選択日の色
+    |--------------------------------------------------------------------------
+    */
+
+    .selected-day-header {
+        background-color: #e7eef7 !important;
+    }
+
+    .selected-day-cell {
+        background-color: #f1f5fa !important;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 左右カードの高さ
+    |--------------------------------------------------------------------------
+    */
+
+    .teacher-profile-card,
+    .schedule-card {
+        height: 750px;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Schedule Card
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-card {
+        overflow: hidden;
+    }
+
+    .schedule-card .card-body {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Schedule Scroll
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-scroll {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | スケジュール表ヘッダー固定
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-scroll thead th {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        background-color: #f8f9fa;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Material表示
+    |--------------------------------------------------------------------------
+    */
+
+    .material-summary {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+    }
+
+</style>
+
 
 
 <div class="container-fluid py-4">
@@ -134,31 +206,36 @@
 
     <div class="row g-4">
 
+
         {{-- ===============================
              Left
              Teacher Profile
         ================================ --}}
         <div class="col-lg-4">
 
-            <div class="card">
+            <div class="card teacher-profile-card">
 
                 <div class="card-body p-4">
+
 
                     {{-- Teacher Image --}}
                     <div class="text-center mb-4">
 
                         <img
-                            src="{{ asset('images/teacher1.jpg') }}"
-                            alt="{{ $teacherName }}"
-                            class="rounded-circle mb-3"
+                            src="{{ $teacher->user->profile_image }}"
+                            alt="{{ $teacher->user->first_name }}"
                             width="120"
                             height="120"
+                            class="rounded-circle mb-3"
                             style="object-fit: cover;"
                         >
-
                         <h4 class="fw-bold mb-1">
-                            {{ $teacherName }}
+
+                            {{ $teacher->user->first_name }}
+                            {{ $teacher->user->last_name }}
+
                         </h4>
+
 
                         <p class="text-secondary mb-0">
                             English Teacher
@@ -178,7 +255,12 @@
                         </strong>
 
                         <p class="mb-0">
-                            {{ $teacherNationality }}
+
+                            {{
+                                $teacher->user->nationality
+                                ?? '-'
+                            }}
+
                         </p>
 
                     </div>
@@ -192,7 +274,12 @@
                         </strong>
 
                         <p class="mb-0">
-                            {{ $teacherCareer }}
+
+                            {{
+                                $teacher->career
+                                ?? '-'
+                            }}
+
                         </p>
 
                     </div>
@@ -206,7 +293,12 @@
                         </strong>
 
                         <p class="mb-0">
-                            {{ $teacherSpecialty }}
+
+                            {{
+                                $teacher->specialty
+                                ?? '-'
+                            }}
+
                         </p>
 
                     </div>
@@ -220,7 +312,12 @@
                         </strong>
 
                         <p class="mb-0">
-                            {{ $teacherCertification }}
+
+                            {{
+                                $teacher->certification
+                                ?? '-'
+                            }}
+
                         </p>
 
                     </div>
@@ -234,7 +331,12 @@
                         </strong>
 
                         <p class="mb-0">
-                            {{ $teacherGraduationSchool }}
+
+                            {{
+                                $teacher->graduation_school
+                                ?? '-'
+                            }}
+
                         </p>
 
                     </div>
@@ -251,7 +353,12 @@
                         </strong>
 
                         <p class="mt-2 mb-0">
-                            {{ $teacherAboutMe }}
+
+                            {{
+                                $teacher->about_me
+                                ?? '-'
+                            }}
+
                         </p>
 
                     </div>
@@ -263,15 +370,17 @@
         </div>
 
 
+
         {{-- ===============================
              Right
              Weekly Schedule
         ================================ --}}
         <div class="col-lg-8">
 
-            <div class="card">
+            <div class="card schedule-card">
 
                 <div class="card-body p-4">
+
 
                     {{-- Schedule Title --}}
                     <div class="mb-3">
@@ -281,63 +390,44 @@
                         </h4>
 
                         <p class="text-secondary mb-0">
-                            You can view this teacher's availability for the week.
+                            Select any available time slot to book a lesson.
                         </p>
 
                     </div>
 
 
+
                     {{-- ===============================
-                         Selected Conditions
+                         Material
                     ================================ --}}
-                    <div class="alert alert-info">
+                    <div
+                        class="
+                            material-summary
+                            px-3
+                            py-2
+                            mb-4
+                        "
+                    >
 
-                        <div class="row g-2">
-
-                            {{-- Date --}}
-                            <div class="col-md-6">
-
-                                <span class="text-secondary">
-                                    Selected Date:
-                                </span>
-
-                                @if ($selectedDate)
-
-                                    <strong>
-                                        {{
-                                            \Carbon\Carbon::parse(
-                                                $selectedDate
-                                            )->format('M d, Y')
-                                        }}
-                                    </strong>
-
-                                @else
-
-                                    <span class="text-secondary">
-                                        Not selected
-                                    </span>
-
-                                @endif
-
-                            </div>
+                        <span
+                            class="
+                                text-secondary
+                                small
+                                me-2
+                            "
+                        >
+                            Material
+                        </span>
 
 
-                            {{-- Material --}}
-                            <div class="col-md-6">
+                        <span class="fw-semibold">
 
-                                <span class="text-secondary">
-                                    Material:
-                                </span>
+                            {{ $material->name }}
 
-                                <strong>
-                                    {{ $selectedMaterial }}
-                                </strong>
-
-                            </div>
-
-                        </div>
+                        </span>
 
                     </div>
+
 
 
                     {{-- ===============================
@@ -352,58 +442,111 @@
                         "
                     >
 
+
                         {{-- Previous Week --}}
                         <a
                             href="{{ route(
-                                'reservations.teacher-detail.test',
+                                'students.reservations.teacher-detail',
                                 [
-                                    'teacher_id' => $teacherId,
-                                    'material_id' => $materialId,
-                                    'date' => $startOfWeek
-                                        ->copy()
-                                        ->subWeek()
-                                        ->format('Y-m-d'),
+                                    'teacher_id' =>
+                                        $teacher->id,
+
+                                    'material_id' =>
+                                        $material->material_id,
+
+                                    'date' =>
+                                        $startOfWeek
+                                            ->copy()
+                                            ->subWeek()
+                                            ->format('Y-m-d'),
+
+                                    'mode' =>
+                                        $validated['mode']
+                                        ?? 'material',
                                 ]
                             ) }}"
-                            class="btn btn-outline-secondary btn-sm"
+                            class="
+                                btn
+                                btn-outline-secondary
+                                btn-sm
+                            "
                         >
-                            &lt; Previous
+
+                            <i
+                                class="
+                                    fa-solid
+                                    fa-chevron-left
+                                    me-1
+                                "
+                            ></i>
+
+                            Previous
+
                         </a>
+
 
 
                         {{-- Week Range --}}
                         <h5 class="fw-bold mb-0">
 
-                            {{ $days->first()['display'] }}
+                            {{ $startOfWeek->format('M d') }}
 
                             -
 
-                            {{ $days->last()['display'] }}
-
-                            {{ $startOfWeek->format('Y') }}
+                            {{
+                                $startOfWeek
+                                    ->copy()
+                                    ->addDays(6)
+                                    ->format('M d, Y')
+                            }}
 
                         </h5>
+
 
 
                         {{-- Next Week --}}
                         <a
                             href="{{ route(
-                                'reservations.teacher-detail.test',
+                                'students.reservations.teacher-detail',
                                 [
-                                    'teacher_id' => $teacherId,
-                                    'material_id' => $materialId,
-                                    'date' => $startOfWeek
-                                        ->copy()
-                                        ->addWeek()
-                                        ->format('Y-m-d'),
+                                    'teacher_id' =>
+                                        $teacher->id,
+
+                                    'material_id' =>
+                                        $material->material_id,
+
+                                    'date' =>
+                                        $startOfWeek
+                                            ->copy()
+                                            ->addWeek()
+                                            ->format('Y-m-d'),
+
+                                    'mode' =>
+                                        $validated['mode']
+                                        ?? 'material',
                                 ]
                             ) }}"
-                            class="btn btn-outline-secondary btn-sm"
+                            class="
+                                btn
+                                btn-outline-secondary
+                                btn-sm
+                            "
                         >
-                            Next &gt;
+
+                            Next
+
+                            <i
+                                class="
+                                    fa-solid
+                                    fa-chevron-right
+                                    ms-1
+                                "
+                            ></i>
+
                         </a>
 
                     </div>
+
 
 
                     {{-- ===============================
@@ -415,19 +558,33 @@
                     >
 
                         <div
-                            class="spinner-border text-primary"
+                            class="
+                                spinner-border
+                                spinner-border-sm
+                                text-secondary
+                            "
                             role="status"
                         >
+
                             <span class="visually-hidden">
                                 Loading...
                             </span>
+
                         </div>
 
-                        <p class="text-secondary mt-2 mb-0">
+
+                        <p
+                            class="
+                                text-secondary
+                                mt-2
+                                mb-0
+                            "
+                        >
                             Loading schedule...
                         </p>
 
                     </div>
+
 
 
                     {{-- ===============================
@@ -435,10 +592,17 @@
                     ================================ --}}
                     <div
                         id="scheduleError"
-                        class="alert alert-danger d-none"
+                        class="
+                            alert
+                            alert-danger
+                            d-none
+                        "
                     >
+
                         Failed to load schedule.
+
                     </div>
+
 
 
                     {{-- ===============================
@@ -446,7 +610,11 @@
                     ================================ --}}
                     <div
                         id="scheduleTable"
-                        class="table-responsive d-none"
+                        class="
+                            table-responsive
+                            schedule-scroll
+                            d-none
+                        "
                     >
 
                         <table
@@ -455,8 +623,10 @@
                                 table-bordered
                                 text-center
                                 align-middle
+                                mb-0
                             "
                         >
+
 
                             {{-- Header --}}
                             <thead class="table-light">
@@ -471,17 +641,24 @@
                                     @foreach ($days as $day)
 
                                         @php
+
                                             $isPast =
                                                 $day['date']
-                                                < now()->format('Y-m-d');
+                                                <
+                                                now()->format('Y-m-d');
+
 
                                             $isToday =
                                                 $day['date']
-                                                === now()->format('Y-m-d');
+                                                ===
+                                                now()->format('Y-m-d');
+
 
                                             $isSelected =
                                                 $selectedDate
-                                                === $day['date'];
+                                                ===
+                                                $day['date'];
+
                                         @endphp
 
 
@@ -490,18 +667,23 @@
                                                 @if ($isPast)
                                                     table-secondary
                                                 @elseif ($isSelected)
-                                                    table-info
+                                                    selected-day-header
                                                 @endif
                                             "
                                             style="min-width: 105px;"
                                         >
 
                                             <div class="fw-bold">
+
                                                 {{ $day['day'] }}
+
                                             </div>
 
+
                                             <small class="text-secondary">
+
                                                 {{ $day['display'] }}
+
                                             </small>
 
 
@@ -527,7 +709,9 @@
                                                     <span
                                                         class="
                                                             badge
-                                                            text-bg-primary
+                                                            bg-light
+                                                            text-secondary
+                                                            border
                                                         "
                                                     >
                                                         Selected
@@ -542,7 +726,9 @@
                                                     <span
                                                         class="
                                                             badge
-                                                            text-bg-dark
+                                                            bg-light
+                                                            text-dark
+                                                            border
                                                         "
                                                     >
                                                         Today
@@ -561,12 +747,14 @@
                             </thead>
 
 
+
                             {{-- Body --}}
                             <tbody>
 
                                 @foreach ($times as $time)
 
                                     <tr>
+
 
                                         {{-- Time --}}
                                         <th class="table-light">
@@ -579,13 +767,18 @@
                                         @foreach ($days as $day)
 
                                             @php
+
                                                 $isPast =
                                                     $day['date']
-                                                    < now()->format('Y-m-d');
+                                                    <
+                                                    now()->format('Y-m-d');
+
 
                                                 $isSelected =
                                                     $selectedDate
-                                                    === $day['date'];
+                                                    ===
+                                                    $day['date'];
+
                                             @endphp
 
 
@@ -597,26 +790,17 @@
                                                     @if ($isPast)
                                                         table-secondary
                                                     @elseif ($isSelected)
-                                                        table-info
+                                                        selected-day-cell
                                                     @endif
                                                 "
                                                 data-date="{{ $day['date'] }}"
                                                 data-time="{{ $time }}"
+                                                style="height: 46px;"
                                             >
 
-                                                @if ($isPast)
-
-                                                    <span class="text-secondary">
-                                                        -
-                                                    </span>
-
-                                                @else
-
-                                                    <span class="text-secondary">
-                                                        -
-                                                    </span>
-
-                                                @endif
+                                                <span class="text-secondary">
+                                                    -
+                                                </span>
 
                                             </td>
 
@@ -631,6 +815,7 @@
                         </table>
 
                     </div>
+
 
 
                     {{-- ===============================
@@ -650,22 +835,16 @@
 
                         <div>
 
-                            <span class="badge text-bg-primary">
+                            <span
+                                class="
+                                    badge
+                                    text-bg-primary
+                                "
+                            >
                                 Book
                             </span>
 
-                            Available for booking
-
-                        </div>
-
-
-                        <div>
-
-                            <span class="badge text-bg-success">
-                                OPEN
-                            </span>
-
-                            Available on another day
+                            Available
 
                         </div>
 
@@ -676,7 +855,7 @@
 
 
                         <div class="text-secondary">
-                            × = outside working hours
+                            × = unavailable
                         </div>
 
 
@@ -697,9 +876,9 @@
 </div>
 
 
+
 {{-- =========================================================
      Booking Form
-     Bookを押したときにBooking Confirmationへ送る
 ========================================================= --}}
 <form
     id="bookingForm"
@@ -710,19 +889,22 @@
 
     @csrf
 
+
     <input
         type="hidden"
         name="teacher_id"
         id="bookingTeacherId"
-        value="{{ $teacherId }}"
+        value="{{ $teacher->id }}"
     >
+
 
     <input
         type="hidden"
         name="material_id"
         id="bookingMaterialId"
-        value="{{ $materialId }}"
+        value="{{ $material->material_id }}"
     >
+
 
     <input
         type="hidden"
@@ -730,11 +912,13 @@
         id="bookingScheduleId"
     >
 
+
     <input
         type="hidden"
         name="start_at"
         id="bookingStartAt"
     >
+
 
     <input
         type="hidden"
@@ -745,139 +929,137 @@
 </form>
 
 
+
 <script>
-document.addEventListener('DOMContentLoaded', async function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | BladeからJavaScriptへ
-    |--------------------------------------------------------------------------
-    */
-
-    const teacherId = @json($teacherId);
-    const materialId = @json($materialId);
-    const selectedDate = @json($selectedDate);
-
-    const days = @json(
-        $days->pluck('date')->values()
-    );
+document.addEventListener(
+    'DOMContentLoaded',
+    async function () {
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Elements
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Blade → JavaScript
+        |--------------------------------------------------------------------------
+        */
 
-    const loading =
-        document.getElementById('scheduleLoading');
-
-    const error =
-        document.getElementById('scheduleError');
-
-    const table =
-        document.getElementById('scheduleTable');
-
-    const legend =
-        document.getElementById('scheduleLegend');
+        const teacherId =
+            @json($teacher->id);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | teacher_idがない場合
-    |--------------------------------------------------------------------------
-    */
-
-    if (!teacherId) {
-
-        loading.classList.add('d-none');
-
-        error.classList.remove('d-none');
-
-        error.textContent =
-            'Teacher information is not available.';
-
-        return;
-    }
+        const materialId =
+            @json($material->material_id);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Helper
-    |--------------------------------------------------------------------------
-    */
+        const days =
+            @json(
+                $days
+                    ->pluck('date')
+                    ->values()
+            );
 
-    function getTimeFromDateTime(dateTime) {
 
-        if (!dateTime) {
-            return null;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Elements
+        |--------------------------------------------------------------------------
+        */
+
+        const loading =
+            document.getElementById(
+                'scheduleLoading'
+            );
+
+
+        const error =
+            document.getElementById(
+                'scheduleError'
+            );
+
+
+        const table =
+            document.getElementById(
+                'scheduleTable'
+            );
+
+
+        const legend =
+            document.getElementById(
+                'scheduleLegend'
+            );
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Helper
+        |--------------------------------------------------------------------------
+        */
+
+        function getTimeFromDateTime(
+            dateTime
+        ) {
+
+            if (!dateTime) {
+                return null;
+            }
+
+
+            const normalized =
+                dateTime.replace(
+                    'T',
+                    ' '
+                );
+
+
+            return normalized.substring(
+                11,
+                16
+            );
+
         }
 
-        /*
-         * APIの値が
-         *
-         * 2026-09-10 09:00:00
-         *
-         * または
-         *
-         * 2026-09-10T09:00:00...
-         *
-         * のどちらでも対応
-         */
-
-        const normalized =
-            dateTime.replace('T', ' ');
-
-        return normalized.substring(11, 16);
-    }
 
 
-    function getCell(date, time) {
+        function getCell(
+            date,
+            time
+        ) {
 
-        const formattedTime =
-            time.replace(':', '-');
-
-        return document.getElementById(
-            `slot-${date}-${formattedTime}`
-        );
-    }
+            const formattedTime =
+                time.replace(
+                    ':',
+                    '-'
+                );
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cell表示
-    |--------------------------------------------------------------------------
-    */
+            return document.getElementById(
+                `slot-${date}-${formattedTime}`
+            );
 
-    function renderAvailableCell(
-        cell,
-        slot,
-        date
-    ) {
+        }
+
+
 
         /*
-         * 選択日がある場合
-         *
-         * → 選択日だけBook可能
-         *
-         * 選択日がない場合
-         *
-         * → OPEN枠すべてBook可能
-         */
+        |--------------------------------------------------------------------------
+        | Available
+        |--------------------------------------------------------------------------
+        */
 
-        const canBook =
-            !selectedDate
-            || selectedDate === date;
-
-
-        if (canBook) {
+        function renderAvailableCell(
+            cell,
+            slot
+        ) {
 
             cell.innerHTML = `
+
                 <button
                     type="button"
                     class="
                         btn
-                        btn-primary
+                        btn-outline-primary
                         btn-sm
                         w-100
                         book-slot-btn
@@ -888,354 +1070,393 @@ document.addEventListener('DOMContentLoaded', async function () {
                 >
                     Book
                 </button>
-            `;
 
-        } else {
-
-            cell.innerHTML = `
-                <span class="badge text-bg-success">
-                    OPEN
-                </span>
             `;
 
         }
-    }
 
 
-    function renderUnavailableCell(
-        cell,
-        slot
-    ) {
 
         /*
-         * student_conflictが
-         * Availability APIに追加された場合
-         *
-         * 自分が同じ時間に
-         * 別の先生を予約済みなら
-         *
-         * Already booked
-         */
+        |--------------------------------------------------------------------------
+        | Unavailable
+        |--------------------------------------------------------------------------
+        */
 
-        if (slot.student_conflict === true) {
+        function renderUnavailableCell(
+            cell,
+            slot
+        ) {
+
+            if (
+                slot.student_conflict
+                === true
+            ) {
+
+                cell.innerHTML = `
+
+                    <span
+                        class="
+                            text-danger
+                            small
+                        "
+                    >
+                        Already booked
+                    </span>
+
+                `;
+
+                return;
+
+            }
+
 
             cell.innerHTML = `
-                <span class="text-danger small">
-                    Already booked
+
+                <span
+                    class="
+                        text-secondary
+                        small
+                    "
+                >
+                    Reserved
                 </span>
+
             `;
 
-            return;
         }
 
 
+
         /*
-         * 現状APIでは
-         * available=falseの場合、
-         *
-         * 予約済み / Exception
-         *
-         * の区別が付かないため
-         * Reservedとして表示
-         */
+        |--------------------------------------------------------------------------
+        | Availability API
+        |--------------------------------------------------------------------------
+        */
 
-        cell.innerHTML = `
-            <span class="text-secondary small">
-                Reserved
-            </span>
-        `;
-    }
+        async function fetchAvailability(
+            date
+        ) {
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | 1日分のAvailability取得
-    |--------------------------------------------------------------------------
-    */
-
-    async function fetchAvailability(date) {
-
-        const url =
-            `/students/availability`
-            + `?teacher_id=${encodeURIComponent(teacherId)}`
-            + `&date=${encodeURIComponent(date)}`;
+            const url =
+                `/students/availability`
+                +
+                `?teacher_id=${encodeURIComponent(
+                    teacherId
+                )}`
+                +
+                `&date=${encodeURIComponent(
+                    date
+                )}`;
 
 
-        const response =
-            await fetch(url, {
-                headers: {
-                    'Accept': 'application/json',
-                },
-            });
+            const response =
+                await fetch(
+                    url,
+                    {
+                        headers: {
+                            'Accept':
+                                'application/json',
+                        },
+                    }
+                );
 
 
-        if (!response.ok) {
+            if (!response.ok) {
 
-            throw new Error(
-                `Availability request failed: ${response.status}`
+                throw new Error(
+                    `Availability request failed: ${response.status}`
+                );
+
+            }
+
+
+            return await response.json();
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1日分表示
+        |--------------------------------------------------------------------------
+        */
+
+        function renderDay(
+            date,
+            data
+        ) {
+
+            document
+                .querySelectorAll(
+                    `.schedule-slot[data-date="${date}"]`
+                )
+                .forEach(function (cell) {
+
+                    const cellDate =
+                        cell.dataset.date;
+
+
+                    const today =
+                        new Date()
+                            .toLocaleDateString(
+                                'en-CA'
+                            );
+
+
+                    if (
+                        cellDate
+                        <
+                        today
+                    ) {
+                        return;
+                    }
+
+
+                    cell.innerHTML = `
+
+                        <span
+                            class="
+                                text-secondary
+                            "
+                        >
+                            ×
+                        </span>
+
+                    `;
+
+                });
+
+
+
+            const slots =
+                data.slots
+                ?? [];
+
+
+            slots.forEach(
+                function (slot) {
+
+
+                    const time =
+                        getTimeFromDateTime(
+                            slot.start_at
+                        );
+
+
+                    if (!time) {
+                        return;
+                    }
+
+
+                    const cell =
+                        getCell(
+                            date,
+                            time
+                        );
+
+
+                    if (!cell) {
+                        return;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | BackendのavailableでBook表示を切り替える
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if (
+                        slot.available
+                        === true
+                    ) {
+
+                        renderAvailableCell(
+                            cell,
+                            slot
+                        );
+
+                    } else {
+
+                        renderUnavailableCell(
+                            cell,
+                            slot
+                        );
+
+                    }
+
+                }
             );
 
         }
 
 
-        return await response.json();
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 1日分を画面に反映
-    |--------------------------------------------------------------------------
-    */
-
-    function renderDay(
-        date,
-        data
-    ) {
 
         /*
-         * 一旦その日の未来セルを
-         * working hours外として × にする
-         *
-         * APIから返ってきたSlotだけ
-         * あとで上書きする
-         */
+        |--------------------------------------------------------------------------
+        | 1週間分取得
+        |--------------------------------------------------------------------------
+        */
 
-        document
-            .querySelectorAll(
-                `.schedule-slot[data-date="${date}"]`
-            )
-            .forEach(function (cell) {
+        try {
 
-                const cellDate =
-                    cell.dataset.date;
+            const results =
+                await Promise.all(
 
-                const today =
-                    new Date()
-                        .toLocaleDateString(
-                            'en-CA'
-                        );
+                    days.map(
+                        async function (
+                            date
+                        ) {
+
+                            const data =
+                                await fetchAvailability(
+                                    date
+                                );
 
 
-                if (cellDate < today) {
+                            return {
+                                date:
+                                    date,
+
+                                data:
+                                    data,
+                            };
+
+                        }
+                    )
+
+                );
+
+
+            results.forEach(
+                function (
+                    result
+                ) {
+
+                    renderDay(
+                        result.date,
+                        result.data
+                    );
+
+                }
+            );
+
+
+            loading
+                .classList
+                .add(
+                    'd-none'
+                );
+
+
+            table
+                .classList
+                .remove(
+                    'd-none'
+                );
+
+
+            legend
+                .classList
+                .remove(
+                    'd-none'
+                );
+
+
+        } catch (err) {
+
+            console.error(
+                err
+            );
+
+
+            loading
+                .classList
+                .add(
+                    'd-none'
+                );
+
+
+            error
+                .classList
+                .remove(
+                    'd-none'
+                );
+
+
+            error.textContent =
+                'Failed to load teacher availability.';
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Book
+        |--------------------------------------------------------------------------
+        */
+
+        document.addEventListener(
+            'click',
+            function (event) {
+
+
+                const button =
+                    event.target.closest(
+                        '.book-slot-btn'
+                    );
+
+
+                if (!button) {
                     return;
                 }
 
 
-                cell.innerHTML = `
-                    <span class="text-secondary">
-                        ×
-                    </span>
-                `;
-
-            });
-
-
-        /*
-         * API response:
-         *
-         * {
-         *   teacher_id: ...,
-         *   date: ...,
-         *   slots: [...]
-         * }
-         */
-
-        const slots =
-            data.slots ?? [];
+                document
+                    .getElementById(
+                        'bookingScheduleId'
+                    )
+                    .value =
+                        button
+                            .dataset
+                            .scheduleId;
 
 
-        slots.forEach(function (slot) {
-
-            const time =
-                getTimeFromDateTime(
-                    slot.start_at
-                );
-
-
-            if (!time) {
-                return;
-            }
+                document
+                    .getElementById(
+                        'bookingStartAt'
+                    )
+                    .value =
+                        button
+                            .dataset
+                            .startAt;
 
 
-            const cell =
-                getCell(
-                    date,
-                    time
-                );
+                document
+                    .getElementById(
+                        'bookingEndAt'
+                    )
+                    .value =
+                        button
+                            .dataset
+                            .endAt;
 
 
-            if (!cell) {
-                return;
-            }
-
-
-            if (slot.available === true) {
-
-                renderAvailableCell(
-                    cell,
-                    slot,
-                    date
-                );
-
-            } else {
-
-                renderUnavailableCell(
-                    cell,
-                    slot
-                );
-
-            }
-
-        });
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 1週間分を取得
-    |--------------------------------------------------------------------------
-    */
-
-    try {
-
-        /*
-         * 7日分を同時に取得
-         */
-
-        const results =
-            await Promise.all(
-
-                days.map(
-                    async function (date) {
-
-                        const data =
-                            await fetchAvailability(
-                                date
-                            );
-
-                        return {
-                            date,
-                            data,
-                        };
-
-                    }
-                )
-
-            );
-
-
-        results.forEach(
-            function (result) {
-
-                renderDay(
-                    result.date,
-                    result.data
-                );
+                document
+                    .getElementById(
+                        'bookingForm'
+                    )
+                    .submit();
 
             }
         );
 
-
-        loading.classList.add('d-none');
-
-        table.classList.remove('d-none');
-
-        legend.classList.remove('d-none');
-
-
-    } catch (err) {
-
-        console.error(err);
-
-        loading.classList.add('d-none');
-
-        error.classList.remove('d-none');
-
-        error.textContent =
-            'Failed to load teacher availability.';
-
     }
+);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Book Button
-    |--------------------------------------------------------------------------
-    |
-    | BookボタンはAPI取得後に生成されるため、
-    | event delegationを使用
-    |
-    */
-
-    document.addEventListener(
-        'click',
-        function (event) {
-
-            const button =
-                event.target.closest(
-                    '.book-slot-btn'
-                );
-
-
-            if (!button) {
-                return;
-            }
-
-
-            /*
-             * material_idがない場合は
-             * Confirmationへ送れない
-             */
-
-            if (!materialId) {
-
-                alert(
-                    'Please select a material first.'
-                );
-
-                return;
-            }
-
-
-            /*
-             * APIから受け取った値を
-             * hidden inputにセット
-             */
-
-            document.getElementById(
-                'bookingScheduleId'
-            ).value =
-                button.dataset.scheduleId;
-
-
-            document.getElementById(
-                'bookingStartAt'
-            ).value =
-                button.dataset.startAt;
-
-
-            document.getElementById(
-                'bookingEndAt'
-            ).value =
-                button.dataset.endAt;
-
-
-            /*
-             * 既存Booking Confirmationへ
-             */
-
-            document
-                .getElementById(
-                    'bookingForm'
-                )
-                .submit();
-
-        }
-    );
-
-});
 </script>
 
 @endsection
