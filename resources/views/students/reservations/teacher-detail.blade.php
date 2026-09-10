@@ -19,37 +19,29 @@
 
     /*
     |--------------------------------------------------------------------------
-    | 週間表示
+    | 7日間表示
     |--------------------------------------------------------------------------
     |
     | date がある場合
-    | → その日を含む週
+    | → 選択した日から7日間
     |
     | date がない場合
-    | → 今週
+    | → 今日から7日間
     |
     */
 
-    $baseDate =
+    $startDate =
         $selectedDate
-            ? \Carbon\Carbon::parse($selectedDate)
-            : now();
-
-
-    $startOfWeek =
-        $baseDate
-            ->copy()
-            ->startOfWeek(
-                \Carbon\Carbon::MONDAY
-            );
+            ? \Carbon\Carbon::parse($selectedDate)->startOfDay()
+            : now()->startOfDay();
 
 
     $days =
         collect(range(0, 6))
-            ->map(function ($i) use ($startOfWeek) {
+            ->map(function ($i) use ($startDate) {
 
                 $date =
-                    $startOfWeek
+                    $startDate
                         ->copy()
                         ->addDays($i);
 
@@ -65,6 +57,24 @@
                 ];
 
             });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Previous表示判定
+    |--------------------------------------------------------------------------
+    */
+
+    $today =
+        now()
+            ->startOfDay();
+
+
+    $canGoPrevious =
+        $startDate
+            ->copy()
+            ->subDays(7)
+            ->gte($today);
 
 
     /*
@@ -151,12 +161,89 @@
     |--------------------------------------------------------------------------
     | Schedule Scroll
     |--------------------------------------------------------------------------
+    |
+    | 横スクロールなし
+    | 縦スクロールのみ
+    |
     */
 
     .schedule-scroll {
         flex: 1;
         min-height: 0;
+
         overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Table
+    |--------------------------------------------------------------------------
+    |
+    | カード幅いっぱいにして
+    | 7日分を均等に表示
+    |
+    */
+
+    .schedule-scroll table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Time列
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-scroll th:first-child,
+    .schedule-scroll td:first-child {
+        width: 65px;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 7日分
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-scroll th:not(:first-child),
+    .schedule-scroll td:not(:first-child) {
+        width: calc((100% - 65px) / 7);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cell
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-scroll th,
+    .schedule-scroll td {
+        padding-left: 4px;
+        padding-right: 4px;
+
+        font-size: 0.85rem;
+
+        overflow: hidden;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Book Button
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-scroll .book-slot-btn {
+        padding-left: 3px;
+        padding-right: 3px;
+
+        font-size: 0.78rem;
     }
 
 
@@ -170,6 +257,7 @@
         position: sticky;
         top: 0;
         z-index: 3;
+
         background-color: #f8f9fa;
     }
 
@@ -182,7 +270,9 @@
 
     .material-summary {
         background-color: #f8f9fa;
+
         border: 1px solid #e9ecef;
+
         border-radius: 6px;
     }
 
@@ -229,6 +319,8 @@
                             class="rounded-circle mb-3"
                             style="object-fit: cover;"
                         >
+
+
                         <h4 class="fw-bold mb-1">
 
                             {{ $teacher->user->first_name }}
@@ -431,7 +523,7 @@
 
 
                     {{-- ===============================
-                         Week Navigation
+                         7 Days Navigation
                     ================================ --}}
                     <div
                         class="
@@ -443,58 +535,66 @@
                     >
 
 
-                        {{-- Previous Week --}}
-                        <a
-                            href="{{ route(
-                                'students.reservations.teacher-detail',
-                                [
-                                    'teacher_id' =>
-                                        $teacher->id,
+                        {{-- Previous --}}
+                        @if ($canGoPrevious)
 
-                                    'material_id' =>
-                                        $material->material_id,
+                            <a
+                                href="{{ route(
+                                    'students.reservations.teacher-detail',
+                                    [
+                                        'teacher_id' =>
+                                            $teacher->id,
 
-                                    'date' =>
-                                        $startOfWeek
-                                            ->copy()
-                                            ->subWeek()
-                                            ->format('Y-m-d'),
+                                        'material_id' =>
+                                            $material->material_id,
 
-                                    'mode' =>
-                                        $validated['mode']
-                                        ?? 'material',
-                                ]
-                            ) }}"
-                            class="
-                                btn
-                                btn-outline-secondary
-                                btn-sm
-                            "
-                        >
+                                        'date' =>
+                                            $startDate
+                                                ->copy()
+                                                ->subDays(7)
+                                                ->format('Y-m-d'),
 
-                            <i
+                                        'mode' =>
+                                            $validated['mode']
+                                            ?? 'material',
+                                    ]
+                                ) }}"
                                 class="
-                                    fa-solid
-                                    fa-chevron-left
-                                    me-1
+                                    btn
+                                    btn-outline-secondary
+                                    btn-sm
                                 "
-                            ></i>
+                            >
 
-                            Previous
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-chevron-left
+                                        me-1
+                                    "
+                                ></i>
 
-                        </a>
+                                Previous
+
+                            </a>
+
+                        @else
+
+                            <span></span>
+
+                        @endif
 
 
 
-                        {{-- Week Range --}}
+                        {{-- Date Range --}}
                         <h5 class="fw-bold mb-0">
 
-                            {{ $startOfWeek->format('M d') }}
+                            {{ $startDate->format('M d') }}
 
                             -
 
                             {{
-                                $startOfWeek
+                                $startDate
                                     ->copy()
                                     ->addDays(6)
                                     ->format('M d, Y')
@@ -504,7 +604,7 @@
 
 
 
-                        {{-- Next Week --}}
+                        {{-- Next --}}
                         <a
                             href="{{ route(
                                 'students.reservations.teacher-detail',
@@ -516,9 +616,9 @@
                                         $material->material_id,
 
                                     'date' =>
-                                        $startOfWeek
+                                        $startDate
                                             ->copy()
-                                            ->addWeek()
+                                            ->addDays(7)
                                             ->format('Y-m-d'),
 
                                     'mode' =>
@@ -611,7 +711,6 @@
                     <div
                         id="scheduleTable"
                         class="
-                            table-responsive
                             schedule-scroll
                             d-none
                         "
@@ -633,7 +732,7 @@
 
                                 <tr>
 
-                                    <th style="min-width: 85px;">
+                                    <th>
                                         Time
                                     </th>
 
@@ -670,7 +769,6 @@
                                                     selected-day-header
                                                 @endif
                                             "
-                                            style="min-width: 105px;"
                                         >
 
                                             <div class="fw-bold">
@@ -702,6 +800,7 @@
 
                                                 </div>
 
+
                                             @elseif ($isSelected)
 
                                                 <div class="mt-1">
@@ -718,6 +817,7 @@
                                                     </span>
 
                                                 </div>
+
 
                                             @elseif ($isToday)
 
@@ -1296,7 +1396,7 @@ document.addEventListener(
 
         /*
         |--------------------------------------------------------------------------
-        | 1週間分取得
+        | 7日分取得
         |--------------------------------------------------------------------------
         */
 
