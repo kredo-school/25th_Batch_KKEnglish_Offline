@@ -115,6 +115,10 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teachers/lessons', [TeacherReservationController::class, 'index'])->name('teachers.reservations.index');
     Route::get('/teachers/lessons/{reservation}', [TeacherReservationController::class, 'show'])->name('teachers.reservations.show');
 
+    //　Lessons results
+    Route::patch('/teachers/lessons/{reservation}/result', [TeacherReservationController::class, 'updateResult'])->name('teachers.reservations.updateResult')
+     ->whereNumber('reservation')
+     ->name('teachers.reservations.result.update');
 // Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
 //     ->name('teacher.schedules.storeGrid');
 });
