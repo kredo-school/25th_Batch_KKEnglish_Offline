@@ -6,9 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use App\Services\ReservationService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 
 class ReservationController extends Controller
 {
+    public function __construct(
+        private ReservationService $reservationService
+    ) {}
     /*
      * ========================================
      * 講師自身の予約一覧
@@ -106,7 +112,7 @@ class ReservationController extends Controller
         abort_unless(
             (int) $reservation->teacher_id
                 ===
-            (int) $teacher->id,
+                (int) $teacher->id,
             403,
             'この予約を表示する権限がありません。'
         );
@@ -130,5 +136,86 @@ class ReservationController extends Controller
             'teachers.reservations.show',
             compact('reservation')
         );
+    }
+
+    /*
+ * ========================================
+ * 授業結果登録
+ * ========================================
+ */
+    public function updateResult(
+        Request $request,
+        Reservation $reservation
+    ): RedirectResponse {
+
+        /*
+     * ========================================
+     * 入力内容のValidation
+     * ========================================
+     */
+        $validated = $request->validate([
+            'result' => [
+                'required',
+                Rule::in([
+                    'completed',
+                    'absent',
+                ]),
+            ],
+
+            'subject' => [
+                'nullable',
+                'required_if:result,completed',
+                'string',
+                'max:255',
+            ],
+
+            'progress_note' => [
+                'nullable',
+                'required_if:result,completed',
+                'string',
+                'max:2000',
+            ],
+        ]);
+
+        /*
+     * ========================================
+     * ログイン中の講師を取得
+     * ========================================
+     */
+        $teacher = $request->user()->teacher;
+
+        abort_unless(
+            $teacher,
+            403,
+            '講師ユーザーではありません。'
+        );
+
+        /*
+     * ========================================
+     * Serviceへ処理を依頼
+     * ========================================
+     */
+        $this->reservationService
+            ->recordLessonResult(
+                $teacher,
+                $reservation,
+                (int) $request->user()->getKey(),
+                $validated
+            );
+
+        /*
+     * ========================================
+     * 予約詳細画面へ戻る
+     * ========================================
+     */
+        return redirect()
+            ->route(
+                'teachers.reservations.show',
+                $reservation
+            )
+            ->with(
+                'success',
+                '授業結果を登録しました。'
+            );
     }
 }
