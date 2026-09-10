@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Student;
 
+use Carbon\CarbonImmutable;
 use App\Services\ReservationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -527,6 +528,12 @@ public function teacherDetail(Request $request): View
             'date',
         ],
 
+        // カレンダーの表示開始日
+        'view_start' => [
+            'nullable',
+            'date',
+        ],
+
         'mode' => [
             'required',
             'in:material,date',
@@ -547,12 +554,34 @@ public function teacherDetail(Request $request): View
             $validated['material_id']
         );
 
+    /*
+     * 生徒が選択した日
+     */
+    $selectedDate = isset($validated['date'])
+        ? CarbonImmutable::parse(
+            $validated['date']
+        )->startOfDay()
+        : null;
+
+    /*
+     * 7日間の表示開始日
+     *
+     * view_startがなければ今日から表示
+     */
+    $viewStart = isset($validated['view_start'])
+        ? CarbonImmutable::parse(
+            $validated['view_start']
+        )->startOfDay()
+        : CarbonImmutable::today();
+
     return view(
         'students.reservations.teacher-detail',
         compact(
             'teacher',
             'material',
-            'validated'
+            'validated',
+            'selectedDate',
+            'viewStart'
         )
     );
 }
