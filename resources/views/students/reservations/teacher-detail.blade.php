@@ -761,7 +761,7 @@
                                         @endphp
 
 
-                                        <th
+                                       <th
                                             class="
                                                 @if ($isPast)
                                                     table-secondary
@@ -771,23 +771,10 @@
                                             "
                                         >
 
-                                            <div class="fw-bold">
-
-                                                {{ $day['day'] }}
-
-                                            </div>
-
-
-                                            <small class="text-secondary">
-
-                                                {{ $day['display'] }}
-
-                                            </small>
-
-
+                                            {{-- Status --}}
                                             @if ($isPast)
 
-                                                <div class="mt-1">
+                                                <div class="mb-1">
 
                                                     <span
                                                         class="
@@ -800,10 +787,9 @@
 
                                                 </div>
 
-
                                             @elseif ($isSelected)
 
-                                                <div class="mt-1">
+                                                <div class="mb-1">
 
                                                     <span
                                                         class="
@@ -818,10 +804,9 @@
 
                                                 </div>
 
-
                                             @elseif ($isToday)
 
-                                                <div class="mt-1">
+                                                <div class="mb-1">
 
                                                     <span
                                                         class="
@@ -837,6 +822,18 @@
                                                 </div>
 
                                             @endif
+
+
+                                            {{-- Day --}}
+                                            <div class="fw-bold">
+                                                {{ $day['day'] }}
+                                            </div>
+
+
+                                            {{-- Date --}}
+                                            <small class="text-secondary">
+                                                {{ $day['display'] }}
+                                            </small>
 
                                         </th>
 

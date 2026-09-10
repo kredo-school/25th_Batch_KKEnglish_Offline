@@ -1,4 +1,3 @@
-<aside class="bg-light border-end min-vh-100">
     @php
         // クエリパラメータ ?menu=schedule が指定されているか、またはスケジュール関連のルートの場合に 'schedule' メニューにする
         $isScheduleMenu = request('menu') === 'schedule' 
@@ -70,4 +69,3 @@
             </a>
         @endif
     </nav>
-</aside>
