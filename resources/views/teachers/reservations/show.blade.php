@@ -188,14 +188,14 @@
 
 
     {{-- ===============================
-         Lesson Result
+         Lesson Record
     ================================ --}}
     <div class="card mt-4">
 
         <div class="card-header bg-white py-3">
 
             <h5 class="fw-bold mb-0">
-                Lesson Result
+                Lesson Record
             </h5>
 
         </div>
@@ -211,14 +211,14 @@
                 @csrf
 
 
-                {{-- Result --}}
+                {{-- Lesson Status --}}
                 <div class="mb-4">
 
                     <label
                         for="lessonResult"
                         class="form-label fw-bold"
                     >
-                        Result
+                        Lesson Status
                     </label>
 
 
@@ -229,7 +229,7 @@
                     >
 
                         <option value="">
-                            Select result
+                            Select status
                         </option>
 
                         <option value="completed">
@@ -245,26 +245,24 @@
                 </div>
 
 
-                {{-- Comment --}}
-                <div class="mb-4">
+               {{-- Progress Note --}}
+            <div class="mb-4">
+                <label
+                    for="progressNote"
+                    class="form-label fw-bold"
+                >
+                    Progress Note
+                </label>
 
-                    <label
-                        for="lessonComment"
-                        class="form-label fw-bold"
-                    >
-                        Comment
-                    </label>
+                <textarea
+                    id="progressNote"
+                    name="progress_note"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Enter lesson progress or notes..."
+                ></textarea>
 
-
-                    <textarea
-                        id="lessonComment"
-                        name="comment"
-                        class="form-control"
-                        rows="4"
-                        placeholder="Enter lesson notes..."
-                    ></textarea>
-
-                </div>
+            </div>
 
 
                 {{-- Save --}}
@@ -274,7 +272,7 @@
                         type="button"
                         class="btn btn-primary"
                     >
-                        Save Result
+                        Save Lesson Record
                     </button>
 
                 </div>

@@ -74,11 +74,11 @@
     ])
 
     <div class="container-fluid px-0">
-        <div class="row g-0 align-items-stretch">
+        <div class="row g-0 align-items-stretch min-vh-100">
 
             {{-- Sidebar --}}
 @auth
-    <aside class="col-md-3 col-lg-2">
+    <aside class="col-md-3 col-lg-2 bg-light border-end">
 
         @if ($roleCode == 'student')
             {{-- 生徒ページの予約ページでは専用のサイドバーを表示　route判定--}}
