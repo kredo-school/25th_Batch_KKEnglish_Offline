@@ -67,6 +67,9 @@ class AvailabilityService
             })
             ->get();
 
+        // 現在時刻から10分後
+        $bookingDeadline = now()->addMinutes(10);
+
         while ($current < $end) {
 
             $slotStart = $current->copy();
@@ -75,26 +78,34 @@ class AvailabilityService
                 ->copy()
                 ->addMinutes(30);
 
-            // 最初は予約可能と考える
-            $available = true;
+            /*
+            * 以下は予約不可
+            * ・昨日以前
+            * ・今日の過去時間
+            * ・現在時刻から10分以内に開始する枠
+            */
+            $available = $slotStart->gt($bookingDeadline);
 
+
+            if ($available) {
             // ScheduleExceptionとの重複判定
-            foreach ($exceptions as $exception) {
+                foreach ($exceptions as $exception) {
 
-                $exceptionStart = Carbon::parse(
-                    $exception->start_at
-                );
+                    $exceptionStart = Carbon::parse(
+                        $exception->start_at
+                    );
 
-                $exceptionEnd = Carbon::parse(
-                    $exception->end_at
-                );
+                    $exceptionEnd = Carbon::parse(
+                        $exception->end_at
+                    );
 
-                if (
-                    $slotStart < $exceptionEnd &&
-                    $slotEnd > $exceptionStart
-                ) {
-                    $available = false;
-                    break;
+                    if (
+                        $slotStart < $exceptionEnd &&
+                        $slotEnd > $exceptionStart
+                    ) {
+                        $available = false;
+                        break;
+                    }
                 }
             }
 
