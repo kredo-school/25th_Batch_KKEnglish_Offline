@@ -28,12 +28,21 @@ class AvailabilityController extends Controller
             ],
         ]);
 
+        $student = $request->user()->student;
+
+        abort_unless(
+            $student,
+            403,
+            '生徒ユーザーではありません。'
+        );
+
         $slots = $this->service->getAvailability(
             (int) $validated['teacher_id'],
             $validated['date']
         );
 
         return response()->json([
+            'student_id' => $student->id,
             'teacher_id' => (int) $validated['teacher_id'],
             'date' => $validated['date'],
             'slots' => $slots,
