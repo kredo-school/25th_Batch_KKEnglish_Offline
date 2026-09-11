@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShiftPattern;
 use App\Models\Teacher;
 use App\Models\TeacherShiftPatternAssignment;
-use App\Services\Admin\GenerateTeacherSchedulesService; // スケジュール生成サービス
+use App\Services\Admin\TeacherScheduleGenerationService; // スケジュール生成サービス
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -17,7 +17,7 @@ class ShiftPatternAssignmentController extends Controller
 {
     // スケジュール生成サービスを注入
     public function __construct(
-        private readonly GenerateTeacherSchedulesService $scheduleGenerator
+        private readonly TeacherScheduleGenerationService $scheduleGenerator
     ) {}
 
     public function index(Request $request): View
@@ -99,10 +99,10 @@ class ShiftPatternAssignmentController extends Controller
                         }
                     }
 
-                    $rows = [];
+                    // $rows = [];
                     foreach ($teacherIds as $teacherId) {
                         foreach ($weekdays as $weekday) {
-                            $rows[] = [
+                            $insertedIds[] = DB::table('teacher_shift_pattern_assignments')->insertGetId([
                                 'shift_pattern_id' => (int)$data['shift_pattern_id'],
                                 'teacher_id'       => (int)$teacherId,
                                 'weekday'          => (int)$weekday,
@@ -111,27 +111,25 @@ class ShiftPatternAssignmentController extends Controller
                                 'priority'         => (int)($data['priority'] ?? 0),
                                 'created_at'       => $now,
                                 'updated_at'       => $now,
-                            ];
+                            ]);
                         }
                     }
 
-                    if (!empty($rows)) {
-                        DB::table('teacher_shift_pattern_assignments')->insert($rows);
-                    }
+                    // if (!empty($rows)) {
+                    //     DB::table('teacher_shift_pattern_assignments')->insert($rows);
+                    // }
                 });
 
                 // 2) スケジュール生成は別 try（失敗しても assignment は残す）
                 $generatedSlotsCount = 0;
                 try {
-                    $pattern = ShiftPattern::findOrFail((int)$data['shift_pattern_id']);
-                    foreach ($teacherIds as $teacherId) {
-                        $generatedSlotsCount += $this->scheduleGenerator->generate(
-                            teacherId: (int)$teacherId,
-                            pattern: $pattern,
-                            effectiveFrom: $data['start_date'],
-                            effectiveTo: $endDate,
-                            createdBy: (int)auth()->id()
-                        );
+                    $assignments = TeacherShiftPatternAssignment::with('shiftPattern.breaks')
+                ->whereIn('id', $insertedIds)
+                ->get();
+
+            foreach ($assignments as $assignment) {
+                $result = $this->scheduleGenerator->generateFromAssignment($assignment, (int)auth()->id());
+                $generatedSlotsCount += $result['generated'];
                     }
                 } catch (\Throwable $e) {
                     Log::error('Schedule generation failed: ' . $e->getMessage());
@@ -158,4 +156,16 @@ class ShiftPatternAssignmentController extends Controller
             ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
             ->with('status', 'Teacher assignmentを削除しました。');
     }
+
+    public function destroyByTeacher(Teacher $teacher): RedirectResponse
+{
+    // 必要なら authorize を追加
+    // $this->authorize('delete', TeacherShiftPatternAssignment::class);
+
+    $deleted = TeacherShiftPatternAssignment::where('teacher_id', $teacher->id)->delete();
+
+    return redirect()
+        ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
+        ->with('status', "Teacher #{$teacher->id} の割り当てを {$deleted} 件削除しました。");
+}
 }

@@ -52,10 +52,10 @@ class Teacher extends Model
         return $this->hasMany(Reservation::class);
     }
 
-    public function shiftAssignments(): HasMany
-    {
-        return $this->hasMany(TeacherShiftPatternAssignment::class);
-    }
+    // public function shiftAssignments(): HasMany
+    // {
+    //     return $this->hasMany(TeacherShiftPatternAssignment::class);
+    // }
 
 
     public function shiftPatterns(): BelongsToMany

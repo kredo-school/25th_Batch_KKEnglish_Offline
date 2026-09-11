@@ -106,8 +106,8 @@
                                     {{-- Priority --}}
                                     <td>{{ $priority }}</td>
 
-                                    {{-- Actions --}}
-                                    <td class="text-end">
+                                    {{-- Delete --}}
+                                    <td class="text-center">
                                         <div class="d-inline-flex gap-1">
                                             @foreach($assignments as $item)
                                                 <form action="{{ route('admin.shift-pattern-assignments.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete assignment for {{ $weekdayNames[$item->weekday] ?? $item->weekday }}?')">
@@ -118,6 +118,18 @@
                                                     </button>
                                                 </form>
                                             @endforeach
+                                        </div>
+                                        <div>
+                                            <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}"
+          method="POST"
+          class="mt-2"
+          onsubmit="return confirm('この先生の全曜日・全シフトパターン割り当てを削除します。よろしいですか？');">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger btn-sm">
+            All assignments of this teacher
+        </button>
+    </form>
                                         </div>
                                     </td>
                                 </tr>
