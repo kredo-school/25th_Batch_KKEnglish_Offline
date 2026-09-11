@@ -12,8 +12,14 @@
     |--------------------------------------------------------------------------
     */
 
+    // → 生徒が選んだ日,Selected表示に使用
     $selectedDate =
         $validated['date']
+        ?? null;
+
+    // カレンダーの表示開始日
+    $viewStart =
+        $validated['view_start']
         ?? null;
 
 
@@ -30,9 +36,10 @@
     |
     */
 
+    // カレンダーを作る基準日
     $startDate =
-        $selectedDate
-            ? \Carbon\Carbon::parse($selectedDate)->startOfDay()
+        $viewStart
+            ? \Carbon\Carbon::parse($viewStart)->startOfDay()
             : now()->startOfDay();
 
 
@@ -549,6 +556,9 @@
                                             $material->material_id,
 
                                         'date' =>
+                                            $selectedDate,
+
+                                        'view_start' =>
                                             $startDate
                                                 ->copy()
                                                 ->subDays(7)
@@ -616,6 +626,9 @@
                                         $material->material_id,
 
                                     'date' =>
+                                        $selectedDate,
+
+                                    'view_start' =>
                                         $startDate
                                             ->copy()
                                             ->addDays(7)
@@ -955,11 +968,6 @@
                             × = unavailable
                         </div>
 
-
-                        <div class="text-secondary">
-                            Gray = past date
-                        </div>
-
                     </div>
 
                 </div>
@@ -977,6 +985,7 @@
 {{-- =========================================================
      Booking Form
 ========================================================= --}}
+{{-- Bookボタンを押したらJavaScriptから値を入れて送信する --}}
 <form
     id="bookingForm"
     method="POST"
@@ -1028,7 +1037,7 @@
 
 
 <script>
-
+// HTMLが全部読み込まれてからJavaScriptを実行する
 document.addEventListener(
     'DOMContentLoaded',
     async function () {
@@ -1040,6 +1049,7 @@ document.addEventListener(
         |--------------------------------------------------------------------------
         */
 
+        // BladeのPHP変数をJavaScriptに渡している
         const teacherId =
             @json($teacher->id);
 
@@ -1048,6 +1058,7 @@ document.addEventListener(
             @json($material->material_id);
 
 
+        // JavaScript配列に変換
         const days =
             @json(
                 $days
@@ -1117,8 +1128,7 @@ document.addEventListener(
 
         }
 
-
-
+        // 日付 + 時間のHTMLのセルを探す
         function getCell(
             date,
             time
@@ -1145,6 +1155,7 @@ document.addEventListener(
         |--------------------------------------------------------------------------
         */
 
+        // 予約可能ならボタンをbookに置き換える
         function renderAvailableCell(
             cell,
             slot
@@ -1185,6 +1196,39 @@ document.addEventListener(
             slot
         ) {
 
+            const slotStart =
+                new Date(
+                    slot.start_at.replace(' ', 'T')
+                );
+
+            const now =
+                new Date();
+
+
+            if (
+                slotStart
+                <
+                now
+            ) {
+
+                cell.innerHTML = `
+
+                    <span
+                        class="
+                            text-secondary
+                            small
+                        "
+                    >
+                        Past
+                    </span>
+
+                `;
+
+                return;
+
+            }
+
+            // ログイン中の生徒が同時間に別の予約を持っている場合に使う値
             if (
                 slot.student_conflict
                 === true
@@ -1230,6 +1274,9 @@ document.addEventListener(
         | Availability API
         |--------------------------------------------------------------------------
         */
+
+        //AvailabilityControllerを呼び出している
+        // AvailabilityController→AvailabilityService→JSONが返ってくる
 
         async function fetchAvailability(
             date
@@ -1294,24 +1341,38 @@ document.addEventListener(
                     const cellDate =
                         cell.dataset.date;
 
+                    const cellTime =
+                        cell.dataset.time;
 
-                    const today =
-                        new Date()
-                            .toLocaleDateString(
-                                'en-CA'
-                            );
+                    const cellDateTime =
+                        new Date(
+                            `${cellDate}T${cellTime}:00`
+                        );
+
+                    const now =
+                        new Date();
 
 
                     if (
-                        cellDate
+                        cellDateTime
                         <
-                        today
+                        now
                     ) {
-                        return;
-                    }
 
+                        cell.classList.add(
+                            'table-secondary'
+                        );
 
                     cell.innerHTML = `
+                        <span class="text-secondary small">
+                            Past
+                        </span>
+                    `;
+
+                    return;
+                }
+
+                        cell.innerHTML = `
 
                         <span
                             class="
