@@ -159,4 +159,5 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])->name('shift-pattern-assignments.create');
     Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])->name('shift-pattern-assignments.store');
     Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');
+    Route::delete('/shift-pattern-assignments/teacher/{teacher}', [ShiftPatternAssignmentController::class, 'destroyByTeacher'])->name('shift-pattern-assignments.destroy-by-teacher');
 });
