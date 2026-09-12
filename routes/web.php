@@ -93,8 +93,8 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     })->name('teacher.dashboard');
 
      // My Schedule 画面
-    Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
-    // Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teacher.schedules.index');
+    // Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
+    Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teachers.schedule');
     Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
     Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
     Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teacher.schedule-exceptions.destroy');

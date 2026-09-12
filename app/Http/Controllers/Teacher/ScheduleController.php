@@ -133,7 +133,7 @@ class ScheduleController extends Controller
         $teacherId = $teacher->id;
         $teachers = collect();
 
-        return view('teachers.schedules.index', compact(
+        return view('teachers.schedule', compact(
             'startOfWeek',
             'viewStart',
             'viewEnd',

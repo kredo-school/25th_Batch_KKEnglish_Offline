@@ -36,9 +36,12 @@ class AvailabilityController extends Controller
             '生徒ユーザーではありません。'
         );
 
+        $studentId = $student->id;
+
         $slots = $this->service->getAvailability(
             (int) $validated['teacher_id'],
-            $validated['date']
+            $validated['date'],
+            $studentId
         );
 
         return response()->json([

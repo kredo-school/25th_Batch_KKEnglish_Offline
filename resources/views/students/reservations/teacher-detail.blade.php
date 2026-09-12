@@ -958,9 +958,13 @@
 
                         </div>
 
+                        <div class="text-secondary">
+                            Already booked = your existing lesson
+                        </div>
+
 
                         <div class="text-secondary">
-                            Reserved = already booked
+                            Reserved = teacher unavailable
                         </div>
 
 
@@ -1196,39 +1200,7 @@ document.addEventListener(
             slot
         ) {
 
-            const slotStart =
-                new Date(
-                    slot.start_at.replace(' ', 'T')
-                );
-
-            const now =
-                new Date();
-
-
-            if (
-                slotStart
-                <
-                now
-            ) {
-
-                cell.innerHTML = `
-
-                    <span
-                        class="
-                            text-secondary
-                            small
-                        "
-                    >
-                        Past
-                    </span>
-
-                `;
-
-                return;
-
-            }
-
-            // ログイン中の生徒が同時間に別の予約を持っている場合に使う値
+            // 生徒自身が同じ時間帯に予約を持っている
             if (
                 slot.student_conflict
                 === true
@@ -1251,7 +1223,7 @@ document.addEventListener(
 
             }
 
-
+            // 先生側ですでに予約が入っている
             cell.innerHTML = `
 
                 <span
@@ -1416,6 +1388,15 @@ document.addEventListener(
 
 
                     if (!cell) {
+                        return;
+                    }
+
+                    // Pastのセルは上書きしない
+                    if (
+                        cell.classList.contains(
+                            'table-secondary'
+                        )
+                    ) {
                         return;
                     }
 
