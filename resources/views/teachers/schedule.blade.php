@@ -6,136 +6,60 @@
 
 <div class="container py-4">
 
-    {{-- CSRF Token --}}
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-
     {{-- ===============================
          Title
     ================================ --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div
+        class="
+            d-flex
+            justify-content-between
+            align-items-center
+            mb-4
+        "
+    >
 
         <h2 class="fw-bold mb-0">
             My Schedule
         </h2>
 
-        <button type="button"
-                id="editBtn"
-                class="btn btn-dark">
 
+        <button
+            type="button"
+            id="editBtn"
+            class="btn btn-dark"
+        >
             Edit Schedule
-
         </button>
 
     </div>
 
 
-    @php
-
-        use Carbon\Carbon;
-
-        /*
-        |--------------------------------------------------------------------------
-        | 表示する週
-        |--------------------------------------------------------------------------
-        |
-        | URLに week_start がある
-        | → 指定された週を表示
-        |
-        | ない
-        | → 今週を表示
-        |
-        */
-
-        $startOfWeek =
-            request('week_start')
-                ? Carbon::parse(
-                    request('week_start')
-                )->startOfWeek(Carbon::MONDAY)
-                : now()->startOfWeek(Carbon::MONDAY);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 前週・翌週
-        |--------------------------------------------------------------------------
-        */
-
-        $previousWeek =
-            $startOfWeek
-                ->copy()
-                ->subWeek()
-                ->format('Y-m-d');
-
-
-        $nextWeek =
-            $startOfWeek
-                ->copy()
-                ->addWeek()
-                ->format('Y-m-d');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 月曜日〜日曜日
-        |--------------------------------------------------------------------------
-        */
-
-        $days = collect(range(0, 6))
-            ->map(
-                fn ($i) =>
-                    $startOfWeek
-                        ->copy()
-                        ->addDays($i)
-            );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 06:00〜22:00
-        | 30分単位
-        |--------------------------------------------------------------------------
-        */
-
-        $times = collect();
-
-        $time =
-            Carbon::createFromTime(6, 0);
-
-        $endTime =
-            Carbon::createFromTime(22, 0);
-
-
-        while ($time < $endTime) {
-
-            $times->push(
-                $time->format('H:i')
-            );
-
-            $time->addMinutes(30);
-
-        }
-
-    @endphp
-
 
     {{-- ===============================
          Week Navigation
     ================================ --}}
-    <div class="
-        d-flex
-        justify-content-between
-        align-items-center
-        mb-3
-    ">
+    <div
+        class="
+            d-flex
+            justify-content-between
+            align-items-center
+            mb-3
+        "
+    >
 
         {{-- Previous Week --}}
         <a
-            href="{{ url()->current() }}?week_start={{ $previousWeek }}"
+            href="#"
             class="btn btn-outline-secondary btn-sm"
         >
 
-            <i class="fa-solid fa-chevron-left me-1"></i>
+            <i
+                class="
+                    fa-solid
+                    fa-chevron-left
+                    me-1
+                "
+            ></i>
 
             Previous Week
 
@@ -160,40 +84,123 @@
 
         {{-- Next Week --}}
         <a
-            href="{{ url()->current() }}?week_start={{ $nextWeek }}"
+            href="#"
             class="btn btn-outline-secondary btn-sm"
         >
 
             Next Week
 
-            <i class="fa-solid fa-chevron-right ms-1"></i>
+            <i
+                class="
+                    fa-solid
+                    fa-chevron-right
+                    ms-1
+                "
+            ></i>
 
         </a>
 
     </div>
 
 
+
     {{-- ===============================
-         Message
+         Legend
     ================================ --}}
-    <div id="editMessage"
-         class="alert alert-warning d-none">
+    <div
+        class="
+            d-flex
+            gap-4
+            flex-wrap
+            mb-3
+            small
+        "
+    >
 
-        Click the time slots you are unavailable.
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="bg-danger-subtle border rounded"
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                "
+            ></span>
+
+            Available
+
+        </div>
+
+
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="table-secondary border rounded"
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                    background-color: #dee2e6;
+                "
+            ></span>
+
+            Unavailable
+
+        </div>
+
+
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="bg-light border rounded"
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                "
+            ></span>
+
+            Outside shift
+
+        </div>
 
     </div>
 
 
-    {{-- エラー表示 --}}
-    <div id="errorMessage"
-         class="alert alert-danger d-none">
+
+    {{-- ===============================
+         Edit Message
+    ================================ --}}
+    <div
+        id="editMessage"
+        class="alert alert-warning d-none"
+    >
+        Select the available time slots you want to mark as unavailable.
     </div>
 
 
-    {{-- 成功表示 --}}
-    <div id="successMessage"
-         class="alert alert-success d-none">
+
+    {{-- ===============================
+         Error Message
+    ================================ --}}
+    <div
+        id="errorMessage"
+        class="alert alert-danger d-none"
+    >
     </div>
+
+
+
+    {{-- ===============================
+         Success Message
+    ================================ --}}
+    <div
+        id="successMessage"
+        class="alert alert-success d-none"
+    >
+    </div>
+
 
 
     {{-- ===============================
@@ -201,7 +208,14 @@
     ================================ --}}
     <div class="table-responsive">
 
-        <table class="table table-bordered text-center align-middle">
+        <table
+            class="
+                table
+                table-bordered
+                text-center
+                align-middle
+            "
+        >
 
             <thead class="table-light">
 
@@ -217,15 +231,11 @@
                         <th style="min-width: 120px;">
 
                             <div class="fw-bold">
-
                                 {{ $day->format('D') }}
-
                             </div>
 
                             <small class="text-secondary">
-
                                 {{ $day->format('m/d') }}
-
                             </small>
 
                         </th>
@@ -243,7 +253,7 @@
 
                     <tr>
 
-                        {{-- 時間 --}}
+                        {{-- Time --}}
                         <th class="table-light">
 
                             {{ $time }}
@@ -251,26 +261,25 @@
                         </th>
 
 
-                        {{-- 1週間分 --}}
+                        {{-- 7 Days --}}
                         @foreach ($days as $day)
 
                             <td
-                                class="schedule-cell bg-light"
+                                class="
+                                    schedule-cell
+                                    bg-light
+                                "
 
                                 data-date="{{ $day->format('Y-m-d') }}"
 
                                 data-time="{{ $time }}"
 
-                                {{-- 勤務時間内か --}}
                                 data-working="false"
 
-                                {{-- TeacherSchedule ID --}}
                                 data-schedule-id=""
 
-                                {{-- ScheduleException ID --}}
                                 data-exception-id=""
 
-                                {{-- 編集開始時の状態 --}}
                                 data-original-unavailable="false"
 
                                 style="
@@ -293,56 +302,58 @@
     </div>
 
 
+
     {{-- ===============================
          Edit Actions
     ================================ --}}
-    <div id="editActions"
-         class="
+    <div
+        id="editActions"
+        class="
             d-none
             justify-content-end
             align-items-center
             gap-2
             mt-3
-         ">
+        "
+    >
 
-
-        {{-- 休み理由 --}}
-        <select id="exceptionType"
-                class="form-select"
-                style="max-width: 220px;">
+        {{-- Exception Type --}}
+        <select
+            id="exceptionType"
+            class="form-select"
+            style="max-width: 220px;"
+        >
 
             <option value="">
                 Select reason
             </option>
 
-            {{-- GETで取得したExceptionTypeを
-                 JavaScriptから追加する --}}
-
         </select>
 
 
         {{-- Cancel --}}
-        <button type="button"
-                id="cancelBtn"
-                class="btn btn-outline-secondary">
-
+        <button
+            type="button"
+            id="cancelBtn"
+            class="btn btn-outline-secondary"
+        >
             Cancel
-
         </button>
 
 
         {{-- Save --}}
-        <button type="button"
-                id="saveBtn"
-                class="btn btn-dark">
-
+        <button
+            type="button"
+            id="saveBtn"
+            class="btn btn-dark"
+        >
             Save Schedule
-
         </button>
 
     </div>
 
 </div>
+
 
 
 <script>
@@ -351,11 +362,12 @@ document.addEventListener(
     'DOMContentLoaded',
     function () {
 
+
         /*
-         * ===============================
-         * Elements
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Elements
+        |--------------------------------------------------------------------------
+        */
 
         const editBtn =
             document.getElementById(
@@ -412,25 +424,20 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * 表示中の週
-         * ===============================
-         *
-         * Bladeで作った
-         * $startOfWeek をJSでも使用
-         *
-         */
+        |--------------------------------------------------------------------------
+        | Current Week
+        |--------------------------------------------------------------------------
+        */
 
         const currentWeekStart =
             '{{ $startOfWeek->format('Y-m-d') }}';
 
 
-
         /*
-         * ===============================
-         * CSRF Token
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | CSRF Token
+        |--------------------------------------------------------------------------
+        */
 
         const token =
             document
@@ -443,68 +450,58 @@ document.addEventListener(
 
 
         /*
-         * 閲覧 / 編集モード
-         */
+        |--------------------------------------------------------------------------
+        | State
+        |--------------------------------------------------------------------------
+        */
+
         let editing =
             false;
 
 
-        /*
-         * Cancel用
-         */
         let originalSchedule =
             [];
 
 
+
         /*
-         * ===============================
-         * Initial Load
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Initial Load
+        |--------------------------------------------------------------------------
+        */
 
         loadSchedule();
 
 
 
         /*
-         * ===============================
-         * GET
-         *
-         * TeacherSchedule
-         * +
-         * ScheduleException
-         * +
-         * ExceptionType
-         *
-         * を取得
-         *
-         * 表示中のweek_startも送る
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | GET Schedule
+        |--------------------------------------------------------------------------
+        */
 
         async function loadSchedule() {
 
-            hideMessages();
-
-
             try {
 
-                const response =
-                    await fetch(
-                        '/teachers/schedule-exceptions'
-                        + '?week_start='
-                        + encodeURIComponent(
-                            currentWeekStart
-                        ),
-                        {
-                            headers: {
+                    const response =
+            await fetch(
+                '/teachers/schedule-exceptions'
+                +
+                '?week_start='
+                +
+                encodeURIComponent(
+                    currentWeekStart
+                ),
+                {
+                    method: 'GET',
 
-                                'Accept':
-                                    'application/json'
-
-                            }
-                        }
-                    );
+                    headers: {
+                        'Accept':
+                            'application/json'
+                    },
+                }
+            );
 
 
                 const data =
@@ -515,7 +512,8 @@ document.addEventListener(
 
                     showError(
                         data.message
-                        ?? 'Failed to load schedule.'
+                        ??
+                        'Failed to load schedule.'
                     );
 
                     return;
@@ -524,15 +522,16 @@ document.addEventListener(
 
 
                 /*
-                 * 確定勤務を表示
+                 * TeacherSchedule
                  */
                 applySchedules(
-                    data
+                    data.schedules
+                    ?? []
                 );
 
 
                 /*
-                 * 休み理由をselectへ
+                 * ExceptionType
                  */
                 applyExceptionTypes(
                     data.exception_types
@@ -558,17 +557,17 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * TeacherScheduleを画面へ反映
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | TeacherSchedule
+        |--------------------------------------------------------------------------
+        */
 
         function applySchedules(
-            data
+            schedules
         ) {
 
             /*
-             * 最初に全部勤務外にする
+             * 全セル初期化
              */
             cells.forEach(
                 function (cell) {
@@ -589,13 +588,18 @@ document.addEventListener(
                         'false';
 
 
-                    cell.classList.add(
-                        'bg-light'
+                    cell.classList.remove(
+                        'bg-danger-subtle'
                     );
 
 
                     cell.classList.remove(
                         'table-secondary'
+                    );
+
+
+                    cell.classList.add(
+                        'bg-light'
                     );
 
 
@@ -611,10 +615,11 @@ document.addEventListener(
 
 
             /*
-             * TeacherSchedule
+             * TeacherScheduleを反映
              */
-            data.schedules.forEach(
+            schedules.forEach(
                 function (schedule) {
+
 
                     const date =
                         schedule
@@ -642,6 +647,7 @@ document.addEventListener(
                     cells.forEach(
                         function (cell) {
 
+
                             /*
                              * 日付が違う
                              */
@@ -660,16 +666,7 @@ document.addEventListener(
 
 
                             /*
-                             * 勤務時間内
-                             *
-                             * 例:
-                             *
-                             * 06:00〜12:00
-                             *
-                             * 06:00 ○
-                             * ...
-                             * 11:30 ○
-                             * 12:00 ×
+                             * シフト時間内
                              */
                             if (
                                 time >= startTime
@@ -681,17 +678,32 @@ document.addEventListener(
                                     'true';
 
 
-                                /*
-                                 * APIの主キー名に合わせる
-                                 */
                                 cell.dataset.scheduleId =
                                     schedule
                                         .schedule_id;
 
 
+                                /*
+                                 * シフト外の色を削除
+                                 */
                                 cell.classList.remove(
                                     'bg-light'
                                 );
+
+
+                                /*
+                                 * 勤務時間は薄い赤
+                                 */
+                                cell.classList.add(
+                                    'bg-danger-subtle'
+                                );
+
+
+                                cell.innerHTML = `
+                                    <span class="small">
+                                        Available
+                                    </span>
+                                `;
 
                             }
 
@@ -700,11 +712,10 @@ document.addEventListener(
 
 
                     /*
-                     * 登録済み休みを表示
+                     * 登録済みException
                      */
                     applyExceptions(
-                        schedule,
-                        date
+                        schedule
                     );
 
                 }
@@ -715,37 +726,30 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Existing Exceptions
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Existing Exceptions
+        |--------------------------------------------------------------------------
+        */
 
         function applyExceptions(
-            schedule,
-            date
+            schedule
         ) {
 
-            if (
-                !schedule.exceptions
-            ) {
-
-                return;
-
-            }
+            const exceptions =
+                schedule.exceptions
+                ?? [];
 
 
-            schedule.exceptions.forEach(
+            exceptions.forEach(
                 function (exception) {
 
 
                     /*
-                     * cancelledは表示しない
+                     * activeのみ
                      */
                     if (
                         exception.status
-                        &&
-                        exception.status
-                            !== 'active'
+                        !== 'active'
                     ) {
 
                         return;
@@ -753,35 +757,32 @@ document.addEventListener(
                     }
 
 
-                    /*
-                     * start_at
-                     *
-                     * 2026-09-03 07:00:00
-                     *
-                     * ↓
-                     *
-                     * 07:00
-                     */
                     const startAt =
-                        exception
-                            .start_at;
+                        exception.start_at;
+
+
+                    const date =
+                        startAt.substring(
+                            0,
+                            10
+                        );
 
 
                     const time =
-                        startAt
-                            .substring(
-                                11,
-                                16
-                            );
+                        startAt.substring(
+                            11,
+                            16
+                        );
 
 
                     const cell =
-                        document
-                            .querySelector(
-                                '.schedule-cell'
-                                + `[data-date="${date}"]`
-                                + `[data-time="${time}"]`
-                            );
+                        document.querySelector(
+                            '.schedule-cell'
+                            +
+                            `[data-date="${date}"]`
+                            +
+                            `[data-time="${time}"]`
+                        );
 
 
                     if (!cell) {
@@ -791,20 +792,31 @@ document.addEventListener(
                     }
 
 
+                    /*
+                     * Available色を削除
+                     */
+                    cell.classList.remove(
+                        'bg-danger-subtle'
+                    );
+
+
+                    /*
+                     * Unavailable色
+                     */
                     cell.classList.add(
                         'table-secondary'
                     );
 
 
-                    cell.textContent =
-                        'Unavailable';
+                    cell.innerHTML = `
+                        <span class="small">
+                            Unavailable
+                        </span>
+                    `;
 
 
                     cell.dataset.exceptionId =
-                        exception.id
-                        ??
-                        exception
-                            .schedule_exception_id;
+                        exception.id;
 
 
                     cell.dataset.originalUnavailable =
@@ -818,19 +830,21 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Exception Types
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Exception Types
+        |--------------------------------------------------------------------------
+        */
 
         function applyExceptionTypes(
             types
         ) {
 
             exceptionType.innerHTML =
-                '<option value="">'
-                + 'Select reason'
-                + '</option>';
+                `
+                    <option value="">
+                        Select reason
+                    </option>
+                `;
 
 
             types.forEach(
@@ -865,10 +879,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Edit Schedule
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Edit Schedule
+        |--------------------------------------------------------------------------
+        */
 
         editBtn.addEventListener(
             'click',
@@ -882,7 +896,7 @@ document.addEventListener(
 
 
                 /*
-                 * Cancel用
+                 * Cancel用に現在状態を保存
                  */
                 originalSchedule =
                     [];
@@ -899,8 +913,8 @@ document.addEventListener(
                             className:
                                 cell.className,
 
-                            text:
-                                cell.textContent,
+                            html:
+                                cell.innerHTML,
 
                             exceptionId:
                                 cell.dataset
@@ -908,9 +922,25 @@ document.addEventListener(
 
                             originalUnavailable:
                                 cell.dataset
-                                    .originalUnavailable
+                                    .originalUnavailable,
 
                         });
+
+
+                        /*
+                         * 勤務時間内だけ
+                         * pointer表示
+                         */
+                        if (
+                            cell.dataset
+                                .working
+                            === 'true'
+                        ) {
+
+                            cell.style.cursor =
+                                'pointer';
+
+                        }
 
                     }
                 );
@@ -941,38 +971,16 @@ document.addEventListener(
                         'd-none'
                     );
 
-
-                /*
-                 * 勤務時間内だけ
-                 * pointerにする
-                 */
-                cells.forEach(
-                    function (cell) {
-
-                        if (
-                            cell.dataset
-                                .working
-                            === 'true'
-                        ) {
-
-                            cell.style.cursor =
-                                'pointer';
-
-                        }
-
-                    }
-                );
-
             }
         );
 
 
 
         /*
-         * ===============================
-         * Cell Click
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Cell Click
+        |--------------------------------------------------------------------------
+        */
 
         cells.forEach(
             function (cell) {
@@ -983,7 +991,7 @@ document.addEventListener(
 
 
                         /*
-                         * 閲覧モード
+                         * 編集中ではない
                          */
                         if (!editing) {
 
@@ -993,7 +1001,7 @@ document.addEventListener(
 
 
                         /*
-                         * 勤務時間外
+                         * シフト外
                          */
                         if (
                             cell.dataset
@@ -1006,31 +1014,63 @@ document.addEventListener(
                         }
 
 
-                        /*
-                         * Available
-                         * ⇅
-                         * Unavailable
-                         */
-                        cell.classList.toggle(
-                            'table-secondary'
-                        );
-
-
-                        if (
+                        const isUnavailable =
                             cell
                                 .classList
                                 .contains(
                                     'table-secondary'
-                                )
+                                );
+
+
+                        /*
+                         * Unavailable
+                         * ↓
+                         * Available
+                         */
+                        if (
+                            isUnavailable
                         ) {
 
-                            cell.textContent =
-                                'Unavailable';
+                            cell.classList.remove(
+                                'table-secondary'
+                            );
 
-                        } else {
 
-                            cell.textContent =
-                                '';
+                            cell.classList.add(
+                                'bg-danger-subtle'
+                            );
+
+
+                            cell.innerHTML = `
+                                <span class="small">
+                                    Available
+                                </span>
+                            `;
+
+                        }
+
+                        /*
+                         * Available
+                         * ↓
+                         * Unavailable
+                         */
+                        else {
+
+                            cell.classList.remove(
+                                'bg-danger-subtle'
+                            );
+
+
+                            cell.classList.add(
+                                'table-secondary'
+                            );
+
+
+                            cell.innerHTML = `
+                                <span class="small">
+                                    Unavailable
+                                </span>
+                            `;
 
                         }
 
@@ -1043,10 +1083,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Cancel
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Cancel
+        |--------------------------------------------------------------------------
+        */
 
         cancelBtn.addEventListener(
             'click',
@@ -1059,8 +1099,8 @@ document.addEventListener(
                             item.className;
 
 
-                        item.cell.textContent =
-                            item.text;
+                        item.cell.innerHTML =
+                            item.html;
 
 
                         item.cell.dataset.exceptionId =
@@ -1082,10 +1122,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Save Schedule
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Save
+        |--------------------------------------------------------------------------
+        */
 
         saveBtn.addEventListener(
             'click',
@@ -1094,16 +1134,10 @@ document.addEventListener(
                 hideMessages();
 
 
-                /*
-                 * 休み理由
-                 */
                 const exceptionTypeId =
                     exceptionType.value;
 
 
-                /*
-                 * 変更されたセル
-                 */
                 const createCells =
                     [];
 
@@ -1114,6 +1148,21 @@ document.addEventListener(
 
                 cells.forEach(
                     function (cell) {
+
+
+                        /*
+                         * シフト外は対象外
+                         */
+                        if (
+                            cell.dataset
+                                .working
+                            !== 'true'
+                        ) {
+
+                            return;
+
+                        }
+
 
                         const wasUnavailable =
                             cell.dataset
@@ -1133,8 +1182,6 @@ document.addEventListener(
                          * Available
                          * ↓
                          * Unavailable
-                         *
-                         * POST
                          */
                         if (
                             !wasUnavailable
@@ -1153,8 +1200,6 @@ document.addEventListener(
                          * Unavailable
                          * ↓
                          * Available
-                         *
-                         * DELETE
                          */
                         if (
                             wasUnavailable
@@ -1173,7 +1218,7 @@ document.addEventListener(
 
 
                 /*
-                 * 新しい休みを登録する場合
+                 * 新しいException作成時は
                  * 理由必須
                  */
                 if (
@@ -1207,17 +1252,15 @@ document.addEventListener(
                 }
 
 
-                /*
-                 * Saveボタン連打防止
-                 */
                 saveBtn.disabled =
                     true;
 
 
                 try {
 
+
                     /*
-                     * 新規Unavailable
+                     * 新規Exception
                      */
                     for (
                         const cell
@@ -1233,7 +1276,7 @@ document.addEventListener(
 
 
                     /*
-                     * Unavailable解除
+                     * Exception解除
                      */
                     for (
                         const cell
@@ -1246,19 +1289,17 @@ document.addEventListener(
 
                     }
 
-
-                    showSuccess(
-                        'Schedule updated successfully.'
-                    );
-
-
                     /*
-                     * DB最新状態を再取得
+                     * DBの最新状態を再取得
                      */
                     await loadSchedule();
 
 
                     finishEditing();
+
+                    showSuccess(
+                        'Schedule updated successfully.'
+                    );
 
 
                 } catch (error) {
@@ -1270,7 +1311,8 @@ document.addEventListener(
 
                     showError(
                         error.message
-                        ?? 'Failed to save schedule.'
+                        ??
+                        'Failed to save schedule.'
                     );
 
 
@@ -1287,12 +1329,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * POST
-         *
-         * ScheduleException登録
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Create Exception
+        |--------------------------------------------------------------------------
+        */
 
         async function createException(
             cell,
@@ -1308,7 +1348,7 @@ document.addEventListener(
 
 
             /*
-             * 30分後をend_atにする
+             * 開始日時
              */
             const start =
                 new Date(
@@ -1316,6 +1356,9 @@ document.addEventListener(
                 );
 
 
+            /*
+             * 30分後
+             */
             const end =
                 new Date(
                     start.getTime()
@@ -1327,7 +1370,8 @@ document.addEventListener(
             const endHour =
                 String(
                     end.getHours()
-                ).padStart(
+                )
+                .padStart(
                     2,
                     '0'
                 );
@@ -1336,7 +1380,8 @@ document.addEventListener(
             const endMinute =
                 String(
                     end.getMinutes()
-                ).padStart(
+                )
+                .padStart(
                     2,
                     '0'
                 );
@@ -1354,7 +1399,6 @@ document.addEventListener(
                             'POST',
 
                         headers: {
-
                             'Content-Type':
                                 'application/json',
 
@@ -1362,8 +1406,7 @@ document.addEventListener(
                                 'application/json',
 
                             'X-CSRF-TOKEN':
-                                token
-
+                                token,
                         },
 
                         body:
@@ -1385,10 +1428,9 @@ document.addEventListener(
                                     `${date} ${time}:00`,
 
                                 end_at:
-                                    `${date} ${endTime}`
+                                    `${date} ${endTime}`,
 
-                            })
-
+                            }),
                     }
                 );
 
@@ -1399,18 +1441,28 @@ document.addEventListener(
 
             if (!response.ok) {
 
+                /*
+                 * Laravel validation error
+                 */
+                const firstError =
+                    result.errors
+                        ? Object.values(
+                            result.errors
+                        )[0]?.[0]
+                        : null;
+
+
                 throw new Error(
+                    firstError
+                    ??
                     result.message
-                    ?? 'Failed to create exception.'
+                    ??
+                    'Failed to create exception.'
                 );
 
             }
 
 
-            /*
-             * DBで作成された
-             * ScheduleException ID
-             */
             cell.dataset.exceptionId =
                 result.exception.id
                 ??
@@ -1422,12 +1474,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * DELETE
-         *
-         * ScheduleException解除
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Cancel Exception
+        |--------------------------------------------------------------------------
+        */
 
         async function cancelException(
             cell
@@ -1445,25 +1495,22 @@ document.addEventListener(
             }
 
 
-            const response =
+           const response =
                 await fetch(
-                    '/teachers/'
-                    + 'schedule-exceptions/'
-                    + exceptionId,
+                    '/teachers/schedule-exceptions/'
+                    +
+                    exceptionId,
                     {
                         method:
                             'DELETE',
 
                         headers: {
-
                             'Accept':
                                 'application/json',
 
                             'X-CSRF-TOKEN':
-                                token
-
-                        }
-
+                                token,
+                        },
                     }
                 );
 
@@ -1474,9 +1521,20 @@ document.addEventListener(
 
             if (!response.ok) {
 
+                const firstError =
+                    result.errors
+                        ? Object.values(
+                            result.errors
+                        )[0]?.[0]
+                        : null;
+
+
                 throw new Error(
+                    firstError
+                    ??
                     result.message
-                    ?? 'Failed to cancel exception.'
+                    ??
+                    'Failed to cancel exception.'
                 );
 
             }
@@ -1490,10 +1548,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Finish Editing
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Finish Editing
+        |--------------------------------------------------------------------------
+        */
 
         function finishEditing() {
 
@@ -1545,10 +1603,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Messages
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Messages
+        |--------------------------------------------------------------------------
+        */
 
         function hideMessages() {
 
