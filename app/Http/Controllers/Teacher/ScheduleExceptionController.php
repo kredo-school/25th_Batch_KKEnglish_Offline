@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Teacher;
 
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Teacher\StoreScheduleExceptionRequest;
 use App\Models\ExceptionType;
@@ -18,98 +19,170 @@ class ScheduleExceptionController extends Controller
     ) {
     }
 
-public function index(Request $request): JsonResponse
-{
-    $teacher = $request->user()->teacher;
+    public function index(Request $request): JsonResponse
+    {
+        $teacher = $request->user()->teacher;
 
-    abort_unless(
-        $teacher,
-        403,
-        '講師ユーザーではありません。'
-    );
+        abort_unless(
+            $teacher,
+            403,
+            '講師ユーザーではありません。'
+        );
+        $weekStart = $request->filled('week_start')
+            ? Carbon::parse(
+                $request->input('week_start')
+            )->startOfWeek(Carbon::MONDAY)
+            : now()->startOfWeek(Carbon::MONDAY);
 
-    $schedules = TeacherSchedule::query()
-        ->with([
-            'shiftPattern',
-            'exceptions.exceptionType',
-            'reservations.status',
-        ])
-        ->where('teacher_id', $teacher->id)
-        ->where('status', 'confirmed')
-        ->whereDate('available_date', '>=', today())
-        ->orderBy('available_date')
-        ->orderBy('start_time')
-        ->get();
+        $weekEnd = $weekStart
+            ->copy()
+            ->addDays(6);
 
-    $formattedSchedules = $schedules->map(function ($schedule) {
+        $schedules = TeacherSchedule::query()
+            ->with([
+                'shiftPattern',
+                'exceptions.exceptionType',
+                'reservations.status',
+            ])
+            ->where('teacher_id', $teacher->id)
+            ->where('status', 'confirmed')
+            ->whereBetween('available_date', [
+                $weekStart->toDateString(),
+                $weekEnd->toDateString(),
+            ])
+            ->orderBy('available_date')
+            ->orderBy('start_time')
+            ->get();
 
-        return [
-            'schedule_id' => $schedule->schedule_id,
+        $formattedSchedules = $schedules->map(function ($schedule) {
 
-            'available_date' => $schedule->available_date
-                instanceof \Carbon\Carbon
+            return [
+                'schedule_id' => $schedule->schedule_id,
+
+                'available_date' => $schedule->available_date
+                    instanceof \Carbon\Carbon
                     ? $schedule->available_date->format('Y-m-d')
                     : substr((string) $schedule->available_date, 0, 10),
 
-            'start_time' => substr(
-                (string) $schedule->start_time,
-                0,
-                8
-            ),
+                'start_time' => substr(
+                    (string) $schedule->start_time,
+                    0,
+                    8
+                ),
 
-            'end_time' => substr(
-                (string) $schedule->end_time,
-                0,
-                8
-            ),
+                'end_time' => substr(
+                    (string) $schedule->end_time,
+                    0,
+                    8
+                ),
 
-            'status' => $schedule->status,
+                'status' => $schedule->status,
 
-            'exceptions' => $schedule->exceptions->map(
-                function ($exception) {
+                'exceptions' => $schedule->exceptions->map(
+                    function ($exception) {
 
-                    return [
-                        'id' => $exception->id,
+                        return [
+                            'id' => $exception->id,
 
-                        'exception_type_id' =>
-                            $exception->exception_type_id,
+                            'exception_type_id' =>
+                                $exception->exception_type_id,
 
-                        'start_at' =>
-                            $exception->start_at
+                            'start_at' =>
+                                $exception->start_at
                                 instanceof \Carbon\Carbon
-                                    ? $exception->start_at
-                                        ->format('Y-m-d H:i:s')
-                                    : (string) $exception->start_at,
+                                ? $exception->start_at
+                                    ->format('Y-m-d H:i:s')
+                                : (string) $exception->start_at,
 
-                        'end_at' =>
-                            $exception->end_at
+                            'end_at' =>
+                                $exception->end_at
                                 instanceof \Carbon\Carbon
-                                    ? $exception->end_at
-                                        ->format('Y-m-d H:i:s')
-                                    : (string) $exception->end_at,
+                                ? $exception->end_at
+                                    ->format('Y-m-d H:i:s')
+                                : (string) $exception->end_at,
 
-                        'status' =>
-                            $exception->status,
+                            'status' =>
+                                $exception->status,
 
-                        'reason' =>
-                            $exception->reason,
+                            'reason' =>
+                                $exception->reason,
 
-                        'exception_type' =>
-                            $exception->exceptionType,
-                    ];
-                }
-            ),
-        ];
-    });
+                            'exception_type' =>
+                                $exception->exceptionType,
+                        ];
+                    }
+                )->values(),
 
-    return response()->json([
-        'schedules' => $formattedSchedules,
+                'reservations' =>
+                    $schedule->reservations->map(
+                        function ($reservation) {
 
-        'exception_types' => ExceptionType::query()
-            ->orderBy('type_name')
-            ->get(),
-    ]);
-}
+                            return [
+
+                                /*
+                                 * PK名が
+                                 * reservation_id / id
+                                 * どちらでも確認できるようにしている
+                                 */
+                                'reservation_id' =>
+                                    $reservation
+                                        ->reservation_id
+                                    ??
+                                    $reservation->id,
+
+
+                                'start_at' =>
+                                    $reservation->start_at
+                                    instanceof \Carbon\Carbon
+                                    ? $reservation
+                                        ->start_at
+                                        ->format(
+                                            'Y-m-d H:i:s'
+                                        )
+                                    : (string)
+                                    $reservation
+                                        ->start_at,
+
+
+                                'end_at' =>
+                                    $reservation->end_at
+                                    instanceof \Carbon\Carbon
+                                    ? $reservation
+                                        ->end_at
+                                        ->format(
+                                            'Y-m-d H:i:s'
+                                        )
+                                    : (string)
+                                    $reservation
+                                        ->end_at,
+
+
+                                'status_code' =>
+                                    $reservation
+                                        ->status
+                                            ?->status_code,
+
+                            ];
+
+                        }
+                    )->values(),
+
+            ];
+        })->values();
+
+
+
+
+        return response()->json([
+            'week_start' => $weekStart->toDateString(),
+            'week_end' => $weekEnd->toDateString(),
+            'schedules' => $formattedSchedules,
+
+            'exception_types' => ExceptionType::query()
+                ->orderBy('type_name')
+                ->get(),
+        ]);
+    }
 
     public function store(
         StoreScheduleExceptionRequest $request
