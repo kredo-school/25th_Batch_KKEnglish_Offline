@@ -49,7 +49,12 @@
 
         {{-- Previous Week --}}
         <a
-            href="#"
+            href="{{ route('teachers.schedule', [
+                'week_start' => $startOfWeek
+                    ->copy()
+                    ->subWeek()
+                    ->format('Y-m-d')
+            ]) }}"
             class="btn btn-outline-secondary btn-sm"
         >
 
@@ -84,7 +89,12 @@
 
         {{-- Next Week --}}
         <a
-            href="#"
+            href="{{ route('teachers.schedule', [
+                'week_start' => $startOfWeek
+                    ->copy()
+                    ->addWeek()
+                    ->format('Y-m-d')
+            ]) }}"
             class="btn btn-outline-secondary btn-sm"
         >
 
@@ -117,10 +127,15 @@
         "
     >
 
+        {{-- Available --}}
         <div class="d-flex align-items-center gap-2">
 
             <span
-                class="bg-danger-subtle border rounded"
+                class="
+                    bg-danger-subtle
+                    border
+                    rounded
+                "
                 style="
                     width: 22px;
                     height: 22px;
@@ -133,15 +148,40 @@
         </div>
 
 
+        {{-- Booked --}}
         <div class="d-flex align-items-center gap-2">
 
             <span
-                class="table-secondary border rounded"
+                class="
+                    bg-primary-subtle
+                    border
+                    rounded
+                "
                 style="
                     width: 22px;
                     height: 22px;
                     display: inline-block;
-                    background-color: #dee2e6;
+                "
+            ></span>
+
+            Booked
+
+        </div>
+
+
+        {{-- Unavailable --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="
+                    bg-warning-subtle
+                    border
+                    rounded
+                "
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
                 "
             ></span>
 
@@ -150,10 +190,36 @@
         </div>
 
 
+        {{-- Past / Completed --}}
         <div class="d-flex align-items-center gap-2">
 
             <span
-                class="bg-light border rounded"
+                class="
+                    bg-secondary-subtle
+                    border
+                    rounded
+                "
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                "
+            ></span>
+
+            Past / Completed
+
+        </div>
+
+
+        {{-- Outside shift --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="
+                    bg-light
+                    border
+                    rounded
+                "
                 style="
                     width: 22px;
                     height: 22px;
@@ -484,24 +550,28 @@ document.addEventListener(
 
             try {
 
-                    const response =
-            await fetch(
-                '/teachers/schedule-exceptions'
-                +
-                '?week_start='
-                +
-                encodeURIComponent(
-                    currentWeekStart
-                ),
-                {
-                    method: 'GET',
+                const response =
+                    await fetch(
+                        '/teachers/schedule-exceptions'
+                        +
+                        '?week_start='
+                        +
+                        encodeURIComponent(
+                            currentWeekStart
+                        ),
+                        {
+                            method:
+                                'GET',
 
-                    headers: {
-                        'Accept':
-                            'application/json'
-                    },
-                }
-            );
+                            headers: {
+                                'Accept':
+                                    'application/json'
+                            },
+
+                            credentials:
+                                'same-origin'
+                        }
+                    );
 
 
                 const data =
@@ -588,16 +658,22 @@ document.addEventListener(
                         'false';
 
 
+                    /*
+                     * 状態ごとの色を全部リセット
+                     */
                     cell.classList.remove(
-                        'bg-danger-subtle'
-                    );
-
-
-                    cell.classList.remove(
+                        'bg-danger-subtle',
+                        'bg-primary-subtle',
+                        'bg-secondary-subtle',
+                        'bg-warning-subtle',
                         'table-secondary'
                     );
 
 
+                    /*
+                     * 初期状態
+                     * Outside shift
+                     */
                     cell.classList.add(
                         'bg-light'
                     );
@@ -712,10 +788,215 @@ document.addEventListener(
 
 
                     /*
+                     * Reservation
+                     */
+                    applyReservations(
+                        schedule
+                    );
+
+
+                    /*
                      * 登録済みException
                      */
                     applyExceptions(
                         schedule
+                    );
+
+                }
+            );
+
+
+            /*
+             * Past
+             */
+            applyPastCells();
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Reservations
+        |--------------------------------------------------------------------------
+        */
+
+        function applyReservations(
+            schedule
+        ) {
+
+            const reservations =
+                schedule.reservations
+                ?? [];
+
+
+            reservations.forEach(
+                function (reservation) {
+
+
+                    const statusCode =
+                        reservation.status_code;
+
+
+                    const reservationStart =
+                        new Date(
+                            reservation.start_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
+                        );
+
+
+                    const reservationEnd =
+                        new Date(
+                            reservation.end_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
+                        );
+
+
+                    cells.forEach(
+                        function (cell) {
+
+
+                            /*
+                             * 日付が違うセルは対象外
+                             */
+                            if (
+                                cell.dataset.date
+                                !==
+                                schedule.available_date
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            /*
+                             * セル開始時間
+                             */
+                            const cellStart =
+                                new Date(
+                                    `${cell.dataset.date}T${cell.dataset.time}:00`
+                                );
+
+
+                            /*
+                             * セル終了時間
+                             * 30分後
+                             */
+                            const cellEnd =
+                                new Date(
+                                    cellStart.getTime()
+                                    +
+                                    30
+                                    *
+                                    60
+                                    *
+                                    1000
+                                );
+
+
+                            /*
+                             * 予約時間とセル時間が
+                             * 重なっているか
+                             */
+                            const overlaps =
+                                cellStart
+                                <
+                                reservationEnd
+                                &&
+                                cellEnd
+                                >
+                                reservationStart;
+
+
+                            if (!overlaps) {
+
+                                return;
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Booked
+                            |--------------------------------------------------------------------------
+                            |
+                            | pending / confirmed
+                            |
+                            */
+
+                            if (
+                                statusCode
+                                === 'pending'
+                                ||
+                                statusCode
+                                === 'confirmed'
+                            ) {
+
+                                cell.classList.remove(
+                                    'bg-danger-subtle',
+                                    'bg-light',
+                                    'bg-secondary-subtle',
+                                    'bg-warning-subtle'
+                                );
+
+
+                                cell.classList.add(
+                                    'bg-primary-subtle'
+                                );
+
+
+                                cell.innerHTML = `
+                                    <span class="small fw-semibold">
+                                        Booked
+                                    </span>
+                                `;
+
+
+                                return;
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Completed
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                statusCode
+                                === 'completed'
+                            ) {
+
+                                cell.classList.remove(
+                                    'bg-danger-subtle',
+                                    'bg-primary-subtle',
+                                    'bg-light',
+                                    'bg-warning-subtle'
+                                );
+
+
+                                cell.classList.add(
+                                    'bg-secondary-subtle'
+                                );
+
+
+                                cell.innerHTML = `
+                                    <span class="small fw-semibold">
+                                        Completed
+                                    </span>
+                                `;
+
+                            }
+
+                        }
                     );
 
                 }
@@ -757,35 +1038,172 @@ document.addEventListener(
                     }
 
 
-                    const startAt =
-                        exception.start_at;
-
-
-                    const date =
-                        startAt.substring(
-                            0,
-                            10
+                    const exceptionStart =
+                        new Date(
+                            exception.start_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
                         );
 
 
-                    const time =
-                        startAt.substring(
-                            11,
-                            16
+                    const exceptionEnd =
+                        new Date(
+                            exception.end_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
                         );
 
 
-                    const cell =
-                        document.querySelector(
-                            '.schedule-cell'
-                            +
-                            `[data-date="${date}"]`
-                            +
-                            `[data-time="${time}"]`
+                    cells.forEach(
+                        function (cell) {
+
+
+                            /*
+                             * 日付が違う
+                             */
+                            if (
+                                cell.dataset.date
+                                !==
+                                schedule.available_date
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const cellStart =
+                                new Date(
+                                    `${cell.dataset.date}T${cell.dataset.time}:00`
+                                );
+
+
+                            const cellEnd =
+                                new Date(
+                                    cellStart.getTime()
+                                    +
+                                    30
+                                    *
+                                    60
+                                    *
+                                    1000
+                                );
+
+
+                            /*
+                             * Exceptionとの重複判定
+                             */
+                            const overlaps =
+                                cellStart
+                                <
+                                exceptionEnd
+                                &&
+                                cellEnd
+                                >
+                                exceptionStart;
+
+
+                            if (!overlaps) {
+
+                                return;
+
+                            }
+
+
+                            /*
+                             * Booked / Completed は
+                             * Unavailableで上書きしない
+                             */
+                            if (
+                                cell.classList.contains(
+                                    'bg-primary-subtle'
+                                )
+                                ||
+                                (
+                                    cell.classList.contains(
+                                        'bg-secondary-subtle'
+                                    )
+                                    &&
+                                    cell.textContent
+                                        .trim()
+                                    === 'Completed'
+                                )
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            cell.classList.remove(
+                                'bg-danger-subtle',
+                                'bg-light'
+                            );
+
+
+                            cell.classList.add(
+                                'bg-warning-subtle'
+                            );
+
+
+                            cell.innerHTML = `
+                                <span class="small">
+                                    Unavailable
+                                </span>
+                            `;
+
+
+                            cell.dataset.exceptionId =
+                                exception.id;
+
+
+                            cell.dataset.originalUnavailable =
+                                'true';
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Past
+        |--------------------------------------------------------------------------
+        */
+
+        function applyPastCells() {
+
+            const now =
+                new Date();
+
+
+            cells.forEach(
+                function (cell) {
+
+
+                    const cellStart =
+                        new Date(
+                            `${cell.dataset.date}T${cell.dataset.time}:00`
                         );
 
 
-                    if (!cell) {
+                    /*
+                     * 未来は対象外
+                     */
+                    if (
+                        cellStart
+                        >=
+                        now
+                    ) {
 
                         return;
 
@@ -793,34 +1211,44 @@ document.addEventListener(
 
 
                     /*
-                     * Available色を削除
+                     * Completedはそのまま
                      */
-                    cell.classList.remove(
-                        'bg-danger-subtle'
-                    );
+                    if (
+                        cell.classList.contains(
+                            'bg-secondary-subtle'
+                        )
+                        &&
+                        cell.textContent
+                            .trim()
+                        === 'Completed'
+                    ) {
+
+                        return;
+
+                    }
 
 
                     /*
-                     * Unavailable色
+                     * Past表示
                      */
+                    cell.classList.remove(
+                        'bg-danger-subtle',
+                        'bg-primary-subtle',
+                        'bg-warning-subtle',
+                        'bg-light'
+                    );
+
+
                     cell.classList.add(
-                        'table-secondary'
+                        'bg-secondary-subtle'
                     );
 
 
                     cell.innerHTML = `
-                        <span class="small">
-                            Unavailable
+                        <span class="small text-secondary">
+                            Past
                         </span>
                     `;
-
-
-                    cell.dataset.exceptionId =
-                        exception.id;
-
-
-                    cell.dataset.originalUnavailable =
-                        'true';
 
                 }
             );
@@ -928,13 +1356,35 @@ document.addEventListener(
 
 
                         /*
-                         * 勤務時間内だけ
-                         * pointer表示
+                         * 編集可能条件
+                         *
+                         * 勤務時間内
+                         * ＋
+                         * Pastではない
+                         * ＋
+                         * Bookedではない
+                         * ＋
+                         * Completedではない
                          */
+                        const isPast =
+                            cell.classList.contains(
+                                'bg-secondary-subtle'
+                            );
+
+
+                        const isBooked =
+                            cell.classList.contains(
+                                'bg-primary-subtle'
+                            );
+
+
                         if (
-                            cell.dataset
-                                .working
+                            cell.dataset.working
                             === 'true'
+                            &&
+                            !isPast
+                            &&
+                            !isBooked
                         ) {
 
                             cell.style.cursor =
@@ -1004,9 +1454,36 @@ document.addEventListener(
                          * シフト外
                          */
                         if (
-                            cell.dataset
-                                .working
+                            cell.dataset.working
                             !== 'true'
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        /*
+                         * Past / Completed
+                         */
+                        if (
+                            cell.classList.contains(
+                                'bg-secondary-subtle'
+                            )
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        /*
+                         * Booked
+                         */
+                        if (
+                            cell.classList.contains(
+                                'bg-primary-subtle'
+                            )
                         ) {
 
                             return;
@@ -1018,7 +1495,7 @@ document.addEventListener(
                             cell
                                 .classList
                                 .contains(
-                                    'table-secondary'
+                                    'bg-warning-subtle'
                                 );
 
 
@@ -1032,7 +1509,7 @@ document.addEventListener(
                         ) {
 
                             cell.classList.remove(
-                                'table-secondary'
+                                'bg-warning-subtle'
                             );
 
 
@@ -1062,7 +1539,7 @@ document.addEventListener(
 
 
                             cell.classList.add(
-                                'table-secondary'
+                                'bg-warning-subtle'
                             );
 
 
@@ -1154,9 +1631,36 @@ document.addEventListener(
                          * シフト外は対象外
                          */
                         if (
-                            cell.dataset
-                                .working
+                            cell.dataset.working
                             !== 'true'
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        /*
+                         * Past / Completedは対象外
+                         */
+                        if (
+                            cell.classList.contains(
+                                'bg-secondary-subtle'
+                            )
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        /*
+                         * Bookedは対象外
+                         */
+                        if (
+                            cell.classList.contains(
+                                'bg-primary-subtle'
+                            )
                         ) {
 
                             return;
@@ -1174,7 +1678,7 @@ document.addEventListener(
                             cell
                                 .classList
                                 .contains(
-                                    'table-secondary'
+                                    'bg-warning-subtle'
                                 );
 
 
@@ -1222,7 +1726,9 @@ document.addEventListener(
                  * 理由必須
                  */
                 if (
-                    createCells.length > 0
+                    createCells.length
+                    >
+                    0
                     &&
                     !exceptionTypeId
                 ) {
@@ -1240,9 +1746,13 @@ document.addEventListener(
                  * 変更なし
                  */
                 if (
-                    createCells.length === 0
+                    createCells.length
+                    ===
+                    0
                     &&
-                    cancelCells.length === 0
+                    cancelCells.length
+                    ===
+                    0
                 ) {
 
                     finishEditing();
@@ -1289,6 +1799,7 @@ document.addEventListener(
 
                     }
 
+
                     /*
                      * DBの最新状態を再取得
                      */
@@ -1296,6 +1807,7 @@ document.addEventListener(
 
 
                     finishEditing();
+
 
                     showSuccess(
                         'Schedule updated successfully.'
@@ -1363,7 +1875,11 @@ document.addEventListener(
                 new Date(
                     start.getTime()
                     +
-                    30 * 60 * 1000
+                    30
+                    *
+                    60
+                    *
+                    1000
                 );
 
 
@@ -1409,6 +1925,9 @@ document.addEventListener(
                                 token,
                         },
 
+                        credentials:
+                            'same-origin',
+
                         body:
                             JSON.stringify({
 
@@ -1441,9 +1960,6 @@ document.addEventListener(
 
             if (!response.ok) {
 
-                /*
-                 * Laravel validation error
-                 */
                 const firstError =
                     result.errors
                         ? Object.values(
@@ -1495,7 +2011,7 @@ document.addEventListener(
             }
 
 
-           const response =
+            const response =
                 await fetch(
                     '/teachers/schedule-exceptions/'
                     +
@@ -1511,6 +2027,9 @@ document.addEventListener(
                             'X-CSRF-TOKEN':
                                 token,
                         },
+
+                        credentials:
+                            'same-origin'
                     }
                 );
 
