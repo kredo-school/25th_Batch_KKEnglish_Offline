@@ -1,11 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Index Details')
+
+@section('title', 'Schedule Details')
 
 @section('content')
 <div class="container py-4">
     <h4 class="mb-3">Details: {{ $date }} / {{ $type }}</h4>
     <a href="{{ route('admin.schedules.index', ['week_start' => \Carbon\Carbon::parse($date)->startOfWeek(\Carbon\Carbon::MONDAY)->toDateString()]) }}"
-       class="btn btn-outline-secondary btn-sm mb-3">Back</a>
+       class="btn btn-outline-secondary btn-sm mb-3">Back to Schedule</a>
 
     @if($items->isEmpty())
         <p class="text-secondary">No data.</p>

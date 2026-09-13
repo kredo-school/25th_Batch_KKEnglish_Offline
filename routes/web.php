@@ -114,7 +114,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // Route::get('/dashboard/details', [DashboardController::class, 'details'])->name('dashboard.details');
+    Route::get('/dashboard.details', [DashboardController::class, 'dashboardDetails'])->name('dashboard.details');
 
     // Material 編集
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
@@ -158,6 +158,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'index'])->name('shift-pattern-assignments.index');
     Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])->name('shift-pattern-assignments.create');
     Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])->name('shift-pattern-assignments.store');
+    Route::get('/shift-pattern-assignments/{assignment}/edit',[ShiftPatternAssignmentController::class, 'edit'])->name('shift-pattern-assignments.edit');
+    Route::put('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'update'])->name('shift-pattern-assignments.update');
+
     Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');
+    
+    Route::get('/shift-pattern-assignments/teacher/{teacher}/bulk-edit',[ShiftPatternAssignmentController::class, 'bulkEdit'])->name('shift-pattern-assignments.bulk-edit');
+    Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
+
     Route::delete('/shift-pattern-assignments/teacher/{teacher}', [ShiftPatternAssignmentController::class, 'destroyByTeacher'])->name('shift-pattern-assignments.destroy-by-teacher');
 });
