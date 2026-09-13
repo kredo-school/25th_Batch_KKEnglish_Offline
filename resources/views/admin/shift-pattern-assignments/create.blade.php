@@ -76,12 +76,12 @@
             </div>
         </div>
 
-        <div class="form-check mb-3">
+        {{-- <div class="form-check mb-3">
             <input type="checkbox" class="form-check-input" id="replace_overlapping" name="replace_overlapping" value="1" @checked(old('replace_overlapping'))>
             <label class="form-check-label" for="replace_overlapping">
                 Replace existing assignments for overlapping periods
             </label>
-        </div>
+        </div> --}}
 
         <button type="submit" class="btn btn-primary">Assign in Bulk</button>
     </form>

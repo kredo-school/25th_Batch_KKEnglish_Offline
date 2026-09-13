@@ -26,7 +26,7 @@
                             <th class="text-center">Weekday</th>
                             <th>Start Date & End Date</th>
                             <th>Priority</th>
-                            <th class="text-center">Delete</th>
+                            <th class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,10 +106,48 @@
                                     {{-- Priority --}}
                                     <td>{{ $priority }}</td>
 
-                                    {{-- Delete --}}
+                                    {{-- Edit / Cancel --}}
                                     <td class="text-center">
-                                        <div class="d-inline-flex gap-1">
-                                            @foreach($assignments as $item)
+                                        <div class="d-flex flex-column gap-1">
+
+                                            @foreach($assignments as $assignment)
+
+                                                <div class="d-inline-flex align-items-center gap-1">
+
+                                                    <span class="small text-muted">
+                                                        {{ $weekdayNames[$assignment->weekday] ?? $assignment->weekday }}
+                                                    </span>
+
+                                                    <a href="{{ route('admin.shift-pattern-assignments.edit', $assignment) }}"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                        Edit
+                                                    </a>
+
+                                                    <form method="POST"
+                                                        action="{{ route('admin.shift-pattern-assignments.destroy', $assignment) }}"
+                                                        onsubmit="return confirm('このShift Assignmentをキャンセルしますか？');">
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button type="submit"
+                                                                class="btn btn-outline-danger btn-sm">
+                                                            Cancel
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @endforeach
+                                            
+                                            {{-- Teacher単位の一括変更 --}}
+                                            <div class="mt-1">
+                                                <a href="{{ route('admin.shift-pattern-assignments.bulk-edit', $teacher) }}"
+                                                    class="btn btn-primary btn-sm">
+                                                    Bulk Edit
+                                                </a>
+                                            </div>
+
+                                        </div>
+                                    </td>
+                                            {{-- @foreach($assignments as $item)
                                                 <form action="{{ route('admin.shift-pattern-assignments.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete assignment for {{ $weekdayNames[$item->weekday] ?? $item->weekday }}?')">
                                                     @csrf
                                                     @method('DELETE')
@@ -121,17 +159,15 @@
                                         </div>
                                         <div>
                                             <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}"
-          method="POST"
-          class="mt-2"
-          onsubmit="return confirm('この先生の全曜日・全シフトパターン割り当てを削除します。よろしいですか？');">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger btn-sm">
-            All assignments of this teacher
-        </button>
-    </form>
+                                                method="POST" class="mt-2" onsubmit="return confirm('この先生の全曜日・全シフトパターン割り当てを削除します。よろしいですか？');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    All assignments of this teacher
+                                                </button>
+                                            </form>
                                         </div>
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @endforeach
                         @endif

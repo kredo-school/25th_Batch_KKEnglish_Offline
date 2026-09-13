@@ -17,7 +17,7 @@
                         <th>Pattern Name</th>
                         <th>Timezone</th>
                         <th>Slot(min)</th>
-                        <th>Teacher</th>
+                        <th>Teachers</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -29,7 +29,7 @@
                         <td>{{ $pattern->pattern_name }}</td>
                         <td>{{ $pattern->timezone ?? 'UTC' }}</td>
                         <td>{{ $pattern->slot_minutes ?? '-' }}</td>
-                        <td>{{ $pattern->teachers_count ?? 0 }}</td>  {{-- 未解決 --}}
+                        <td>{{ $pattern->teachers_count ?? 0 }}</td>
                         <td class="text-end">
                             <a href="{{ route('admin.shift-patterns.edit', $pattern) }}" class="btn btn-outline-primary btn-sm">Edit</a>
                             <a href="{{ route('admin.shift-pattern-assignments.create', ['pattern_id' => $pattern->id]) }}" class="btn btn-outline-secondary btn-sm">Assign</a>
@@ -41,7 +41,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="text-center text-muted py-4">No patterns found.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">No patterns found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

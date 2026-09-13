@@ -21,7 +21,7 @@
             {{-- 週間予定表 --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Weekly schedule
+                Today's schedule
             </a>
 
             {{-- シフト作成 --}}
