@@ -964,11 +964,6 @@
 
 
                         <div class="text-secondary">
-                            Reserved = teacher unavailable
-                        </div>
-
-
-                        <div class="text-secondary">
                             × = unavailable
                         </div>
 
@@ -1223,16 +1218,15 @@ document.addEventListener(
 
             }
 
-            // 先生側ですでに予約が入っている
+            // その他の予約不可
             cell.innerHTML = `
 
                 <span
                     class="
                         text-secondary
-                        small
                     "
                 >
-                    Reserved
+                    ×
                 </span>
 
             `;
