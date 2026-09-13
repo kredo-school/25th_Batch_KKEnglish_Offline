@@ -60,7 +60,7 @@ class ScheduleController extends Controller
                         ->whereHas('status', function ($statusQuery) {
                             $statusQuery->whereIn(
                                 'status_code',
-                                ['pending', 'confirmed']
+                                ['pending', 'confirmed', 'completed']
                             );
                         })
                         ->with([
@@ -119,12 +119,26 @@ class ScheduleController extends Controller
                     }
                 );
 
-                if ($reservation) {
-                    $existingMap[$cellDate][$cellTime] = 'booked';
+            if ($reservation) {
 
-                    $reservationMap[$cellDate][$cellTime] =
-                        $reservation;
+                $statusCode =
+                    $reservation->status->status_code;
+
+                if ($statusCode === 'completed') {
+
+                    $existingMap[$cellDate][$cellTime] =
+                        'completed';
+
+                } else {
+
+                    $existingMap[$cellDate][$cellTime] =
+                        'booked';
+
                 }
+
+                $reservationMap[$cellDate][$cellTime] =
+                    $reservation;
+            }
 
                 $slotStart->addMinutes(30);
             }
