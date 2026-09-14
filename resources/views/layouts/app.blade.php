@@ -16,7 +16,7 @@
 
     } elseif ($roleCode == 'teacher') {
 
-        $barClass = 'bg-warning';
+        $barClass = 'teacher-navbar';
         $textClass = 'text-dark';
         $accountLabel = 'Teacher';
         $homeHref = route('teacher.dashboard');
@@ -55,8 +55,17 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <style>
+        .teacher-navbar {
+            background-color: #FFD166 !important;
+        }
+        /* F7D44C */
+        /* FFD166 */
+        /* FFC978 */
+
+    </style>
 </head>
 
 <body>

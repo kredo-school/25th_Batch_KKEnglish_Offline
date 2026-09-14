@@ -22,7 +22,7 @@
       <div class="col-12">
 
          {{-- Hello Header --}}
-        <div class="bg-light p-4 mb-4 d-flex justify-content-between align-items-center">
+        <div class="bg-light mb-4 d-flex justify-content-between align-items-center px-4 py-3">
 
          {{-- 名前・日付 --}}
       <div>
@@ -43,7 +43,7 @@
       </div>
 
     {{-- レッスン予約ボタン --}}
-    <a href="{{ route('students.reservations.index') }}" class="btn btn-primary">
+    <a href="{{ route('students.reservations.index') }}" class="btn btn-primary me-3">
         レッスンを予約
     </a>
 
