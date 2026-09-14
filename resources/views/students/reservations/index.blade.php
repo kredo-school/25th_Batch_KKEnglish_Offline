@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- ===============================
          Title
@@ -470,6 +470,7 @@ document.addEventListener(
         |--------------------------------------------------------------------------
         */
 
+        // HourとMinuteを合体させる関数
         function getSelectedTime() {
 
             const hour =
@@ -826,27 +827,10 @@ document.addEventListener(
              * Dateが選択されていたら
              * その日を含む週を最初に表示
              */
-            if (date) {
-
-                params.append(
-                    'date',
-                    date
-                );
-
-
-                params.append(
-                    'mode',
-                    'date'
-                );
-
-            } else {
-
-                params.append(
-                    'mode',
-                    'material'
-                );
-
-            }
+           params.append(
+                'mode',
+                'material'
+            );
 
 
             button.href =

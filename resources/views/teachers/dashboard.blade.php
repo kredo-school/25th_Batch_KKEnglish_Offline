@@ -75,12 +75,12 @@
 @endphp
 
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- ===============================
          Hello Header
     ================================ --}}
-    <div class="bg-light p-4 mb-4">
+    <div class="bg-light mb-4 px-4 py-3">
 
         <h2 class="fw-bold mb-1">
 

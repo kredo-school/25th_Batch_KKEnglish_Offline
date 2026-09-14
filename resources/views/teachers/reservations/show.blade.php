@@ -25,7 +25,7 @@
 @endphp
 
 
-<div class="container py-4">
+<div class="container-fluid">
 
     {{-- ===============================
          Title
