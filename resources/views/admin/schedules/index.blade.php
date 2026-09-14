@@ -140,6 +140,16 @@
         color: #ffffff;
         border-color: #2563eb;
     }
+    .shift-block {
+        position: absolute;
+        top: 6px;
+        height: 42px; /* セル高54pxに対してほぼ全面 */
+        background-color: rgba(59, 130, 246, 0.28); /* 塗りを見やすく */
+        border: 1px solid #3b82f6;
+        border-radius: 4px;
+        z-index: 2;
+        pointer-events: none;
+    }
 </style>
 
 <div class="dashboard-main-container">
@@ -254,7 +264,7 @@
         { id: 4, name: 'Online Booth 1', role: 'Remote', blocks: [{ title: 'Hans Müller / Tom Wilson', start_time: '08:00', end_time: '12:00', start_minutes: 480, duration_minutes: 240 }] }
     ];
 
-    const teacherData = (serverTeacherData && serverTeacherData.length > 0) ? serverTeacherData : fallbackTeachers;
+    const teacherData = Array.isArray(serverTeacherData) ? serverTeacherData : [];
     const locationData = (serverLocationData && serverLocationData.length > 0) ? serverLocationData : fallbackLocations;
 
     const serverCurrentTimeMinutes = @json($currentTimeMinutes ?? null);
@@ -286,31 +296,48 @@
 
         const dataList = currentMode === 'teacher' ? teacherData : locationData;
 
+        // データ0件時
+        if (!Array.isArray(dataList) || dataList.length === 0) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 25; // label1 + 24h
+            td.className = 'text-center text-muted py-4';
+            td.textContent = currentMode === 'teacher'
+                ? '表示できる先生データがありません'
+                : '表示できるStationデータがありません';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
         dataList.forEach((item, index) => {
             const tr = document.createElement('tr');
 
-            // 左側Y軸ラベル
+            // 左ラベル
             const labelTd = document.createElement('td');
             labelTd.className = 'timeline-label-col';
+            const name = item?.name ?? '';
+            const role = item?.role ?? '';
             labelTd.innerHTML = `
                 <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold" style="width:24px; height:24px; font-size:10px; flex-shrink:0;">
-                        ${(item.name || '').charAt(0)}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold"
+                        style="width:24px;height:24px;font-size:10px;flex-shrink:0;">
+                        ${(name || '?').charAt(0)}
                     </div>
                     <div class="text-truncate">
-                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.78rem;">${item.name}</div>
-                        <div class="small text-muted text-truncate" style="font-size: 0.65rem;">${item.role || ''}</div>
+                        <div class="fw-bold text-dark text-truncate" style="font-size:0.78rem;">${name || '(no name)'}</div>
+                        <div class="small text-muted text-truncate" style="font-size:0.65rem;">${role}</div>
                     </div>
                 </div>
             `;
             tr.appendChild(labelTd);
 
-            // 右側タイムラインセル
+            // 右タイムライン
             const timelineTd = document.createElement('td');
             timelineTd.colSpan = 24;
             timelineTd.className = 'timeline-cell-wrapper';
 
-            // 赤色の現在時刻線
+            // 現在時刻線
             const timeRatio = (currentTimeMinutes / (24 * 60)) * 100;
             const timeLine = document.createElement('div');
             timeLine.className = 'current-time-line';
@@ -324,31 +351,69 @@
             }
             timelineTd.appendChild(timeLine);
 
-            // 予定判定
-            if (!item.blocks || item.blocks.length === 0) {
-                const emptyMsg = document.createElement('div');
-                emptyMsg.className = 'text-muted small position-absolute top-50 start-50 translate-middle';
-                emptyMsg.style.pointerEvents = 'none';
-                emptyMsg.style.zIndex = '4';
-                emptyMsg.innerHTML = '<span class="badge bg-light text-secondary border px-2 py-1" style="font-size:0.65rem;"><i class="fa-regular fa-calendar-xmark me-1"></i>本日の予定はありません</span>';
-                timelineTd.appendChild(emptyMsg);
-            } else {
-                item.blocks.forEach(block => {
-                    const startPercent = (block.start_minutes / (24 * 60)) * 100;
-                    const durationPercent = (block.duration_minutes / (24 * 60)) * 100;
+            // 1) shift先描画（teacherモードのみ）
+            const shifts = Array.isArray(item?.shift_blocks) ? item.shift_blocks : [];
+            if (currentMode === 'teacher' && Array.isArray(item.shift_blocks) && item.shift_blocks.length > 0) {
+        item.shift_blocks.forEach(shift => {
+            // "HH:mm" を分に変換
+            const toMinutes = (hhmm) => {
+                if (!hhmm || typeof hhmm !== 'string' || !hhmm.includes(':')) return null;
+                const [h, m] = hhmm.split(':').map(v => Number(v));
+                if (Number.isNaN(h) || Number.isNaN(m)) return null;
+                return h * 60 + m;
+            };
+
+            let startMin = toMinutes(shift.start_time);
+            let endMin = toMinutes(shift.end_time);
+
+            // フォールバック（数値があれば使う）
+            if (startMin === null) startMin = Number(shift.start_minutes ?? 0);
+            if (endMin === null) endMin = startMin + Number(shift.duration_minutes ?? 0);
+
+            // 深夜跨ぎ対応（例 22:00 -> 02:00）
+            if (endMin < startMin) endMin += 1440;
+
+            const duration = Math.max(1, endMin - startMin);
+            const left = (startMin / 1440) * 100;
+            const width = (duration / 1440) * 100;
+
+            const shiftEl = document.createElement('div');
+            shiftEl.className = 'shift-block';
+            shiftEl.style.left = `${left}%`;
+            shiftEl.style.width = `${width}%`;
+            shiftEl.title = `Shift ${shift.start_time ?? ''} - ${shift.end_time ?? ''}`;
+            timelineTd.appendChild(shiftEl);
+        });
+    }
+
+            // 2) 予約描画
+            const blocks = Array.isArray(item?.blocks) ? item.blocks : [];
+            if (blocks.length > 0) {
+                blocks.forEach(block => {
+                    const startPercent = ((block.start_minutes ?? 0) / (24 * 60)) * 100;
+                    const durationPercent = ((block.duration_minutes ?? 0) / (24 * 60)) * 100;
 
                     const blockEl = document.createElement('div');
                     blockEl.className = `booking-block ${currentMode === 'location' ? 'location-type' : ''}`;
                     blockEl.style.left = startPercent + '%';
                     blockEl.style.width = Math.max(durationPercent, 4) + '%';
                     blockEl.innerHTML = `
-                        <div class="fw-bold text-truncate">${block.title}</div>
-                        <div class="small text-muted" style="font-size:0.65rem;"><i class="fa-regular fa-clock me-1"></i>${block.start_time} - ${block.end_time}</div>
+                        <div class="fw-bold text-truncate">${block.title ?? ''}</div>
+                        <div class="small text-muted" style="font-size:0.65rem;">
+                            <i class="fa-regular fa-clock me-1"></i>${block.start_time ?? '--:--'} - ${block.end_time ?? '--:--'}
+                        </div>
                     `;
-
                     blockEl.onclick = () => showBookingDetail(block);
                     timelineTd.appendChild(blockEl);
                 });
+            } else if (currentMode === 'teacher' && shifts.length === 0) {
+                // teacherでshiftも予約もない時だけ空表示
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'text-muted small position-absolute top-50 start-50 translate-middle';
+                emptyMsg.style.pointerEvents = 'none';
+                emptyMsg.style.zIndex = '4';
+                emptyMsg.innerHTML = '<span class="badge bg-light text-secondary border px-2 py-1" style="font-size:0.65rem;">データなし</span>';
+                timelineTd.appendChild(emptyMsg);
             }
 
             tr.appendChild(timelineTd);

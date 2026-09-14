@@ -356,113 +356,179 @@ class DashboardController extends Controller
      * Schedule Management: 週間予定表画面 (admin/schedules/index.blade.php)
      */
     public function schedulesIndex(Request $request)
-    {
-        $today = Carbon::today();
-        $todayStr = $today->toDateString();
-        // 1. サマリー数値
-        $capacity = DB::table('teacher_schedules')
-            ->whereDate('available_date', $todayStr)
-            ->count();
-        $booked = DB::table('reservations')
-            ->whereDate('start_at', $todayStr)
-            ->whereNull('cancelled_at')
-            ->count();
-        $autoBooked = DB::table('reservations')
-            ->whereDate('start_at', $todayStr)
-            ->where('is_auto_assigned', 1)
-            ->whereNull('cancelled_at')
-            ->count();
-        // 2. 先生データ & 予約データ
-        $teachers = DB::table('teachers as t')
-            ->join('users as u', 'u.id', '=', 't.user_id')
-            ->select([
-                't.id',
-                't.user_id',
-                DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as name"),
-                't.specialty as role',
-            ])
-            ->get();
-        $reservations = DB::table('reservations as r')
-            ->join('students as s', 's.id', '=', 'r.student_id')
-            ->join('users as su', 'su.id', '=', 's.user_id')
-            ->join('materials as m', 'm.material_id', '=', 'r.material_id')
-            ->whereDate('r.start_at', $todayStr)
-            ->whereNull('r.cancelled_at')
-            ->select([
-                'r.id',
-                'r.teacher_id',
-                'r.start_at',
-                'r.end_at',
-                DB::raw("CONCAT(COALESCE(su.last_name,''), ' ', COALESCE(su.first_name,'')) as student_name"),
-                'm.name as material_name'
-            ])
-            ->get();
-        // 先生モード用タイムライン
-        $teacherTimeline = $teachers->map(function ($teacher) use ($reservations) {
-            $teacherReservations = $reservations->where('teacher_id', $teacher->id)->map(function ($res) {
-                $start = Carbon::parse($res->start_at);
-                $end = Carbon::parse($res->end_at);
-                return [
-                    'id' => $res->id,
-                    'title' => $res->student_name . ' (' . $res->material_name . ')',
-                    'start_time' => $start->format('H:i'),
-                    'end_time' => $end->format('H:i'),
-                    'start_minutes' => $start->hour * 60 + $start->minute,
-                    'duration_minutes' => $end->diffInMinutes($start),
-                    'type' => 'booked'
-                ];
-            })->values();
-            return [
-                'id' => 'teacher_' . $teacher->id,
-                'name' => $teacher->name ?: 'Teacher #' . $teacher->id,
-                'role' => $teacher->role ?: 'Instructor',
-                'blocks' => $teacherReservations
-            ];
-        });
-        // 3. 場所（教室）モード用タイムライン
-        $rooms = collect([
-            ['id' => 'room_1', 'name' => 'Station A (Room 101)', 'role' => 'Main Building'],
-            ['id' => 'room_2', 'name' => 'Station B (Room 102)', 'role' => 'Main Building'],
-            ['id' => 'room_3', 'name' => 'Station C (Room 103)', 'role' => 'Annex'],
-            ['id' => 'room_4', 'name' => 'Online Booth 1', 'role' => 'Remote'],
-            ['id' => 'room_5', 'name' => 'Online Booth 2', 'role' => 'Remote'],
-        ]);
-        $roomCount = $rooms->count();
-        $locationTimeline = $rooms->map(function ($room, $index) use ($reservations, $roomCount) {
-            $assignedReservations = $reservations->filter(function ($res, $key) use ($index, $roomCount) {
-                return $roomCount > 0 && ($key % $roomCount) === $index;
-            })->map(function ($res) {
-                $start = Carbon::parse($res->start_at);
-                $end = Carbon::parse($res->end_at);
-                return [
-                    'id' => $res->id,
-                    'title' => $res->student_name . ' - Lesson',
-                    'start_time' => $start->format('H:i'),
-                    'end_time' => $end->format('H:i'),
-                    'start_minutes' => $start->hour * 60 + $start->minute,
-                    'duration_minutes' => $end->diffInMinutes($start),
-                    'type' => 'room_used'
-                ];
-            })->values();
-            return [
-                'id' => $room['id'],
-                'name' => $room['name'],
-                'role' => $room['role'],
-                'blocks' => $assignedReservations
-            ];
-        });
-        $now = Carbon::now();
-        return view('admin.schedules.index', [
-            'todayDate' => $today->format('Y/m/d'),
-            'capacity' => $capacity,
-            'booked' => $booked,
-            'autoBooked' => $autoBooked,
-            'teacherTimeline' => $teacherTimeline,
-            'locationTimeline' => $locationTimeline,
-            'currentTimeMinutes' => $now->hour * 60 + $now->minute,
-            'currentTimeStr' => $now->format('H:i'),
-        ]);
+{
+    $today = Carbon::today();
+    $todayStr = $today->toDateString();
+
+    // 1) サマリー
+    $capacity = DB::table('teacher_schedules')
+        ->whereDate('available_date', $todayStr)
+        ->whereNotIn('status', ['cancelled'])
+        ->count();
+
+    $booked = DB::table('reservations')
+        ->whereDate('start_at', $todayStr)
+        ->whereNull('cancelled_at')
+        ->count();
+
+    $autoBooked = DB::table('reservations')
+        ->whereDate('start_at', $todayStr)
+        ->where('is_auto_assigned', 1)
+        ->whereNull('cancelled_at')
+        ->count();
+
+    // 2) 先生マスタ（名前）
+    $teachersMaster = DB::table('teachers as t')
+        ->leftJoin('users as u', 'u.id', '=', 't.user_id')
+        ->select([
+            't.id as teacher_id',
+            DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as name"),
+            't.specialty as role',
+        ])
+        ->get()
+        ->keyBy('teacher_id');
+
+    // 3) 予約（フラット）: Station用
+    $reservationsFlat = DB::table('reservations as r')
+        ->leftJoin('students as s', 's.id', '=', 'r.student_id')
+        ->leftJoin('users as su', 'su.id', '=', 's.user_id')
+        ->leftJoin('materials as m', 'm.material_id', '=', 'r.material_id')
+        ->whereDate('r.start_at', $todayStr)
+        ->whereNull('r.cancelled_at')
+        ->select([
+            'r.id',
+            'r.teacher_id',
+            'r.start_at',
+            'r.end_at',
+            DB::raw("CONCAT(COALESCE(su.last_name,''), ' ', COALESCE(su.first_name,'')) as student_name"),
+            'm.name as material_name',
+        ])
+        ->orderBy('r.start_at')
+        ->get();
+
+    // 4) 予約（teacher_id別）: Teacher用
+    $reservationsByTeacher = $reservationsFlat->groupBy('teacher_id');
+
+    // 5) shift（teacher_id別）: Teacher表示の主データ
+    $allShifts = DB::table('teacher_schedules as ts')
+        ->whereDate('ts.available_date', $todayStr)
+        ->whereNotIn('ts.status', ['cancelled'])
+        ->select([
+            'ts.teacher_id',
+            'ts.available_date',
+            'ts.start_time',
+            'ts.end_time',
+        ])
+        ->orderBy('ts.start_time')
+        ->get()
+        ->groupBy('teacher_id');
+
+    // 6) 表示対象teacher_id（shift優先。なければ予約補完）
+    $teacherIds = $allShifts->keys()->sort()->values();
+    if ($teacherIds->isEmpty()) {
+        $teacherIds = $reservationsByTeacher->keys()->sort()->values();
     }
+
+    // 7) Teacher timeline
+    $teacherTimeline = $teacherIds->map(function ($teacherId) use ($allShifts, $reservationsByTeacher, $teachersMaster, $todayStr) {
+        $teacher = $teachersMaster->get($teacherId);
+
+        $shiftRows = $allShifts->get($teacherId, collect())->values();
+        $shiftBlocks = $shiftRows->map(function ($shift, $idx) use ($teacherId, $todayStr) {
+            $start = Carbon::parse($shift->start_time);
+            $end = Carbon::parse($shift->end_time);
+            $minutes = max($end->diffInMinutes($start), 1);
+
+            return [
+                'id' => 'shift_' . $teacherId . '_' . $todayStr . '_' . $idx,
+                'title' => 'Shift',
+                'start_time' => $start->format('H:i'),
+                'end_time' => $end->format('H:i'),
+                'start_minutes' => $start->hour * 60 + $start->minute,
+                'duration_minutes' => $minutes,
+                'type' => 'shift_assignment',
+            ];
+        });
+
+        $bookedRows = $reservationsByTeacher->get($teacherId, collect())->values();
+        $bookedBlocks = $bookedRows->map(function ($res) {
+            $start = Carbon::parse($res->start_at);
+            $end = Carbon::parse($res->end_at);
+
+            return [
+                'id' => 'booked_' . $res->id,
+                'title' => ($res->student_name ?: 'Unknown Student') . ' (' . ($res->material_name ?: 'Lesson') . ')',
+                'start_time' => $start->format('H:i'),
+                'end_time' => $end->format('H:i'),
+                'start_minutes' => $start->hour * 60 + $start->minute,
+                'duration_minutes' => max($end->diffInMinutes($start), 1),
+                'type' => 'booked',
+            ];
+        });
+
+        return [
+            'id' => 'teacher_' . $teacherId,
+            'name' => (isset($teacher->name) && trim($teacher->name) !== '') ? $teacher->name : ('Teacher #' . $teacherId),
+            'role' => $teacher->role ?? 'Instructor',
+            'shift_blocks' => $shiftBlocks,
+            'blocks' => $bookedBlocks,
+        ];
+    })->values();
+
+    // 8) Station timeline（フラット予約を使う）
+    $rooms = collect([
+        ['id' => 'room_1', 'name' => 'Station A (Room 101)', 'role' => 'Main Building'],
+        ['id' => 'room_2', 'name' => 'Station B (Room 102)', 'role' => 'Main Building'],
+        ['id' => 'room_3', 'name' => 'Station C (Room 103)', 'role' => 'Annex'],
+        ['id' => 'room_4', 'name' => 'Online Booth 1', 'role' => 'Remote'],
+        ['id' => 'room_5', 'name' => 'Online Booth 2', 'role' => 'Remote'],
+    ]);
+
+    $roomCount = $rooms->count();
+
+    $locationTimeline = $rooms->map(function ($room, $index) use ($reservationsFlat, $roomCount) {
+        $assignedReservations = $reservationsFlat
+            ->values()
+            ->filter(function ($res, $key) use ($index, $roomCount) {
+                return $roomCount > 0 && ($key % $roomCount) === $index;
+            })
+            ->map(function ($res) {
+                $start = Carbon::parse($res->start_at);
+                $end = Carbon::parse($res->end_at);
+
+                return [
+                    'id' => $res->id,
+                    'title' => ($res->student_name ?: 'Unknown Student') . ' - Lesson',
+                    'start_time' => $start->format('H:i'),
+                    'end_time' => $end->format('H:i'),
+                    'start_minutes' => $start->hour * 60 + $start->minute,
+                    'duration_minutes' => max($end->diffInMinutes($start), 1),
+                    'type' => 'room_used',
+                ];
+            })
+            ->values();
+
+        return [
+            'id' => $room['id'],
+            'name' => $room['name'],
+            'role' => $room['role'],
+            'blocks' => $assignedReservations,
+        ];
+    });
+
+    $now = Carbon::now();
+
+    return view('admin.schedules.index', [
+        'todayDate' => $today->format('Y/m/d'),
+        'capacity' => $capacity,
+        'booked' => $booked,
+        'autoBooked' => $autoBooked,
+        'teacherTimeline' => $teacherTimeline,
+        'locationTimeline' => $locationTimeline,
+        'currentTimeMinutes' => $now->hour * 60 + $now->minute,
+        'currentTimeStr' => $now->format('H:i'),
+    ]);
+}
     // {
     //     $validated = $request->validate([
     //         'week_start' => ['nullable', 'date_format:Y-m-d'],
@@ -800,9 +866,13 @@ class DashboardController extends Controller
     $items = DB::table('reservations as r')
         ->leftJoin('teachers as t', 't.id', '=', 'r.teacher_id')
         ->leftJoin('users as u', 'u.id', '=', 't.user_id')
+        ->leftJoin('students as s', 's.id', '=', 'r.student_id')
+        ->leftJoin('users as su', 'su.id', '=', 's.user_id')
         ->whereDate('r.start_at', $date)
         ->whereNull('r.cancelled_at')
-        ->select(['r.id', 'r.student_id', 'r.start_at', 'r.end_at',
+        ->select(['r.id', 'r.student_id',
+            DB::raw("CONCAT(COALESCE(su.first_name,''), ' ', COALESCE(su.last_name,'')) as student_name"),
+            'r.start_at', 'r.end_at',
             DB::raw("CONCAT(COALESCE(u.first_name,''), ' ', COALESCE(u.last_name,'')) as teacher_name"),
         ])
         ->orderBy('r.start_at')
@@ -909,11 +979,14 @@ class DashboardController extends Controller
             return DB::table('reservations as r')
                 ->leftJoin('teachers as t', 't.id', '=', 'r.teacher_id')
                 ->leftJoin('users as u', 'u.id', '=', 't.user_id')
+                ->leftJoin('students as s', 's.id', '=', 'r.student_id')
+                ->leftJoin('users as su', 'su.id', '=', 's.user_id')
                 ->whereDate('r.start_at', $date)
                 ->whereNull('r.cancelled_at')
                 ->select([
                     'r.id',
                     'r.student_id',
+                    DB::raw("CONCAT(COALESCE(su.first_name,''), ' ', COALESCE(su.last_name,'')) as student_name"),
                     'r.start_at',
                     'r.end_at',
                     DB::raw("CONCAT(COALESCE(u.first_name,''), ' ', COALESCE(u.last_name,'')) as teacher_name"),
