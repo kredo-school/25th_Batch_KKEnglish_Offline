@@ -4,7 +4,84 @@
 
 @section('content')
 
-<div class="container py-4">
+<style>
+
+    /*
+    |--------------------------------------------------------------------------
+    | Schedule Colors
+    |--------------------------------------------------------------------------
+    */
+
+    /* Available */
+    .schedule-available {
+        background-color: #F5F6F7 !important;
+    }
+
+
+    /* Booked */
+    .schedule-booked {
+        background-color: #CFE8F7 !important;
+    }
+
+
+    /* Past / Completed */
+    .schedule-past,
+    .schedule-completed {
+        background-color: #E2E3E5 !important;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Schedule Cell
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-cell {
+        transition:
+            background-color 0.15s ease;
+    }
+
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #d6d9dc !important;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Booked
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-booked-text {
+        color: #212529;
+
+        font-size: 0.8rem;
+
+        font-weight: 600;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Completed
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-completed-text {
+        color: #6c757d;
+
+        font-size: 0.8rem;
+
+        font-weight: 600;
+    }
+
+</style>
+
+
+
+<div class="container">
 
     {{-- ===============================
          Title
@@ -122,6 +199,7 @@
             d-flex
             gap-4
             flex-wrap
+            align-items-center
             mb-3
             small
         "
@@ -132,7 +210,7 @@
 
             <span
                 class="
-                    bg-danger-subtle
+                    schedule-available
                     border
                     rounded
                 "
@@ -148,12 +226,24 @@
         </div>
 
 
+        {{-- Unavailable --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span   class="text-dark fw-bold fs-5">
+                ×
+            </span>
+
+            Unavailable
+
+        </div>
+
+
         {{-- Booked --}}
         <div class="d-flex align-items-center gap-2">
 
             <span
                 class="
-                    bg-primary-subtle
+                    schedule-booked
                     border
                     rounded
                 "
@@ -169,33 +259,12 @@
         </div>
 
 
-        {{-- Unavailable --}}
+        {{-- Completed / Past --}}
         <div class="d-flex align-items-center gap-2">
 
             <span
                 class="
-                    bg-warning-subtle
-                    border
-                    rounded
-                "
-                style="
-                    width: 22px;
-                    height: 22px;
-                    display: inline-block;
-                "
-            ></span>
-
-            Unavailable
-
-        </div>
-
-
-        {{-- Past / Completed --}}
-        <div class="d-flex align-items-center gap-2">
-
-            <span
-                class="
-                    bg-secondary-subtle
+                    schedule-past
                     border
                     rounded
                 "
@@ -216,7 +285,7 @@
 
             <span
                 class="
-                    bg-light
+                    bg-white
                     border
                     rounded
                 "
@@ -300,6 +369,7 @@
                                 {{ $day->format('D') }}
                             </div>
 
+
                             <small class="text-secondary">
                                 {{ $day->format('m/d') }}
                             </small>
@@ -327,13 +397,12 @@
                         </th>
 
 
-                        {{-- 7 Days --}}
                         @foreach ($days as $day)
 
                             <td
                                 class="
                                     schedule-cell
-                                    bg-light
+                                    bg-white
                                 "
 
                                 data-date="{{ $day->format('Y-m-d') }}"
@@ -347,6 +416,8 @@
                                 data-exception-id=""
 
                                 data-original-unavailable="false"
+
+                                data-state="outside"
 
                                 style="
                                     height: 45px;
@@ -489,6 +560,7 @@ document.addEventListener(
             );
 
 
+
         /*
         |--------------------------------------------------------------------------
         | Current Week
@@ -497,6 +569,7 @@ document.addEventListener(
 
         const currentWeekStart =
             '{{ $startOfWeek->format('Y-m-d') }}';
+
 
 
         /*
@@ -513,6 +586,7 @@ document.addEventListener(
                 .getAttribute(
                     'content'
                 );
+
 
 
         /*
@@ -658,28 +732,30 @@ document.addEventListener(
                         'false';
 
 
+                    cell.dataset.state =
+                        'outside';
+
+
                     /*
-                     * 状態ごとの色を全部リセット
+                     * 表示状態をリセット
                      */
                     cell.classList.remove(
-                        'bg-danger-subtle',
-                        'bg-primary-subtle',
+                        'schedule-available',
+                        'schedule-booked',
+                        'schedule-past',
+                        'schedule-completed',
                         'bg-secondary-subtle',
-                        'bg-warning-subtle',
-                        'table-secondary'
-                    );
-
-
-                    /*
-                     * 初期状態
-                     * Outside shift
-                     */
-                    cell.classList.add(
+                        'bg-primary-subtle',
                         'bg-light'
                     );
 
 
-                    cell.textContent =
+                    cell.classList.add(
+                        'bg-white'
+                    );
+
+
+                    cell.innerHTML =
                         '';
 
 
@@ -690,16 +766,16 @@ document.addEventListener(
             );
 
 
+
             /*
-             * TeacherScheduleを反映
+             * TeacherSchedule
              */
             schedules.forEach(
                 function (schedule) {
 
 
                     const date =
-                        schedule
-                            .available_date;
+                        schedule.available_date;
 
 
                     const startTime =
@@ -725,7 +801,7 @@ document.addEventListener(
 
 
                             /*
-                             * 日付が違う
+                             * 日付違い
                              */
                             if (
                                 cell.dataset.date
@@ -742,7 +818,7 @@ document.addEventListener(
 
 
                             /*
-                             * シフト時間内
+                             * 勤務時間内
                              */
                             if (
                                 time >= startTime
@@ -755,31 +831,29 @@ document.addEventListener(
 
 
                                 cell.dataset.scheduleId =
-                                    schedule
-                                        .schedule_id;
+                                    schedule.schedule_id;
 
 
-                                /*
-                                 * シフト外の色を削除
-                                 */
+                                cell.dataset.state =
+                                    'available';
+
+
                                 cell.classList.remove(
-                                    'bg-light'
+                                    'bg-white'
                                 );
 
 
                                 /*
-                                 * 勤務時間は薄い赤
+                                 * Available
+                                 * 背景のみ
                                  */
                                 cell.classList.add(
-                                    'bg-danger-subtle'
+                                    'schedule-available'
                                 );
 
 
-                                cell.innerHTML = `
-                                    <span class="small">
-                                        Available
-                                    </span>
-                                `;
+                                cell.innerHTML =
+                                    '';
 
                             }
 
@@ -796,7 +870,7 @@ document.addEventListener(
 
 
                     /*
-                     * 登録済みException
+                     * Exception
                      */
                     applyExceptions(
                         schedule
@@ -862,9 +936,6 @@ document.addEventListener(
                         function (cell) {
 
 
-                            /*
-                             * 日付が違うセルは対象外
-                             */
                             if (
                                 cell.dataset.date
                                 !==
@@ -876,19 +947,12 @@ document.addEventListener(
                             }
 
 
-                            /*
-                             * セル開始時間
-                             */
                             const cellStart =
                                 new Date(
                                     `${cell.dataset.date}T${cell.dataset.time}:00`
                                 );
 
 
-                            /*
-                             * セル終了時間
-                             * 30分後
-                             */
                             const cellEnd =
                                 new Date(
                                     cellStart.getTime()
@@ -902,8 +966,7 @@ document.addEventListener(
 
 
                             /*
-                             * 予約時間とセル時間が
-                             * 重なっているか
+                             * 予約時間との重複
                              */
                             const overlaps =
                                 cellStart
@@ -922,13 +985,11 @@ document.addEventListener(
                             }
 
 
+
                             /*
                             |--------------------------------------------------------------------------
                             | Booked
                             |--------------------------------------------------------------------------
-                            |
-                            | pending / confirmed
-                            |
                             */
 
                             if (
@@ -939,21 +1000,29 @@ document.addEventListener(
                                 === 'confirmed'
                             ) {
 
+                                cell.dataset.state =
+                                    'booked';
+
+
                                 cell.classList.remove(
-                                    'bg-danger-subtle',
-                                    'bg-light',
-                                    'bg-secondary-subtle',
-                                    'bg-warning-subtle'
+                                    'schedule-available',
+                                    'schedule-past',
+                                    'schedule-completed',
+                                    'bg-white'
                                 );
 
 
                                 cell.classList.add(
-                                    'bg-primary-subtle'
+                                    'schedule-booked'
                                 );
 
 
                                 cell.innerHTML = `
-                                    <span class="small fw-semibold">
+                                    <span
+                                        class="
+                                            schedule-booked-text
+                                        "
+                                    >
                                         Booked
                                     </span>
                                 `;
@@ -962,6 +1031,7 @@ document.addEventListener(
                                 return;
 
                             }
+
 
 
                             /*
@@ -975,21 +1045,28 @@ document.addEventListener(
                                 === 'completed'
                             ) {
 
+                                cell.dataset.state =
+                                    'completed';
+
+
                                 cell.classList.remove(
-                                    'bg-danger-subtle',
-                                    'bg-primary-subtle',
-                                    'bg-light',
-                                    'bg-warning-subtle'
+                                    'schedule-available',
+                                    'schedule-booked',
+                                    'bg-white'
                                 );
 
 
                                 cell.classList.add(
-                                    'bg-secondary-subtle'
+                                    'schedule-completed'
                                 );
 
 
                                 cell.innerHTML = `
-                                    <span class="small fw-semibold">
+                                    <span
+                                        class="
+                                            schedule-completed-text
+                                        "
+                                    >
                                         Completed
                                     </span>
                                 `;
@@ -1062,9 +1139,6 @@ document.addEventListener(
                         function (cell) {
 
 
-                            /*
-                             * 日付が違う
-                             */
                             if (
                                 cell.dataset.date
                                 !==
@@ -1094,9 +1168,6 @@ document.addEventListener(
                                 );
 
 
-                            /*
-                             * Exceptionとの重複判定
-                             */
                             const overlaps =
                                 cellStart
                                 <
@@ -1115,23 +1186,15 @@ document.addEventListener(
 
 
                             /*
-                             * Booked / Completed は
-                             * Unavailableで上書きしない
+                             * Booked / Completedは
+                             * 上書きしない
                              */
                             if (
-                                cell.classList.contains(
-                                    'bg-primary-subtle'
-                                )
+                                cell.dataset.state
+                                === 'booked'
                                 ||
-                                (
-                                    cell.classList.contains(
-                                        'bg-secondary-subtle'
-                                    )
-                                    &&
-                                    cell.textContent
-                                        .trim()
-                                    === 'Completed'
-                                )
+                                cell.dataset.state
+                                === 'completed'
                             ) {
 
                                 return;
@@ -1139,20 +1202,27 @@ document.addEventListener(
                             }
 
 
+                            cell.dataset.state =
+                                'unavailable';
+
+
                             cell.classList.remove(
-                                'bg-danger-subtle',
-                                'bg-light'
+                                'schedule-available',
+                                'bg-white'
                             );
 
 
-                            cell.classList.add(
-                                'bg-warning-subtle'
-                            );
-
-
+                            /*
+                             * Unavailable
+                             * ×のみ
+                             */
                             cell.innerHTML = `
-                                <span class="small">
-                                    Unavailable
+                                <span
+                                    class="
+                                        schedule-unavailable-mark
+                                    "
+                                >
+                                    ×
                                 </span>
                             `;
 
@@ -1197,7 +1267,7 @@ document.addEventListener(
 
 
                     /*
-                     * 未来は対象外
+                     * 未来
                      */
                     if (
                         cellStart
@@ -1211,16 +1281,11 @@ document.addEventListener(
 
 
                     /*
-                     * Completedはそのまま
+                     * Completedは残す
                      */
                     if (
-                        cell.classList.contains(
-                            'bg-secondary-subtle'
-                        )
-                        &&
-                        cell.textContent
-                            .trim()
-                        === 'Completed'
+                        cell.dataset.state
+                        === 'completed'
                     ) {
 
                         return;
@@ -1229,26 +1294,29 @@ document.addEventListener(
 
 
                     /*
-                     * Past表示
+                     * Past
                      */
+                    cell.dataset.state =
+                        'past';
+
+
                     cell.classList.remove(
-                        'bg-danger-subtle',
-                        'bg-primary-subtle',
-                        'bg-warning-subtle',
-                        'bg-light'
+                        'schedule-available',
+                        'schedule-booked',
+                        'bg-white'
                     );
 
 
                     cell.classList.add(
-                        'bg-secondary-subtle'
+                        'schedule-past'
                     );
 
 
-                    cell.innerHTML = `
-                        <span class="small text-secondary">
-                            Past
-                        </span>
-                    `;
+                    /*
+                     * Pastは文字なし
+                     */
+                    cell.innerHTML =
+                        '';
 
                 }
             );
@@ -1285,19 +1353,16 @@ document.addEventListener(
 
 
                     option.value =
-                        type
-                            .exception_type_id;
+                        type.exception_type_id;
 
 
                     option.textContent =
-                        type
-                            .type_name;
+                        type.type_name;
 
 
-                    exceptionType
-                        .appendChild(
-                            option
-                        );
+                    exceptionType.appendChild(
+                        option
+                    );
 
                 }
             );
@@ -1323,9 +1388,6 @@ document.addEventListener(
                 hideMessages();
 
 
-                /*
-                 * Cancel用に現在状態を保存
-                 */
                 originalSchedule =
                     [];
 
@@ -1344,47 +1406,28 @@ document.addEventListener(
                             html:
                                 cell.innerHTML,
 
+                            state:
+                                cell.dataset.state,
+
                             exceptionId:
-                                cell.dataset
-                                    .exceptionId,
+                                cell.dataset.exceptionId,
 
                             originalUnavailable:
-                                cell.dataset
-                                    .originalUnavailable,
+                                cell.dataset.originalUnavailable,
 
                         });
 
 
                         /*
-                         * 編集可能条件
-                         *
-                         * 勤務時間内
-                         * ＋
-                         * Pastではない
-                         * ＋
-                         * Bookedではない
-                         * ＋
-                         * Completedではない
+                         * Available / Unavailable
+                         * のみ編集可能
                          */
-                        const isPast =
-                            cell.classList.contains(
-                                'bg-secondary-subtle'
-                            );
-
-
-                        const isBooked =
-                            cell.classList.contains(
-                                'bg-primary-subtle'
-                            );
-
-
                         if (
-                            cell.dataset.working
-                            === 'true'
-                            &&
-                            !isPast
-                            &&
-                            !isBooked
+                            cell.dataset.state
+                            === 'available'
+                            ||
+                            cell.dataset.state
+                            === 'unavailable'
                         ) {
 
                             cell.style.cursor =
@@ -1401,25 +1444,19 @@ document.addEventListener(
                 );
 
 
-                editActions
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
+                editActions.classList.remove(
+                    'd-none'
+                );
 
 
-                editActions
-                    .classList
-                    .add(
-                        'd-flex'
-                    );
+                editActions.classList.add(
+                    'd-flex'
+                );
 
 
-                editMessage
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
+                editMessage.classList.remove(
+                    'd-none'
+                );
 
             }
         );
@@ -1440,9 +1477,6 @@ document.addEventListener(
                     function () {
 
 
-                        /*
-                         * 編集中ではない
-                         */
                         if (!editing) {
 
                             return;
@@ -1451,52 +1485,20 @@ document.addEventListener(
 
 
                         /*
-                         * シフト外
+                         * Available / Unavailableのみ
                          */
                         if (
-                            cell.dataset.working
-                            !== 'true'
+                            cell.dataset.state
+                            !== 'available'
+                            &&
+                            cell.dataset.state
+                            !== 'unavailable'
                         ) {
 
                             return;
 
                         }
 
-
-                        /*
-                         * Past / Completed
-                         */
-                        if (
-                            cell.classList.contains(
-                                'bg-secondary-subtle'
-                            )
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        /*
-                         * Booked
-                         */
-                        if (
-                            cell.classList.contains(
-                                'bg-primary-subtle'
-                            )
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        const isUnavailable =
-                            cell
-                                .classList
-                                .contains(
-                                    'bg-warning-subtle'
-                                );
 
 
                         /*
@@ -1505,51 +1507,53 @@ document.addEventListener(
                          * Available
                          */
                         if (
-                            isUnavailable
+                            cell.dataset.state
+                            === 'unavailable'
                         ) {
 
-                            cell.classList.remove(
-                                'bg-warning-subtle'
-                            );
+                            cell.dataset.state =
+                                'available';
 
 
                             cell.classList.add(
-                                'bg-danger-subtle'
+                                'schedule-available'
                             );
 
 
-                            cell.innerHTML = `
-                                <span class="small">
-                                    Available
-                                </span>
-                            `;
+                            cell.innerHTML =
+                                '';
+
+
+                            return;
 
                         }
+
+
 
                         /*
                          * Available
                          * ↓
                          * Unavailable
                          */
-                        else {
 
-                            cell.classList.remove(
-                                'bg-danger-subtle'
-                            );
+                        cell.dataset.state =
+                            'unavailable';
 
 
-                            cell.classList.add(
-                                'bg-warning-subtle'
-                            );
+                        cell.classList.remove(
+                            'schedule-available'
+                        );
 
 
-                            cell.innerHTML = `
-                                <span class="small">
-                                    Unavailable
-                                </span>
-                            `;
-
-                        }
+                        cell.innerHTML = `
+                            <span
+                                class="
+                                    schedule-unavailable-mark
+                                "
+                            >
+                                ×
+                            </span>
+                        `;
 
                     }
                 );
@@ -1578,6 +1582,10 @@ document.addEventListener(
 
                         item.cell.innerHTML =
                             item.html;
+
+
+                        item.cell.dataset.state =
+                            item.state;
 
 
                         item.cell.dataset.exceptionId =
@@ -1628,39 +1636,14 @@ document.addEventListener(
 
 
                         /*
-                         * シフト外は対象外
+                         * Available / Unavailableのみ
                          */
                         if (
-                            cell.dataset.working
-                            !== 'true'
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        /*
-                         * Past / Completedは対象外
-                         */
-                        if (
-                            cell.classList.contains(
-                                'bg-secondary-subtle'
-                            )
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        /*
-                         * Bookedは対象外
-                         */
-                        if (
-                            cell.classList.contains(
-                                'bg-primary-subtle'
-                            )
+                            cell.dataset.state
+                            !== 'available'
+                            &&
+                            cell.dataset.state
+                            !== 'unavailable'
                         ) {
 
                             return;
@@ -1669,17 +1652,14 @@ document.addEventListener(
 
 
                         const wasUnavailable =
-                            cell.dataset
-                                .originalUnavailable
+                            cell.dataset.originalUnavailable
                             === 'true';
 
 
                         const isUnavailable =
-                            cell
-                                .classList
-                                .contains(
-                                    'bg-warning-subtle'
-                                );
+                            cell.dataset.state
+                            === 'unavailable';
+
 
 
                         /*
@@ -1698,6 +1678,7 @@ document.addEventListener(
                             );
 
                         }
+
 
 
                         /*
@@ -1721,14 +1702,12 @@ document.addEventListener(
                 );
 
 
+
                 /*
-                 * 新しいException作成時は
-                 * 理由必須
+                 * Exception理由必須
                  */
                 if (
-                    createCells.length
-                    >
-                    0
+                    createCells.length > 0
                     &&
                     !exceptionTypeId
                 ) {
@@ -1742,17 +1721,14 @@ document.addEventListener(
                 }
 
 
+
                 /*
                  * 変更なし
                  */
                 if (
-                    createCells.length
-                    ===
-                    0
+                    createCells.length === 0
                     &&
-                    cancelCells.length
-                    ===
-                    0
+                    cancelCells.length === 0
                 ) {
 
                     finishEditing();
@@ -1770,7 +1746,7 @@ document.addEventListener(
 
 
                     /*
-                     * 新規Exception
+                     * Exception作成
                      */
                     for (
                         const cell
@@ -1783,6 +1759,7 @@ document.addEventListener(
                         );
 
                     }
+
 
 
                     /*
@@ -1800,8 +1777,9 @@ document.addEventListener(
                     }
 
 
+
                     /*
-                     * DBの最新状態を再取得
+                     * DB最新状態
                      */
                     await loadSchedule();
 
@@ -1859,18 +1837,12 @@ document.addEventListener(
                 cell.dataset.time;
 
 
-            /*
-             * 開始日時
-             */
             const start =
                 new Date(
                     `${date}T${time}:00`
                 );
 
 
-            /*
-             * 30分後
-             */
             const end =
                 new Date(
                     start.getTime()
@@ -1933,9 +1905,7 @@ document.addEventListener(
 
                                 schedule_id:
                                     Number(
-                                        cell
-                                            .dataset
-                                            .scheduleId
+                                        cell.dataset.scheduleId
                                     ),
 
                                 exception_type_id:
@@ -2000,8 +1970,7 @@ document.addEventListener(
         ) {
 
             const exceptionId =
-                cell.dataset
-                    .exceptionId;
+                cell.dataset.exceptionId;
 
 
             if (!exceptionId) {
@@ -2083,25 +2052,19 @@ document.addEventListener(
             );
 
 
-            editActions
-                .classList
-                .add(
-                    'd-none'
-                );
+            editActions.classList.add(
+                'd-none'
+            );
 
 
-            editActions
-                .classList
-                .remove(
-                    'd-flex'
-                );
+            editActions.classList.remove(
+                'd-flex'
+            );
 
 
-            editMessage
-                .classList
-                .add(
-                    'd-none'
-                );
+            editMessage.classList.add(
+                'd-none'
+            );
 
 
             exceptionType.value =
@@ -2129,18 +2092,14 @@ document.addEventListener(
 
         function hideMessages() {
 
-            errorMessage
-                .classList
-                .add(
-                    'd-none'
-                );
+            errorMessage.classList.add(
+                'd-none'
+            );
 
 
-            successMessage
-                .classList
-                .add(
-                    'd-none'
-                );
+            successMessage.classList.add(
+                'd-none'
+            );
 
         }
 
@@ -2153,11 +2112,9 @@ document.addEventListener(
                 message;
 
 
-            errorMessage
-                .classList
-                .remove(
-                    'd-none'
-                );
+            errorMessage.classList.remove(
+                'd-none'
+            );
 
         }
 
@@ -2170,11 +2127,9 @@ document.addEventListener(
                 message;
 
 
-            successMessage
-                .classList
-                .remove(
-                    'd-none'
-                );
+            successMessage.classList.remove(
+                'd-none'
+            );
 
         }
 

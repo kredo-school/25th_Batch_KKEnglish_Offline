@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="container py-4">
+<div class="container">
 
     <h2 class="fw-bold mb-4">Teaching Materials</h2>
 

@@ -25,12 +25,23 @@ class Reservation extends Model
         ];
     }
 
-    public function student(): BelongsTo { return $this->belongsTo(Student::class); }
-    public function teacher(): BelongsTo { return $this->belongsTo(Teacher::class); }
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class);
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class);
+    }
 
     public function schedule(): BelongsTo
     {
-        return $this->belongsTo(TeacherSchedule::class, 'schedule_id', 'schedule_id');
+        return $this->belongsTo(
+            TeacherSchedule::class,
+            'schedule_id',
+            'schedule_id'
+        );
     }
 
     public function material(): BelongsTo
@@ -57,4 +68,12 @@ class Reservation extends Model
     {
         return $this->hasOne(LessonRecord::class);
     }
+
+    public function pointTransactions()
+{
+    return $this->hasMany(
+        PointTransaction::class,
+        'related_reservation_id'
+    );
+}
 }

@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- Title --}}
     <div class="mb-4">

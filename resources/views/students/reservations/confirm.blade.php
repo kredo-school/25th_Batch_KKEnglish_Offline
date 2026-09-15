@@ -168,6 +168,19 @@
 
                     </div>
 
+                    {{-- Lesson Points --}}
+                    <div class="row mb-4">
+
+                        <div class="col-4 fw-bold">
+                            Lesson Points
+                        </div>
+
+                        <div class="col-8">
+                            {{ number_format($teacher->point_consumed ?? 0) }} pt
+                        </div>
+
+                    </div>
+
 
                     <hr>
 
