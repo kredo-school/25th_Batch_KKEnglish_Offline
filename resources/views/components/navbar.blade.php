@@ -38,15 +38,15 @@
             ================================ --}}
             @if($roleCode == 'student')
 
-                <div
-                    class="me-2 px-3 py-2 border border-secondary-subtle rounded d-flex align-items-center"
-                >
+               <a
+                    href="{{ route('students.point-history.test') }}"
+                    class="me-2 px-3 py-2 border border-secondary-subtle rounded d-flex align-items-center text-decoration-none text-dark">
                     <i class="fa-solid fa-coins me-2 text-warning"></i>
 
                     <span class="fw-semibold">
                         {{ number_format($user->student->point_balance ?? 0) }} pt
                     </span>
-                </div>
+                </a>
 
             @endif
 

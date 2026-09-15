@@ -44,6 +44,42 @@
 
 
     {{-- ===============================
+         Success Message
+    ================================ --}}
+    @if (session('success'))
+
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+
+    @endif
+
+
+    {{-- ===============================
+         Validation Errors
+    ================================ --}}
+    @if ($errors->any())
+
+        <div class="alert alert-danger">
+
+            <ul class="mb-0">
+
+                @foreach ($errors->all() as $error)
+
+                    <li>
+                        {{ $error }}
+                    </li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    {{-- ===============================
          Lesson Details
     ================================ --}}
     <div class="card">
@@ -122,7 +158,17 @@
                         )
 
                             <img
-                                src="{{ $reservation->student->user->profile_image }}"
+                                src="{{ str_starts_with(
+                                    $reservation->student->user->profile_image,
+                                    'http'
+                                )
+                                    ? $reservation->student->user->profile_image
+                                    : asset(
+                                        'storage/'
+                                        .
+                                        $reservation->student->user->profile_image
+                                    )
+                                }}"
                                 alt="{{ $reservation->student->user->first_name }}"
                                 width="45"
                                 height="45"
@@ -137,6 +183,7 @@
                                     fa-solid
                                     fa-circle-user
                                     me-2
+                                    fa-2x
                                 "
                             ></i>
 
@@ -205,13 +252,19 @@
 
             <form
                 method="POST"
-                action="#"
+                action="{{ route(
+                    'teachers.reservations.result.update',
+                    $reservation
+                ) }}"
             >
 
                 @csrf
+                @method('PATCH')
 
 
-                {{-- Lesson Status --}}
+                {{-- ===============================
+                     Lesson Status
+                ================================ --}}
                 <div class="mb-4">
 
                     <label
@@ -226,17 +279,34 @@
                         id="lessonResult"
                         name="result"
                         class="form-select"
+                        required
                     >
 
                         <option value="">
                             Select status
                         </option>
 
-                        <option value="completed">
+
+                        <option
+                            value="completed"
+                            @selected(
+                                old('result')
+                                ===
+                                'completed'
+                            )
+                        >
                             Completed
                         </option>
 
-                        <option value="absent">
+
+                        <option
+                            value="absent"
+                            @selected(
+                                old('result')
+                                ===
+                                'absent'
+                            )
+                        >
                             Absent
                         </option>
 
@@ -245,31 +315,65 @@
                 </div>
 
 
-               {{-- Progress Note --}}
-            <div class="mb-4">
-                <label
-                    for="progressNote"
-                    class="form-label fw-bold"
-                >
-                    Progress Note
-                </label>
-
-                <textarea
-                    id="progressNote"
-                    name="progress_note"
-                    class="form-control"
-                    rows="4"
-                    placeholder="Enter lesson progress or notes..."
-                ></textarea>
-
-            </div>
+                {{-- ===============================
+                     Completed Only Fields
+                ================================ --}}
+                <div id="completedFields">
 
 
-                {{-- Save --}}
+                    {{-- Subject --}}
+                    <div class="mb-4">
+
+                        <label
+                            for="subject"
+                            class="form-label fw-bold"
+                        >
+                            Subject
+                        </label>
+
+                      <div class="form-control bg-light">
+                        {{ $reservation->material->name ?? '-' }}
+                    </div>
+
+                </div>
+
+
+                    {{-- Progress Note --}}
+                    <div class="mb-4">
+
+                        <label
+                            for="progressNote"
+                            class="form-label fw-bold"
+                        >
+                            Progress Note
+                        </label>
+
+                        <textarea
+                            id="progressNote"
+                            name="progress_note"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Enter lesson progress or notes..."
+                        >{{ old(
+                            'progress_note',
+                            $reservation
+                                ->lessonRecord
+                                ?->progress_note
+                            ?? ''
+                        ) }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                {{-- ===============================
+                     Save
+                ================================ --}}
                 <div class="text-end">
 
                     <button
-                        type="button"
+                        type="submit"
                         class="btn btn-primary"
                     >
                         Save Lesson Record
@@ -290,7 +394,9 @@
     <div class="mt-4">
 
         <a
-            href="{{ route('teachers.reservations.index') }}"
+            href="{{ route(
+                'teachers.reservations.index'
+            ) }}"
             class="btn btn-outline-secondary"
         >
             Back
@@ -299,5 +405,122 @@
     </div>
 
 </div>
+
+
+{{-- ===============================
+     JavaScript
+================================ --}}
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const lessonResult =
+            document.getElementById(
+                'lessonResult'
+            );
+
+
+        const completedFields =
+            document.getElementById(
+                'completedFields'
+            );
+
+
+        const subject =
+            document.getElementById(
+                'subject'
+            );
+
+
+        const progressNote =
+            document.getElementById(
+                'progressNote'
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Completed / Absent 切り替え
+        |--------------------------------------------------------------------------
+        */
+
+        function updateLessonFields() {
+
+            if (
+                lessonResult.value
+                ===
+                'completed'
+            ) {
+
+                /*
+                 * Completedの場合
+                 * Subject / Progress Noteを表示
+                 */
+                completedFields
+                    .classList
+                    .remove(
+                        'd-none'
+                    );
+
+
+                subject.required =
+                    true;
+
+
+                progressNote.required =
+                    true;
+
+
+            } else {
+
+                /*
+                 * Absent または未選択の場合
+                 * Subject / Progress Noteを非表示
+                 */
+                completedFields
+                    .classList
+                    .add(
+                        'd-none'
+                    );
+
+
+                subject.required =
+                    false;
+
+
+                progressNote.required =
+                    false;
+
+            }
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status変更時
+        |--------------------------------------------------------------------------
+        */
+
+        lessonResult.addEventListener(
+            'change',
+            updateLessonFields
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 初期表示
+        |--------------------------------------------------------------------------
+        */
+
+        updateLessonFields();
+
+    }
+);
+
+</script>
 
 @endsection

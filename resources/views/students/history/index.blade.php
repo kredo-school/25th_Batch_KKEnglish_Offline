@@ -6,8 +6,10 @@
 
 <div class="container-fluid">
 
-    {{-- Title --}}
-    <div class="mb-4">
+   {{-- Title --}}
+<div class="d-flex justify-content-between align-items-start mb-4">
+
+    <div>
 
         <h2 class="fw-bold mb-1">
             Lesson History
@@ -18,6 +20,18 @@
         </p>
 
     </div>
+
+
+    {{-- Point History --}}
+    <a
+        href="{{ route('students.point-history.test') }}"
+        class="btn btn-outline-secondary"
+    >
+        <i class="fa-solid fa-coins me-1"></i>
+        Point History
+    </a>
+
+</div>
 
 
     {{-- History List --}}
