@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\PointTransaction;
+use App\Models\TeacherLike;
 
 class Student extends Model
 {
@@ -32,6 +33,14 @@ class Student extends Model
     {
         return $this->hasMany(
             PointTransaction::class,
+            'student_id'
+        );
+    }
+
+    public function teacherLikes()
+    {
+        return $this->hasMany(
+            TeacherLike::class,
             'student_id'
         );
     }

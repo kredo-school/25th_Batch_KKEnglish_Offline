@@ -8,13 +8,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
+use App\Models\Student;
 use App\Models\Material;
 use App\Models\TeacherSchedule;
 use App\Models\Reservation;
 use App\Models\ReservationStatus;
 use App\Models\ReservationHistory;
 use Illuminate\Contracts\View\View;
-
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Services\PointService;
@@ -397,7 +397,13 @@ class ReservationController extends Controller
          * ========================================
          */
         DB::transaction(function () use ($request, $reservation, $student, $validated) {
-
+            /*
+            * Studentをロック
+            */
+            $student = Student::query()
+                ->whereKey($student->id)
+                ->lockForUpdate()
+                ->firstOrFail();
             /*
              * =====================================
              * Reservationを最新状態で再取得
@@ -542,38 +548,38 @@ class ReservationController extends Controller
          * 完了
          * ========================================
          */
-            $reservation->refresh();
-            $reservation->load('teacher.user');
+        $reservation->refresh();
+        $reservation->load('teacher.user');
 
-            $student->refresh();
+        $student->refresh();
 
-            $teacherName =
-                $reservation->teacher->user->name;
+        $teacherName =
+            $reservation->teacher->user->name;
 
-            $lessonDate =
-                \Carbon\Carbon::parse(
-                    $reservation->start_at
-                )->format('n月j日 H:i');
+        $lessonDate =
+            \Carbon\Carbon::parse(
+                $reservation->start_at
+            )->format('n月j日 H:i');
 
-            $refundedPoints =
-                (int) $reservation->point_cost;
+        $refundedPoints =
+            (int) $reservation->point_cost;
 
-            $remainingPoints =
-                (int) $student->point_balance;
+        $remainingPoints =
+            (int) $student->point_balance;
 
-            return back()->with(
-                'success',
-                'Cancelled the lesson reservation.'
+        return back()->with(
+            'success',
+            'Cancelled the lesson reservation.'
 
-                    . '   Lesson Date：'
-                    . $lessonDate
-                    . '   < Refunded Points：'
-                    . number_format($refundedPoints)
-                    . ' pt'
-                    . '    Remaining Points：'
-                    . number_format($remainingPoints)
-                    . ' pt >'
-            );
+                . '   Lesson Date：'
+                . $lessonDate
+                . '   < Refunded Points：'
+                . number_format($refundedPoints)
+                . ' pt'
+                . '    Remaining Points：'
+                . number_format($remainingPoints)
+                . ' pt >'
+        );
     }
 
     public function myReservations(Request $request): View
