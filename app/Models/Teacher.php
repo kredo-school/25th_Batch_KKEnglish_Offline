@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\TeacherLike;
 use App\Models\Material;
 
 use App\Models\User;
@@ -81,6 +82,11 @@ class Teacher extends Model
     public function shiftPatternAssignments(): HasMany
     {
         return $this->hasMany(TeacherShiftPatternAssignment::class);
+    }
+
+    public function teacherLikes(): HasMany
+    {
+        return $this->hasMany(TeacherLike::class);
     }
 
 }

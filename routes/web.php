@@ -19,6 +19,7 @@ use App\Http\Controllers\Teacher\ScheduleExceptionController;
 use App\Http\Controllers\Student\AvailabilityController;
 use App\Http\Controllers\Student\ReservationController;
 use App\Http\Controllers\Admin\TeacherMaterialController;
+use App\Http\Controllers\Student\TeacherLikeController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Models\Teacher;
 
@@ -27,7 +28,6 @@ Route::view('/student-history-test','students.history.index')
 ->name('student.history.test');
 Route::view('/teachers/reservations-detail-test','teachers.reservations.show')
 ->name('teachers.reservations.show.test');
-
 
 // Public routes
 Auth::routes();
@@ -58,6 +58,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
+
+    Route::post('/students/teacher-likes', [TeacherLikeController::class, 'store'])->name('students.teacher.like');
+    Route::delete('/students/teacher-likes/{teacherLike}', [TeacherLikeController::class, 'destroy'])->name('students.teachers.unlike');
 
 // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');

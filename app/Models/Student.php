@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use App\Models\PointTransaction;
+use App\Models\TeacherLike;
 
 class Student extends Model
 {
@@ -48,4 +49,13 @@ class Student extends Model
             'id'
         );
     }
+
+    public function teacherLikes()
+    {
+        return $this->hasMany(
+            TeacherLike::class,
+            'student_id'
+        );
+    }
+
 }
