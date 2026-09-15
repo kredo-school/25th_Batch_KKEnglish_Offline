@@ -25,8 +25,7 @@ class ReservationController extends Controller
     public function __construct(
         private ReservationService $reservationService,
         private PointService $pointService
-    ) {
-    }
+    ) {}
 
     public function index(): View
     {
@@ -151,7 +150,7 @@ class ReservationController extends Controller
         ) {
             throw ValidationException::withMessages([
                 'teacher_id' =>
-                    '選択した講師と勤務スケジュールが一致しません。',
+                '選択した講師と勤務スケジュールが一致しません。',
             ]);
         }
 
@@ -165,7 +164,7 @@ class ReservationController extends Controller
 
             throw ValidationException::withMessages([
                 'schedule_id' =>
-                    'この勤務スケジュールは予約できません。',
+                'この勤務スケジュールは予約できません。',
             ]);
         }
 
@@ -187,7 +186,7 @@ class ReservationController extends Controller
 
             throw ValidationException::withMessages([
                 'material_id' =>
-                    'この講師は選択した教材を担当できません。',
+                'この講師は選択した教材を担当できません。',
             ]);
         }
 
@@ -310,19 +309,53 @@ class ReservationController extends Controller
 
         $reservation =
             $this->reservationService
-                ->createForStudent(
-                    $student,
-                    $validated
-                );
+            ->createForStudent(
+                $student,
+                $validated
+            );
+
+        /*
+        * 最新のポイント残高を再取得
+        */
+        $student->refresh();
+
+        /*
+        * 消費ポイント
+        */
+        $usedPoints =
+            (int) $reservation->point_cost;
+
+        /*
+        * 予約後の残高
+        */
+        $remainingPoints =
+            (int) $student->point_balance;
+
+        /*
+        * 授業日時
+        */
+        $lessonDate =
+            \Carbon\Carbon::parse($reservation->start_at)
+            ->format('n/j H:i');
 
 
         return redirect()
             ->route('students.reservations.upcoming')
             ->with(
                 'success',
-                '予約が完了しました。'
+                'Reservation completed.'
+                    . '  Lesson Date：'
+                    . $lessonDate
+                    . '  < Consumption：'
+                    . number_format($usedPoints)
+                    . ' pt'
+                    . ' / Balance：'
+                    . number_format($remainingPoints)
+                    . ' pt >'
             );
     }
+
+
     public function cancel(
         Request $request,
         Reservation $reservation
@@ -387,8 +420,8 @@ class ReservationController extends Controller
              */
             abort_unless(
                 (int) $reservation->student_id
-                ===
-                (int) $student->id,
+                    ===
+                    (int) $student->id,
                 403,
                 '他の生徒の予約はキャンセルできません。'
             );
@@ -412,7 +445,7 @@ class ReservationController extends Controller
 
                 throw ValidationException::withMessages([
                     'reservation' =>
-                        'この予約はキャンセルできません。',
+                    'この予約はキャンセルできません。',
                 ]);
             }
 
@@ -420,7 +453,7 @@ class ReservationController extends Controller
             if ($reservation->start_at->lte(now())) {
                 throw ValidationException::withMessages([
                     'reservation' =>
-                        '開始済みまたは過去の予約はキャンセルできません。',
+                    '開始済みまたは過去の予約はキャンセルできません。',
                 ]);
             }
 
@@ -431,11 +464,11 @@ class ReservationController extends Controller
              */
             $cancelledStatus =
                 ReservationStatus::query()
-                    ->where(
-                        'status_code',
-                        'cancelled'
-                    )
-                    ->firstOrFail();
+                ->where(
+                    'status_code',
+                    'cancelled'
+                )
+                ->firstOrFail();
 
 
             /*
@@ -455,16 +488,16 @@ class ReservationController extends Controller
             $reservation->update([
 
                 'status_id' =>
-                    $cancelledStatus->status_id,
+                $cancelledStatus->status_id,
 
                 'cancelled_by' =>
-                    $request->user()->id,
+                $request->user()->id,
 
                 'cancelled_at' =>
-                    now(),
+                now(),
 
                 'cancellation_reason' =>
-                    $validated['cancellation_reason'] ?? null,
+                $validated['cancellation_reason'] ?? null,
             ]);
 
             /*
@@ -485,28 +518,20 @@ class ReservationController extends Controller
             ReservationHistory::create([
 
                 'reservation_id' =>
-                    $reservation->id,
+                $reservation->id,
 
                 'from_status_id' =>
-                    $fromStatusId,
+                $fromStatusId,
 
                 'to_status_id' =>
-                    $cancelledStatus->status_id,
+                $cancelledStatus->status_id,
 
                 'changed_by' =>
-                    $request->user()->id,
+                $request->user()->id,
 
                 'reason' =>
-                    $validated['cancellation_reason'] ?? null,
+                $validated['cancellation_reason'] ?? null,
             ]);
-
-
-            
-
-
-
-
-
         });
 
 
@@ -517,13 +542,37 @@ class ReservationController extends Controller
          * 完了
          * ========================================
          */
-        return redirect()
-            ->route(
-                'students.reservations.upcoming'
-            )
-            ->with(
+            $reservation->refresh();
+            $reservation->load('teacher.user');
+
+            $student->refresh();
+
+            $teacherName =
+                $reservation->teacher->user->name;
+
+            $lessonDate =
+                \Carbon\Carbon::parse(
+                    $reservation->start_at
+                )->format('n月j日 H:i');
+
+            $refundedPoints =
+                (int) $reservation->point_cost;
+
+            $remainingPoints =
+                (int) $student->point_balance;
+
+            return back()->with(
                 'success',
-                '予約をキャンセルしました。'
+                'Cancelled the lesson reservation.'
+
+                    . '   Lesson Date：'
+                    . $lessonDate
+                    . '   < Refunded Points：'
+                    . number_format($refundedPoints)
+                    . ' pt'
+                    . '    Remaining Points：'
+                    . number_format($remainingPoints)
+                    . ' pt >'
             );
     }
 
@@ -683,7 +732,7 @@ class ReservationController extends Controller
         );
     }
     public function showReservation(
-        
+
         Request $request,
         Reservation $reservation
     ): View {

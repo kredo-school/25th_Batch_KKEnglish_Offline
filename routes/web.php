@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
-use App\Http\Controllers\Student\LessonController;
+use App\Http\Controllers\Student\PointHistoryController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\ScheduleController;
@@ -58,23 +58,19 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 
-    // Teacher list/profile（studentも閲覧可）
+// Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
-    Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
-        ->name('student.lessons.cancel');
+    // Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
+    //     ->name('student.lessons.cancel');
     // Student reservations
      // 予約一覧・検索画面
     Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
 
-    // 予約確認前のチェック
+    //　予約確認画面
     Route::post('/students/reservations/confirm', [ReservationController::class, 'confirm'])->name('students.reservations.confirm');
-
-    //　予約確認画面の表示
-    Route::get('/students/reservations/confirmation', [ReservationController::class, 'confirmation'])->name('students.reservations.confirmation');
 
     //  予約確定
     Route::post('/students/reservations', [ReservationController::class, 'store'])->name('students.reservations.store');
-    
     // キャンセル
     Route::patch('/students/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('students.reservations.cancel');
 
@@ -87,6 +83,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
+    // Point History
+    Route::get('/students/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
 });
 
 // Teacher Dashboard
