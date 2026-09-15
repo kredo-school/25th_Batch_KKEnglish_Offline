@@ -11,7 +11,9 @@
     </h2>
 
 
-    {{-- Favorite Teachers --}}
+    {{-- ===============================
+         Favorite Teachers
+    ================================ --}}
     <h5 class="fw-bold mb-3">
         Favorite Teachers
     </h5>
@@ -23,35 +25,70 @@
 
             <div class="card h-100">
 
-                <img src="{{ asset('images/teacher1.jpg') }}"
-                     alt="John"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
+                <img
+                    src="{{ asset('images/teacher1.jpg') }}"
+                    alt="John"
+                    class="card-img-top"
+                    style="
+                        height: 180px;
+                        object-fit: cover;
+                    "
+                >
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
 
-                        <h5 class="fw-bold mb-0">
-                            John
-                        </h5>
+                        <div>
 
-                        <i class="fa-solid fa-heart text-danger"></i>
+                            <h5 class="fw-bold mb-1">
+                                John
+                            </h5>
+
+                            {{-- Lesson Point --}}
+                            <span
+                                class="badge text-dark px-2 py-2"
+                                style="
+                                    background-color: #f0c94d;
+                                    font-family: Arial, sans-serif;
+                                "
+                            >
+                                300 pt
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-heart text-danger ms-2"></i>
 
                     </div>
 
+
                     <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
+
+                        <span class="text-secondary">
+                            Nationality:
+                        </span>
+
                         Philippines
+
                     </p>
+
 
                     <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
+
+                        <span class="text-secondary">
+                            Specialty:
+                        </span>
+
                         Daily Conversation
+
                     </p>
 
-                    <a href="#"
-                       class="btn btn-outline-primary btn-sm w-100">
+
+                    <a
+                        href="#"
+                        class="btn btn-outline-primary btn-sm w-100"
+                    >
                         View Profile
                     </a>
 
@@ -67,35 +104,70 @@
 
             <div class="card h-100">
 
-                <img src="{{ asset('images/teacher2.jpg') }}"
-                     alt="Jane"
-                     class="card-img-top"
-                     style="height: 180px; object-fit: cover;">
+                <img
+                    src="{{ asset('images/teacher2.jpg') }}"
+                    alt="Jane"
+                    class="card-img-top"
+                    style="
+                        height: 180px;
+                        object-fit: cover;
+                    "
+                >
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
 
-                        <h5 class="fw-bold mb-0">
-                            Jane
-                        </h5>
+                        <div>
 
-                        <i class="fa-solid fa-heart text-danger"></i>
+                            <h5 class="fw-bold mb-1">
+                                Jane
+                            </h5>
+
+                            {{-- Lesson Point --}}
+                            <span
+                                class="badge text-dark px-2 py-2"
+                                style="
+                                    background-color: #f0c94d;
+                                    font-family: Arial, sans-serif;
+                                "
+                            >
+                                400 pt
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-heart text-danger ms-2"></i>
 
                     </div>
 
+
                     <p class="mb-1 small">
-                        <span class="text-secondary">Nationality:</span>
+
+                        <span class="text-secondary">
+                            Nationality:
+                        </span>
+
                         Philippines
+
                     </p>
+
 
                     <p class="mb-3 small">
-                        <span class="text-secondary">Specialty:</span>
+
+                        <span class="text-secondary">
+                            Specialty:
+                        </span>
+
                         Grammar
+
                     </p>
 
-                    <a href="#"
-                       class="btn btn-outline-primary btn-sm w-100">
+
+                    <a
+                        href="#"
+                        class="btn btn-outline-primary btn-sm w-100"
+                    >
                         View Profile
                     </a>
 
@@ -108,7 +180,9 @@
     </div>
 
 
-    {{-- All Teachers --}}
+    {{-- ===============================
+         All Teachers
+    ================================ --}}
     <h5 class="fw-bold mb-3">
         All Teachers
     </h5>
@@ -121,44 +195,115 @@
 
                 <div class="card h-100">
 
-                    <img src="{{ $teacher->user->profile_image }}"
-                         alt="{{ $teacher->user->first_name }}"
-                         class="card-img-top"
-                         style="height: 180px; object-fit: cover;">
+                    {{-- Teacher Image --}}
+                    <img
+                        src="{{ $teacher->user->profile_image }}"
+                        alt="{{ $teacher->user->first_name }}"
+                        class="card-img-top"
+                        style="
+                            height: 180px;
+                            object-fit: cover;
+                        "
+                    >
+
 
                     <div class="card-body d-flex flex-column">
 
+
+                        {{-- ===============================
+                             Name + Point + Favorite
+                        ================================ --}}
                         <div class="d-flex justify-content-between align-items-start mb-2">
 
-                            <h5 class="fw-bold mb-0"
-                                style="min-height: 48px;">
-                                {{ $teacher->user->first_name }}
-                                {{ $teacher->user->last_name }}
-                            </h5>
+                            <div>
 
-                            <i class="fa-regular fa-heart text-secondary ms-2"></i>
+                                {{-- Name --}}
+                                <h5
+                                    class="fw-bold mb-1"
+                                    style="min-height: 48px;"
+                                >
+                                    {{ $teacher->user->first_name }}
+                                    {{ $teacher->user->last_name }}
+                                </h5>
+
+
+                                {{-- Lesson Point --}}
+                                <span
+                                    class="badge text-dark px-2 py-2"
+                                    style="
+                                        background-color: #f0c94d;
+                                        font-family: Arial, sans-serif;
+                                    "
+                                >
+                                    {{ number_format($teacher->point_consumed ?? 0) }} pt
+                                </span>
+
+                            </div>
+
+
+                            {{-- Favorite --}}
+                            <i
+                                class="
+                                    fa-regular
+                                    fa-heart
+                                    text-secondary
+                                    ms-2
+                                "
+                            ></i>
 
                         </div>
 
+
+                        {{-- ===============================
+                             Nationality
+                        ================================ --}}
                         <p class="mb-1 small">
+
                             <span class="text-secondary">
                                 Nationality:
                             </span>
 
-                            {{ $teacher->user->nationality }}
+                            {{
+                                $teacher->user->nationality
+                                ?? '-'
+                            }}
+
                         </p>
 
-                        <p class="mb-3 small"
-                           style="min-height: 60px;">
+
+                        {{-- ===============================
+                             Specialty
+                        ================================ --}}
+                        <p
+                            class="mb-3 small"
+                            style="min-height: 60px;"
+                        >
+
                             <span class="text-secondary">
                                 Specialty:
                             </span>
 
-                            {{ $teacher->specialty }}
+                            {{
+                                $teacher->specialty
+                                ?? '-'
+                            }}
+
                         </p>
 
-                        <a href="{{ route('teachers.show', $teacher->id) }}"
-                           class="btn btn-outline-primary btn-sm w-100 mt-auto">
+
+                        {{-- ===============================
+                             View Profile
+                        ================================ --}}
+                        <a
+                            href="{{ route('teachers.show', $teacher->id) }}"
+                            class="
+                                btn
+                                btn-outline-primary
+                                btn-sm
+                                w-100
+                                mt-auto
+                            "
+                        >
                             View Profile
                         </a>
 

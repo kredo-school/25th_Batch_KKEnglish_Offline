@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use App\Models\PointTransaction;
 use App\Models\TeacherLike;
@@ -15,25 +17,36 @@ class Student extends Model
         'birthday',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'point_balance' => 'integer',
+        'birthday' => 'date',
+    ];
+
+    /**
+     * Student → User
+     *
+     * この生徒のログインアカウント情報
+     */
+    public function user(): BelongsTo
     {
-        return [
-            'point_balance' => 'integer',
-            'birthday' => 'date',
-        ];
+        return $this->belongsTo(
+            User::class,
+            'user_id',
+            'id'
+        );
     }
 
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function pointTransactions()
+    /**
+     * Student → PointTransaction
+     *
+     * この生徒のポイント取引履歴
+     */
+    public function pointTransactions(): HasMany
     {
         return $this->hasMany(
             PointTransaction::class,
-            'student_id'
+            'student_id',
+            'id'
         );
     }
 

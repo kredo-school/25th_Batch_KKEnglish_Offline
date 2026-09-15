@@ -3,55 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PointTransaction extends Model
 {
+    protected $table = 'point_transactions';
     protected $primaryKey = 'transaction_id';
-
     public $timestamps = false;
 
     protected $fillable = [
-        'student_id',
-        'transaction_type',
-        'point',
-        'related_reservation_id',
-        'note',
-        'created_by',
-        'created_at',
+        'student_id','transaction_type','point',
+        'related_reservation_id','note','created_by','created_at',
     ];
 
-    protected $casts = [
-        'point' => 'integer',
-        'created_at' => 'datetime',
-    ];
+    protected $casts = ['created_at'=>'datetime','point'=>'integer'];
 
-    public function student()
+    public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class, 'student_id');
     }
 
-    public function transactionType()
+    public function transactionType(): BelongsTo
     {
-        return $this->belongsTo(
-            TransactionType::class,
-            'transaction_type',
-            'type_id'
-        );
+        return $this->belongsTo(TransactionType::class, 'transaction_type', 'type_id');
     }
 
-    public function reservation()
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(
-            Reservation::class,
-            'related_reservation_id'
-        );
-    }
-
-    public function createdBy()
-    {
-        return $this->belongsTo(
-            User::class,
-            'created_by'
-        );
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

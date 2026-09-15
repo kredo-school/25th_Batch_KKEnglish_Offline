@@ -190,13 +190,17 @@
 
 
                     {{-- Lesson Point --}}
-                    <span class="badge bg-light text-dark border px-2 py-2">
+                    <span
+                        class="badge text-dark px-2 py-2"
+                        style="
+                            background-color: #f0c94d;
+                            font-family: Arial, sans-serif;
+                        "
+                    >
                         {{ number_format($teacher->point_consumed ?? 0) }} pt
                     </span>
 
                 </div>
-
-
                         {{-- Nationality --}}
                         <p class="mb-1 small">
 

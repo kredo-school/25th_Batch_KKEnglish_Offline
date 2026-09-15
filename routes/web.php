@@ -20,6 +20,8 @@ use App\Http\Controllers\Student\AvailabilityController;
 use App\Http\Controllers\Student\ReservationController;
 use App\Http\Controllers\Admin\TeacherMaterialController;
 use App\Http\Controllers\Student\TeacherLikeController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Models\Teacher;
 
 // Test route for frontend testing
 Route::view('/student-history-test','students.history.index')
@@ -152,6 +154,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     // Teacher Material Management
     Route::get('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'edit'])->name('teachers.materials.edit');
     Route::put('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'update'])->name('teachers.materials.update');
+
+    // Student Management
+    Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+    Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
+    Route::get('/students/{student}/profile', [StudentController::class, 'profile'])->name('students.profile');
+    Route::get('/students/{student}/points/create', [StudentController::class, 'pointCreate'])->name('students.points.create');
+    Route::post('/students/{student}/points', [StudentController::class, 'pointStore'])->name('students.points.store');
+
 
     // Schedule Management
     Route::get('/schedules', [DashboardController::class, 'schedulesIndex'])->name('schedules.index');
