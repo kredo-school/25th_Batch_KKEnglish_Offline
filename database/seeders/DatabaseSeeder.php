@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             ShiftPatternSeeder::class,
             TeacherScheduleSeeder::class,
             MaterialTeacherSeeder::class,
-
+            TransactionTypeSeeder::class,
         ]);
 
         User::factory()->create([

@@ -12,9 +12,13 @@ use App\Models\TeacherSchedule;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Services\PointService;
 
 class ReservationService
 {
+    public function __construct(
+        private PointService $pointService
+    ) {}
     public function createForStudent(
         Student $student,
         array $data
@@ -272,6 +276,7 @@ class ReservationService
                 )
                 ->firstOrFail();
 
+            $pointCost = (int) $teacher->point_consumed;
 
             /*
              * Reservation作成
@@ -302,6 +307,12 @@ class ReservationService
                 (int) $teacher->point_consumed,
             ]);
 
+            $this->pointService->consume(
+                $student,
+                $reservation,
+                $pointCost,
+                $student->user_id
+            );
 
             return $reservation->refresh();
         });
