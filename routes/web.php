@@ -69,6 +69,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     //　予約確認画面
     Route::post('/students/reservations/confirm', [ReservationController::class, 'confirm'])->name('students.reservations.confirm');
 
+    //　予約確認画面の表示
+    Route::get('/students/reservations/confirmation', [ReservationController::class, 'confirmation'])->name('students.reservations.confirmation');
+
     //  予約確定
     Route::post('/students/reservations', [ReservationController::class, 'store'])->name('students.reservations.store');
     // キャンセル
