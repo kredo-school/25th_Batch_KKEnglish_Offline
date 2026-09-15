@@ -127,10 +127,6 @@
                         Today's Lessons
                     </h5>
 
-                    <small class="text-secondary">
-                        {{ now()->format('F j, Y') }}
-                    </small>
-
                 </div>
 
 

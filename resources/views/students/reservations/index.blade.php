@@ -170,20 +170,31 @@
                         "
                     >
 
-                        {{-- Name --}}
-                        <h5 class="fw-bold mb-2">
+                    {{-- Name + Lesson Point --}}
+                <div class="d-flex justify-content-between align-items-start mb-2">
 
-                            {{
-                                $teacher->user?->first_name
-                                ?? 'Teacher'
-                            }}
+                    {{-- Name --}}
+                    <h5 class="fw-bold mb-0">
 
-                            {{
-                                $teacher->user?->last_name
-                                ?? ''
-                            }}
+                        {{
+                            $teacher->user?->first_name
+                            ?? 'Teacher'
+                        }}
 
-                        </h5>
+                        {{
+                            $teacher->user?->last_name
+                            ?? ''
+                        }}
+
+                    </h5>
+
+
+                    {{-- Lesson Point --}}
+                    <span class="badge bg-light text-dark border px-2 py-2">
+                        {{ number_format($teacher->point_consumed ?? 0) }} pt
+                    </span>
+
+                </div>
 
 
                         {{-- Nationality --}}
