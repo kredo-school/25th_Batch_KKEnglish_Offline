@@ -26,8 +26,10 @@ use App\Models\Teacher;
 // Test route for frontend testing
 Route::view('/student-history-test','students.history.index')
 ->name('student.history.test');
-Route::view('/teachers/reservations-detail-test','teachers.reservations.show')
-->name('teachers.reservations.show.test');
+Route::view('/teachers/lesson-history-test','teachers.reservations.history')
+->name('teachers.reservations.history.test');
+Route::view('/students/point-history-test','students.history.point-history')
+->name('students.point-history.test');
 
 // Public routes
 Auth::routes();
@@ -112,7 +114,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teachers/lessons/{reservation}', [TeacherReservationController::class, 'show'])->name('teachers.reservations.show');
 
     //　Lessons results
-    Route::patch('/teachers/lessons/{reservation}/result', [TeacherReservationController::class, 'updateResult'])->name('teachers.reservations.updateResult')
+    Route::patch('/teachers/lessons/{reservation}/result', [TeacherReservationController::class, 'updateResult'])
      ->whereNumber('reservation')
      ->name('teachers.reservations.result.update');
 

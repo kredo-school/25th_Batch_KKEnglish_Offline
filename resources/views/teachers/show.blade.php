@@ -68,13 +68,27 @@
                 @endif
 
 
-                {{-- Name --}}
+                {{-- Name + Lesson Point --}}
                 <div>
 
-                    <h3 class="fw-bold mb-1">
-                        {{ $teacher->user->first_name }}
-                        {{ $teacher->user->last_name }}
-                    </h3>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+
+                        <h3 class="fw-bold mb-0">
+                            {{ $teacher->user->first_name }}
+                            {{ $teacher->user->last_name }}
+                        </h3>
+
+                        <span
+                            class="badge text-dark px-2 py-2"
+                            style="
+                                background-color: #f0c94d;
+                                font-family: Arial, sans-serif;
+                            "
+                        >
+                            {{ number_format($teacher->point_consumed ?? 0) }} pt
+                        </span>
+
+                    </div>
 
                     <p class="text-secondary mb-0">
                         English Teacher
