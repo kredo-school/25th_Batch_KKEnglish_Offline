@@ -19,6 +19,7 @@ use App\Http\Controllers\Teacher\ScheduleExceptionController;
 use App\Http\Controllers\Student\AvailabilityController;
 use App\Http\Controllers\Student\ReservationController;
 use App\Http\Controllers\Admin\TeacherMaterialController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Models\Teacher;
 
 // Test route for frontend testing
@@ -147,6 +148,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'edit'])->name('teachers.materials.edit');
     Route::put('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'update'])->name('teachers.materials.update');
 
+    // Student Management
+    Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+    Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
+    Route::get('/students/{student}/profile', [StudentController::class, 'profile'])->name('students.profile');
+    Route::get('/students/{student}/points/create', [StudentController::class, 'pointCreate'])->name('students.points.create');
+    Route::post('/students/{student}/points', [StudentController::class, 'pointStore'])->name('students.points.store');
+
+
     // Schedule Management
     Route::get('/schedules', [DashboardController::class, 'schedulesIndex'])->name('schedules.index');
     Route::get('/schedules/details', [DashboardController::class, 'details'])->name('schedules.index_details');
@@ -162,7 +171,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::put('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'update'])->name('shift-pattern-assignments.update');
 
     Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');
-    
+
     Route::get('/shift-pattern-assignments/teacher/{teacher}/bulk-edit',[ShiftPatternAssignmentController::class, 'bulkEdit'])->name('shift-pattern-assignments.bulk-edit');
     Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
 
