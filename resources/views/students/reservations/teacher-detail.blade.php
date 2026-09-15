@@ -335,10 +335,15 @@
                             {{ $teacher->user->last_name }}
                         </h4>
 
-                        <span class="badge bg-light text-dark border px-2 py-2">
-                            {{ number_format($teacher->point_consumed ?? 0) }} pt
-                        </span>
-
+                          <span
+                        class="badge text-dark px-2 py-2"
+                        style="
+                            background-color: #f0c94d;
+                            font-family: Arial, sans-serif;
+                        "
+                    >
+                        {{ number_format($teacher->point_consumed ?? 0) }} pt
+                    </span>
                     </div>
 
 

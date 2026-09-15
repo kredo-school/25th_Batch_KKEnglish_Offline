@@ -84,11 +84,11 @@
                                     Points
                                 </th>
 
-                                <th class="py-3">
+                                <th class="py-3 text-center">
                                     Status
                                 </th>
 
-                                <th class="py-3 text-end pe-4">
+                                <th class="py-3 text-center">
                                     Action
                                 </th>
 
@@ -289,7 +289,7 @@
                                         <span
                                             class="
                                                 badge
-                                                bg-light
+                                                bg-white
                                                 text-dark
                                                 border
                                                 px-2
@@ -313,7 +313,7 @@
                                     {{-- ===============================
                                          Status
                                     ================================ --}}
-                                    <td>
+                                    <td class="text-center">
 
                                         @if (
                                             $reservation
@@ -386,7 +386,7 @@
                                     {{-- ===============================
                                          Action
                                     ================================ --}}
-                                    <td class="text-end pe-4">
+                                    <td class="text-center">
 
                                         @if (
                                             in_array(
