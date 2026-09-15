@@ -58,7 +58,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 
-// Teacher list/profile（studentも閲覧可）
+    // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
     Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
         ->name('student.lessons.cancel');
@@ -66,12 +66,15 @@ Route::middleware(['auth', 'role:student'])->group(function () {
      // 予約一覧・検索画面
     Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
 
-
-    //　予約確認画面
+    // 予約確認前のチェック
     Route::post('/students/reservations/confirm', [ReservationController::class, 'confirm'])->name('students.reservations.confirm');
+
+    //　予約確認画面の表示
+    Route::get('/students/reservations/confirmation', [ReservationController::class, 'confirmation'])->name('students.reservations.confirmation');
 
     //  予約確定
     Route::post('/students/reservations', [ReservationController::class, 'store'])->name('students.reservations.store');
+    
     // キャンセル
     Route::patch('/students/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('students.reservations.cancel');
 
@@ -162,7 +165,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::put('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'update'])->name('shift-pattern-assignments.update');
 
     Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');
-    
+
     Route::get('/shift-pattern-assignments/teacher/{teacher}/bulk-edit',[ShiftPatternAssignmentController::class, 'bulkEdit'])->name('shift-pattern-assignments.bulk-edit');
     Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
 
