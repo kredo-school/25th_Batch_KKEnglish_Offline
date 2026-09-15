@@ -35,12 +35,12 @@ class PointService
                 )
                 ->exists();
 
-            if ($alreadyRefunded) {
+            if ($alreadyConsumed) {
                 throw ValidationException::withMessages([
                     'points' =>
                         'この予約のポイントはすでに消費されています。',
                 ]);
-            }    
+            }
 
             if ($student->point_balance < $points) {
                 throw ValidationException::withMessages([
@@ -99,7 +99,7 @@ class PointService
                     'points' =>
                         'この予約のポイントはすでに返還されています。',
                 ]);
-            }    
+            }
 
             $point = (int) $reservation->point_cost;
 
