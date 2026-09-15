@@ -327,13 +327,20 @@
                             style="object-fit: cover;"
                         >
 
+                    {{-- Lesson Point --}}
+                    <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
 
-                        <h4 class="fw-bold mb-1">
-
+                        <h4 class="fw-bold mb-0">
                             {{ $teacher->user->first_name }}
                             {{ $teacher->user->last_name }}
-
                         </h4>
+
+                        <span class="badge bg-light text-dark border px-2 py-2">
+                            {{ number_format($teacher->point_consumed ?? 0) }} pt
+                        </span>
+
+                    </div>
+
 
 
                         <p class="text-secondary mb-0">
