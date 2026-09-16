@@ -7,8 +7,8 @@
          Header
     ============================================================ --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 mb-0">ID {{ $student->id }} {{ $student->user->first_name }} {{ $student->user->last_name }}</h1>
-        <a href="{{ route('admin.students.index') }}" class="btn btn-outline-secondary btn-sm">一覧に戻る</a>
+        <h1 class="h4 mb-0 text-bold">ID: {{ $student->id }} {{ $student->user->first_name }} {{ $student->user->last_name }}</h1>
+        <a href="{{ route('admin.students.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
     </div>
 
     @if(session('status'))
@@ -42,21 +42,21 @@
                                 @endif
                             </div>
                             <div>
-                                <button type="button" class="btn btn-outline-primary btn-sm mb-1">変更</button><br>
-                                <button type="button" class="btn btn-outline-danger btn-sm">削除</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm mb-1">Edit</button><br>
+                                <button type="button" class="btn btn-outline-danger btn-sm">Delete</button>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">ニックネーム (英語)</label>
+                                <label class="form-label">Nickname (English)</label>
                                 {{-- ※DBにカラムがないため空値にしています --}}
                                 <input type="text" class="form-control" name="nickname" value="" placeholder="Nickname">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">性別</label>
+                                <label class="form-label">Gender</label>
                                 <select class="form-select" name="gender">
-                                    <option value="">選択してください</option>
+                                    <option value="">Please select</option>
                                     <option value="male" @selected($student->user->gender === 'male')>Male</option>
                                     <option value="female" @selected($student->user->gender === 'female')>Female</option>
                                     <option value="other" @selected($student->user->gender === 'other')>Other</option>
@@ -161,7 +161,7 @@
                             @endif
                         </li>
                     </ul>
-                    
+
                     <div class="mt-3 d-grid">
                         <a href="{{ route('admin.students.points.create', $student) }}" class="btn btn-outline-primary btn-sm">ポイントを付与する</a>
                     </div>

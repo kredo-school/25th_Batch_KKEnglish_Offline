@@ -223,13 +223,49 @@ class DashboardController extends Controller
     |--------------------------------------------------------------------------
     */
         $announcements = collect();
-        if (Schema::hasTable('announcements')) {
-            $announcements = DB::table('announcements')
-                ->select(['title', 'body', 'published_at'])
-                ->orderByDesc('published_at')
-                ->limit(5)
-                ->get();
+
+if (Schema::hasTable('announcements')) {
+    $columns = [];
+
+    // title
+    if (Schema::hasColumn('announcements', 'title')) {
+        $columns[] = 'title';
+    }
+
+    // target
+    if (Schema::hasColumn('announcements', 'target')) {
+        $columns[] = 'target';
+    }
+
+    // 本文カラム
+    if (Schema::hasColumn('announcements', 'body')) {
+        $columns[] = 'body';
+    } elseif (Schema::hasColumn('announcements', 'content')) {
+        $columns[] = 'content';
+    } elseif (Schema::hasColumn('announcements', 'description')) {
+        $columns[] = 'description';
+    }
+
+    // 日付カラム候補
+    $dateColumn = null;
+    foreach (['published_at', 'created_at', 'updated_at', 'date'] as $candidate) {
+        if (Schema::hasColumn('announcements', $candidate)) {
+            $dateColumn = $candidate;
+            $columns[] = $candidate;
+            break;
         }
+    }
+
+    if (!empty($columns)) {
+        $query = DB::table('announcements')->select($columns);
+
+        if ($dateColumn !== null) {
+            $query->orderByDesc($dateColumn);
+        }
+
+        $announcements = $query->limit(2)->get();
+    }
+}
 
     /*
     |--------------------------------------------------------------------------

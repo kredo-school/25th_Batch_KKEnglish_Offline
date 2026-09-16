@@ -155,5 +155,19 @@
             </div>
         </div>
     </form>
+    <hr class="my-4">
+<div class="card border-danger mb-4">
+    <div class="card-body">
+        <h5 class="text-danger">全シフトの一括削除</h5>
+        <p class="text-muted small">
+            この先生に設定されているすべてのシフト割り当てと、未来の未予約スケジュールを全て削除します。（予約済みのレッスンは削除されません）
+        </p>
+        <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}" method="POST" onsubmit="return confirm('本当にこの先生のすべてのシフトを一括削除しますか？');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">一括削除を実行する</button>
+        </form>
+    </div>
+</div>
 </div>
 @endsection
