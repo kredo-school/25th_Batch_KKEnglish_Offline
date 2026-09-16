@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\Student;
+use App\Models\TeacherLike;
 use App\Models\Material;
 use App\Models\TeacherSchedule;
 use App\Models\Reservation;
@@ -29,7 +30,7 @@ class ReservationController extends Controller
 
     public function index(): View
     {
-
+        $student = auth()->user()->student;
         /**
          * Teacher一覧
          *
@@ -41,6 +42,25 @@ class ReservationController extends Controller
         $teachers = Teacher::query()
             ->with(['user', 'materials'])
             ->get();
+
+        /*
+        * ログイン中の生徒が
+        * お気に入り登録しているteacher_idを取得
+        */
+        $favoriteTeacherIds = TeacherLike::query()
+            ->where('student_id', $student->id)
+            ->pluck('teacher_id');
+
+            /*
+            * Favorite Teachers
+            */
+            $favoriteTeachers = Teacher::query()
+                ->with([
+                    'user',
+                    'materials',
+                ])
+                ->whereIn('id', $favoriteTeacherIds)
+                ->get();
 
         /*
          * Material一覧
@@ -59,7 +79,10 @@ class ReservationController extends Controller
          */
         return view(
             'students.reservations.index',
-            compact('teachers', 'materials')
+            compact('teachers',
+                    'materials',
+                    'favoriteTeachers'
+            )
         );
     }
     public function confirm(Request $request): RedirectResponse

@@ -68,4 +68,53 @@ class LessonHistoryController extends Controller
             )
         );
     }
+
+    public function historyDetail(
+        Request $request,
+        Reservation $reservation
+    ): View {
+
+        $teacher = $request->user()->teacher;
+
+        abort_unless(
+            $teacher,
+            403,
+            '講師ユーザーではありません。'
+        );
+
+        /*
+        * 自分が担当した授業か確認
+        */
+        abort_unless(
+            (int) $reservation->teacher_id
+                ===
+            (int) $teacher->id,
+            403,
+            'この授業を表示する権限がありません。'
+        );
+
+        /*
+        * 過去の授業であることを確認
+        */
+        abort_unless(
+            $reservation->end_at <= now(),
+            404,
+            'この授業は履歴ではありません。'
+        );
+
+        $reservation->load([
+            'student.user',
+            'material',
+            'status',
+            'lessonRecord',
+        ]);
+
+        return view(
+            'teachers.lessons.history-detail',
+            compact(
+                'teacher',
+                'reservation'
+            )
+        );
+    }
 }
