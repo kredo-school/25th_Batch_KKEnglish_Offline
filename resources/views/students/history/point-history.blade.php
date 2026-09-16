@@ -347,7 +347,7 @@
     <div class="mt-4">
 
         <a
-            href="{{ route('student.history.test') }}"
+            href="{{ route('students.history.index') }}"
             class="btn btn-outline-secondary"
         >
             Back

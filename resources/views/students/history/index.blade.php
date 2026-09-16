@@ -247,19 +247,6 @@
                                             Absent
                                         </span>
 
-                                    @else
-
-                                        <span class="badge text-bg-secondary">
-                                            {{
-                                                ucfirst(
-                                                    $reservation
-                                                        ->status
-                                                        ?->status_code
-                                                    ?? 'unknown'
-                                                )
-                                            }}
-                                        </span>
-
                                     @endif
 
                                 </td>
