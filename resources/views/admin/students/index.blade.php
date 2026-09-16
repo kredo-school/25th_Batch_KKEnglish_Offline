@@ -91,16 +91,16 @@
             <table class="table table-bordered table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>
+                        <th class="text-center">
                             Student ID
                         </th>
-                        <th>
+                        <th class="text-center">
                             Name
                         </th>
-                        <th>
-                            Birthday
+                        <th class="text-center">
+                            Date of Membership
                         </th>
-                        <th class="text-end">
+                        <th class="text-center">
                             Remaining Points
                         </th>
                         <th class="text-center">
@@ -127,22 +127,22 @@
 
                     <tr>
                         {{-- Student ID --}}
-                        <td>
+                        <td class="text-center">
                             {{ $student->id }}
                         </td>
 
                         {{-- Name --}}
-                        <td class="fw-semibold">
+                        <td class="text-center fw-semibold">
                             {{ $name ?: 'Name Not Registered' }}
                         </td>
 
-                        {{-- Birthday --}}
-                        <td>
-                            {{ $student->birthday?->format('Y-m-d') ?? '-' }}
+                        {{-- Date of membership --}}
+                        <td class="text-center">
+                            {{ $student->created_at?->format('Y-m-d') ?? '-' }}
                         </td>
 
                         {{-- Point --}}
-                        <td class="text-end fw-bold">
+                        <td class="text-center fw-bold">
                             {{ number_format($pointBalance) }}
                             pt
                         </td>
@@ -151,11 +151,11 @@
                         <td class="text-center">
                             @if(($student->user->status ?? null) === 'active')
                                 <span class="badge bg-success">
-                                    ON
+                                    Active
                                 </span>
                             @else
                                 <span class="badge bg-secondary">
-                                    OFF
+                                    Inactive
                                 </span>
                             @endif
                         </td>

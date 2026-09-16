@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ShiftPattern;
 use App\Models\Teacher;
+use App\Models\TeacherSchedule;
 use App\Models\TeacherShiftPatternAssignment;
 use App\Services\Admin\TeacherScheduleGenerationService; // スケジュール生成サービス
 use Illuminate\Http\Request;
@@ -66,10 +67,11 @@ class ShiftPatternAssignmentController extends Controller
         public function store(Request $request): RedirectResponse
         {
             $data = $request->validate([
+                'assignment_type'     => ['required', 'string', 'in:weekly,specific_date'],
                 'shift_pattern_id'    => ['required', 'integer', 'exists:shift_patterns,id'],
                 'teacher_ids'         => ['required', 'array', 'min:1'],
                 'teacher_ids.*'       => ['integer', 'exists:teachers,id'],
-                'weekdays'            => ['required', 'array', 'min:1'],
+                'weekdays'            => ['nullable', 'array', 'min:1'],
                 'weekdays.*'          => ['integer', 'in:0,1,2,3,4,5,6'],
                 'start_date'          => ['required', 'date'],
                 'end_date'            => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -78,7 +80,17 @@ class ShiftPatternAssignmentController extends Controller
             ]);
 
             $teacherIds = collect($data['teacher_ids'])->map(fn($v) => (int)$v)->unique()->values();
+            if ($data['assignment_type'] === 'specific_date') {
+                $dateObj = Carbon::parse($data['start_date']);
+                $weekdays = collect([$dateObj->dayOfWeek]);
+                $newStart = $data['start_date'];
+                $newEnd = $data['start_date'];
+                $priority = 1; // 臨時シフトは優先度を上げて上書きする
+            } else {
             $weekdays   = collect($data['weekdays'])->map(fn($v) => (int)$v)->unique()->values();
+            if ($weekdays->isEmpty()) {
+                return back()->withInput()->withErrors(['weekdays' => '曜日を選択してください。']);
+            }
             // $endDate    = !empty($data['end_date']) ? $data['end_date'] : null;
             // $now        = now();
             // $replaceOverlapping = (bool)($data['replace_overlapping'] ?? false);
@@ -86,6 +98,8 @@ class ShiftPatternAssignmentController extends Controller
             $newStart = $data['start_date'];
             $newEnd = $data['end_date'] ?? null;
             $priority = (int) ($data['priority'] ?? 0);
+            }
+
             $createdBy = (int) auth()->id();
 
             $insertedIds = [];
@@ -93,6 +107,30 @@ class ShiftPatternAssignmentController extends Controller
             try {
                 // 1) assignment保存だけをトランザクションで確定
                 DB::transaction(function () use ($data, $teacherIds, $weekdays, $newStart, $newEnd, $priority, $createdBy, &$insertedIds) {
+
+                // 【重要】設定日以降の「未予約の古いスケジュール」を事前に削除する
+                $query = TeacherSchedule::whereIn('teacher_id', $teacherIds)
+                    ->where('available_date', '>=', $newStart)
+                    ->whereIn('status', ['confirmed', 'draft']); // ★未予約の confirmed と draft の両方を対象にする
+                if ($newEnd) {
+                    $query->where('available_date', '<=', $newEnd);
+                }
+
+                // MySQLの場合 DAYOFWEEK は 1(Sun)~7(Sat) なので -1 して 0~6 に合わせる
+                $query->whereIn(DB::raw('DAYOFWEEK(available_date) - 1'), $weekdays);
+                // 削除対象のID配列を取得
+                $scheduleIdsToDelete = $query->pluck('schedule_id');
+
+                if ($scheduleIdsToDelete->isNotEmpty()) {
+                    // 【修正】例外(休講)データは消さず、紐づけ(schedule_id)のみを外して残す
+                    \App\Models\ScheduleException::whereIn('schedule_id', $scheduleIdsToDelete)
+                        ->update(['schedule_id' => null]);
+
+                    // その後、古いスケジュール枠のみを削除
+                    TeacherSchedule::whereIn('schedule_id', $scheduleIdsToDelete)->delete();
+                }
+
+                // Assignmentsの保存と更新
                 foreach ($teacherIds as $teacherId) {
                     foreach ($weekdays as $weekday) {
 
@@ -192,7 +230,7 @@ class ShiftPatternAssignmentController extends Controller
                 Log::error(
                     'Teacher schedule generation failed.',
                     [
-                        'assignment_ids' => $insertedIds,
+                        // 'assignment_ids' => $insertedIds,
                         'error' => $e->getMessage(),
                     ]
                 );
@@ -205,7 +243,7 @@ class ShiftPatternAssignmentController extends Controller
                 )
                 ->with(
                     'status',
-                    "Shift assignmentを登録しました。{$generatedSchedules}件のスケジュールを生成しました。"
+                    "Shift assignmentを登録しました。設定日以降の古い枠を整理して{$generatedSchedules}件のスケジュールを生成しました。"
                 );
 
         } catch (\Throwable $e) {
@@ -223,6 +261,31 @@ class ShiftPatternAssignmentController extends Controller
                     'error' => '保存中にエラーが発生しました: ' . $e->getMessage(),
                 ]);
         }
+    }
+
+    public function destroyByTeacher(Teacher $teacher): RedirectResponse
+    {
+        DB::transaction(function () use ($teacher) {
+            // アサインメントの削除
+            TeacherShiftPatternAssignment::where('teacher_id', $teacher->id)->delete();
+
+            // 削除対象の「未来（今日以降）の未予約スケジュール」のIDを取得
+            $scheduleIdsToDelete = TeacherSchedule::where('teacher_id', $teacher->id)
+                ->where('available_date', '>=', now()->toDateString()) // 過去は残す
+                ->where('status', 'confirmed') // 未予約のみ
+                ->pluck('schedule_id'); // 主キーを取得
+
+            if ($scheduleIdsToDelete->isNotEmpty()) {
+                // 例外(休講)データは消さず、紐づけ(schedule_id)のみを外して残す
+                \App\Models\ScheduleException::whereIn('schedule_id', $scheduleIdsToDelete)->update(['schedule_id' => null]);
+
+                // その後、スケジュール本体を削除
+                TeacherSchedule::whereIn('schedule_id', $scheduleIdsToDelete)->delete();
+            }
+        });
+        return redirect()
+            ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
+            ->with('status', "Teacher #{$teacher->id} の割り当てと、未来の未予約シフトを一括削除しました。（休講記録は保持されます）");
     }
 
     public function edit(TeacherShiftPatternAssignment $assignment): View
@@ -244,10 +307,11 @@ class ShiftPatternAssignmentController extends Controller
     public function update(TeacherShiftPatternAssignment $assignment, Request $request): RedirectResponse
     {
         $data = $request->validate([
+                'assignment_type'     => ['required', 'string', 'in:weekly,specific_date'],
                 'shift_pattern_id'    => ['required', 'integer', 'exists:shift_patterns,id'],
                 'teacher_ids'         => ['required', 'array', 'min:1'],
                 'teacher_ids.*'       => ['integer', 'exists:teachers,id'],
-                'weekdays'            => ['required', 'array', 'min:1'],
+                'weekdays'            => ['nullable', 'array', 'min:1'],
                 'weekdays.*'          => ['integer', 'in:0,1,2,3,4,5,6'],
                 'start_date'          => ['required', 'date'],
                 'end_date'            => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -412,17 +476,17 @@ class ShiftPatternAssignmentController extends Controller
             ->with('status', 'Teacher assignmentを削除しました。');
     }
 
-    public function destroyByTeacher(Teacher $teacher): RedirectResponse
-    {
-        // 必要なら authorize を追加
-        // $this->authorize('delete', TeacherShiftPatternAssignment::class);
+    // public function destroyByTeacher(Teacher $teacher): RedirectResponse
+    // {
+    //     // 必要なら authorize を追加
+    //     // $this->authorize('delete', TeacherShiftPatternAssignment::class);
 
-        $deleted = TeacherShiftPatternAssignment::where('teacher_id', $teacher->id)->delete();
+    //     $deleted = TeacherShiftPatternAssignment::where('teacher_id', $teacher->id)->delete();
 
-        return redirect()
-            ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
-            ->with('status', "Teacher #{$teacher->id} の割り当てを {$deleted} 件削除しました。");
-    }
+    //     return redirect()
+    //         ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
+    //         ->with('status', "Teacher #{$teacher->id} の割り当てを {$deleted} 件削除しました。");
+    // }
 
     public function bulkEdit(Teacher $teacher): View
     {
@@ -480,13 +544,14 @@ class ShiftPatternAssignmentController extends Controller
 public function bulkUpdate(Teacher $teacher, Request $request): RedirectResponse
     {
         $data = $request->validate([
+            'assignment_type'     => ['required', 'string', 'in:weekly,specific_date'],
             'shift_pattern_id' => [
                 'required',
                 'integer',
                 'exists:shift_patterns,id',
             ],
             'weekdays' => [
-                'required',
+                'nullable',
                 'array',
                 'min:1',
             ],

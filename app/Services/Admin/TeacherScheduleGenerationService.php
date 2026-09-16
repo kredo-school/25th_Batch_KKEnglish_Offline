@@ -114,6 +114,8 @@ class TeacherScheduleGenerationService
                     'end_time' => $period['end']->format('H:i:s'),
                     'status' => 'confirmed',
                     'created_by' => $createdBy,
+                    'confirmed_by' => $createdBy,
+                    'confirmed_at' => now(),
                 ]);
 
                 $generated++;
@@ -225,6 +227,8 @@ class TeacherScheduleGenerationService
                         'end_time' => $end,
                         'status' => 'confirmed',
                         'created_by' => $createdBy,
+                        'confirmed_by' => $createdBy,
+                        'confirmed_at' => now(),
                     ]);
                     $generated++;
                     $existing->push((object) [
