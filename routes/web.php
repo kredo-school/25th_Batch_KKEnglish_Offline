@@ -21,15 +21,17 @@ use App\Http\Controllers\Student\ReservationController;
 use App\Http\Controllers\Admin\TeacherMaterialController;
 use App\Http\Controllers\Student\TeacherLikeController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Student\LessonHistoryController;
 use App\Models\Teacher;
+use App\Http\Controllers\Admin\AnnouncementController;
 
 // Test route for frontend testing
 Route::view('/student-history-test','students.history.index')
 ->name('student.history.test');
 Route::view('/teachers/lesson-history-test','teachers.reservations.history')
 ->name('teachers.reservations.history.test');
-Route::view('/students/point-history-test','students.history.point-history')
-->name('students.point-history.test');
+// Route::view('/students/point-history-test','students.history.point-history')
+// ->name('students.point-history.test');
 
 // Public routes
 Auth::routes();
@@ -57,10 +59,15 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         return view('students.dashboard');
     })->name('student.dashboard');
 
+    // Student profile
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 
+    // Lessons history
+    Route::get('/students/history', [LessonHistoryController::class, 'index'])->name('students.history.index');
+
+    // Likes
     Route::post('/students/teacher-likes', [TeacherLikeController::class, 'store'])->name('students.teacher.like');
     Route::delete('/students/teacher-likes/{teacherLike}', [TeacherLikeController::class, 'destroy'])->name('students.teachers.unlike');
 
@@ -93,7 +100,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
     // Point History
-    Route::get('/students/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
+    Route::get('/students/history/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
 });
 
 // Teacher Dashboard
@@ -185,4 +192,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
 
     Route::delete('/shift-pattern-assignments/teacher/{teacher}', [ShiftPatternAssignmentController::class, 'destroyByTeacher'])->name('shift-pattern-assignments.destroy-by-teacher');
+
+    // Announcement Management
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+    Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 });

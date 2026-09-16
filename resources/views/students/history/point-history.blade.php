@@ -12,7 +12,6 @@
     <div class="d-flex justify-content-between align-items-start mb-4">
 
         <div>
-
             <h2 class="fw-bold mb-1">
                 Point History
             </h2>
@@ -20,28 +19,27 @@
             <p class="text-secondary mb-0">
                 View your point usage and refunds.
             </p>
-
         </div>
 
 
         {{-- Current Points --}}
-        <div
-            class="border rounded px-3 py-2"
-        >
+        <div class="border rounded px-3 py-2">
+
             <span class="text-secondary small me-2">
                 Current Points
             </span>
 
             <span class="fw-bold">
-                 {{ number_format(auth()->user()->student->point_balance ?? 0) }} pt
+                {{ number_format($student->point_balance ?? 0) }} pt
             </span>
+
         </div>
 
     </div>
 
 
     {{-- ===============================
-         Point History
+         Point Transactions
     ================================ --}}
     <div class="card">
 
@@ -60,7 +58,9 @@
 
                 <table class="table table-hover align-middle mb-0">
 
-                    {{-- Header --}}
+                    {{-- ===============================
+                         Header
+                    ================================ --}}
                     <thead class="table-light">
 
                         <tr>
@@ -74,15 +74,18 @@
                             </th>
 
                             <th class="py-3">
-                                Lesson
+                                Teacher
                             </th>
 
-                            <th class="py-3 text-end">
+                            <th class="py-3">
+                                Material
+                            </th>
+
+                            <th
+                                class="py-3 text-center"
+                                style="width: 110px;"
+                            >
                                 Points
-                            </th>
-
-                            <th class="py-3 pe-4">
-                                Note
                             </th>
 
                         </tr>
@@ -90,176 +93,242 @@
                     </thead>
 
 
-                    {{-- Body --}}
+                    {{-- ===============================
+                         Body
+                    ================================ --}}
                     <tbody>
 
+                        @forelse ($pointTransactions as $transaction)
 
-                        {{-- ===============================
-                             Reservation Use
-                        ================================ --}}
-                        <tr>
+                            <tr>
 
-                            <td class="px-4">
 
-                                <div class="fw-semibold">
-                                    Sep 15, 2026
-                                </div>
+                                {{-- ===============================
+                                     Date
+                                ================================ --}}
+                                <td class="px-4">
 
-                                <small class="text-secondary">
-                                    10:15 AM
-                                </small>
+                                    <div class="fw-semibold">
 
-                            </td>
+                                        {{
+                                            $transaction
+                                                ->created_at
+                                                ?->format('M d, Y')
+                                            ?? '-'
+                                        }}
+
+                                    </div>
+
+                                    <small class="text-secondary">
+
+                                        {{
+                                            $transaction
+                                                ->created_at
+                                                ?->format('h:i A')
+                                            ?? ''
+                                        }}
+
+                                    </small>
+
+                                </td>
+
+
+                                {{-- ===============================
+                                     Type
+                                ================================ --}}
+                                <td>
+
+                                    @if (
+                                        $transaction
+                                            ->transactionType
+                                            ?->type_code
+                                        === 'reservation_use'
+                                    )
+
+                                        <span class="badge bg-light text-dark border">
+                                            Consumed
+                                        </span>
+
+                                    @elseif (
+                                        $transaction
+                                            ->transactionType
+                                            ?->type_code
+                                        === 'reservation_refund'
+                                    )
+
+                                        <span class="badge bg-light text-dark border">
+                                            Refund
+                                        </span>
 
+                                    @else
 
-                            <td>
+                                        <span class="badge bg-light text-dark border">
+                                            -
+                                        </span>
 
-                                <span class="badge bg-light text-dark border">
-                                    Reservation
-                                </span>
+                                    @endif
 
-                            </td>
+                                </td>
 
 
-                            <td>
+                                {{-- ===============================
+                                     Teacher
+                                ================================ --}}
+                                <td>
+
+                                    @if ($transaction->reservation)
 
-                                <div class="fw-semibold">
-                                    Daily Conversation
-                                </div>
+                                        <div class="d-flex align-items-center">
+
+                                            {{-- Teacher Image --}}
+                                            @if (
+                                                $transaction
+                                                    ->reservation
+                                                    ->teacher
+                                                    ?->user
+                                                    ?->profile_image
+                                            )
 
-                                <small class="text-secondary">
-                                    John Smith
-                                </small>
+                                                <img
+                                                    src="{{ $transaction->reservation->teacher->user->profile_image }}"
+                                                    alt="Teacher"
+                                                    width="40"
+                                                    height="40"
+                                                    class="rounded-circle me-2"
+                                                    style="object-fit: cover;"
+                                                >
 
-                            </td>
+                                            @else
 
+                                                <div
+                                                    class="
+                                                        rounded-circle
+                                                        bg-light
+                                                        d-flex
+                                                        justify-content-center
+                                                        align-items-center
+                                                        text-secondary
+                                                        me-2
+                                                    "
+                                                    style="
+                                                        width: 40px;
+                                                        height: 40px;
+                                                    "
+                                                >
+                                                    <i class="fa-solid fa-user"></i>
+                                                </div>
 
-                            <td class="text-end">
+                                            @endif
 
-                                <span class="fw-bold text-danger">
-                                    -300 pt
-                                </span>
 
-                            </td>
+                                            {{-- Teacher Name --}}
+                                            <span class="fw-semibold">
 
+                                                {{
+                                                    $transaction
+                                                        ->reservation
+                                                        ->teacher
+                                                        ?->user
+                                                        ?->first_name
+                                                    ?? ''
+                                                }}
 
-                            <td class="pe-4 text-secondary">
-                                Lesson booking
-                            </td>
+                                                {{
+                                                    $transaction
+                                                        ->reservation
+                                                        ->teacher
+                                                        ?->user
+                                                        ?->last_name
+                                                    ?? ''
+                                                }}
 
-                        </tr>
+                                            </span>
 
+                                        </div>
 
-                        {{-- ===============================
-                             Reservation Use
-                        ================================ --}}
-                        <tr>
+                                    @else
 
-                            <td class="px-4">
+                                        <span class="text-secondary">
+                                            -
+                                        </span>
 
-                                <div class="fw-semibold">
-                                    Sep 14, 2026
-                                </div>
+                                    @endif
 
-                                <small class="text-secondary">
-                                    02:30 PM
-                                </small>
+                                </td>
 
-                            </td>
 
+                                {{-- ===============================
+                                     Material
+                                ================================ --}}
+                                <td>
 
-                            <td>
+                                    @if ($transaction->reservation)
 
-                                <span class="badge bg-light text-dark border">
-                                    Reservation
-                                </span>
+                                        <span>
+                                            {{
+                                                $transaction
+                                                    ->reservation
+                                                    ->material
+                                                    ?->name
+                                                ?? '-'
+                                            }}
+                                        </span>
 
-                            </td>
+                                    @else
 
+                                        <span class="text-secondary">
+                                            -
+                                        </span>
 
-                            <td>
+                                    @endif
 
-                                <div class="fw-semibold">
-                                    Grammar
-                                </div>
+                                </td>
 
-                                <small class="text-secondary">
-                                    Jane Doe
-                                </small>
 
-                            </td>
+                                {{-- ===============================
+                                     Points
+                                ================================ --}}
+                                <td class="text-center">
 
+                                    @if ($transaction->point > 0)
 
-                            <td class="text-end">
+                                        <span class="fw-bold text-success">
+                                            +{{ number_format($transaction->point) }} pt
+                                        </span>
 
-                                <span class="fw-bold text-danger">
-                                    -400 pt
-                                </span>
+                                    @elseif ($transaction->point < 0)
 
-                            </td>
+                                        <span class="fw-bold text-danger">
+                                            {{ number_format($transaction->point) }} pt
+                                        </span>
 
+                                    @else
 
-                            <td class="pe-4 text-secondary">
-                                Lesson booking
-                            </td>
+                                        <span class="fw-bold">
+                                            0 pt
+                                        </span>
 
-                        </tr>
+                                    @endif
 
+                                </td>
 
-                        {{-- ===============================
-                             Refund
-                        ================================ --}}
-                        <tr>
+                            </tr>
 
-                            <td class="px-4">
 
-                                <div class="fw-semibold">
-                                    Sep 14, 2026
-                                </div>
+                        @empty
 
-                                <small class="text-secondary">
-                                    04:10 PM
-                                </small>
+                            <tr>
 
-                            </td>
+                                <td
+                                    colspan="5"
+                                    class="text-center py-5 text-secondary"
+                                >
+                                    No point transactions yet.
+                                </td>
 
+                            </tr>
 
-                            <td>
-
-                                <span class="badge bg-light text-dark border">
-                                    Refund
-                                </span>
-
-                            </td>
-
-
-                            <td>
-
-                                <div class="fw-semibold">
-                                    Grammar
-                                </div>
-
-                                <small class="text-secondary">
-                                    Jane Doe
-                                </small>
-
-                            </td>
-
-
-                            <td class="text-end">
-
-                                <span class="fw-bold text-success">
-                                    +400 pt
-                                </span>
-
-                            </td>
-
-
-                            <td class="pe-4 text-secondary">
-                                Reservation cancelled
-                            </td>
-
-                        </tr>
+                        @endforelse
 
                     </tbody>
 

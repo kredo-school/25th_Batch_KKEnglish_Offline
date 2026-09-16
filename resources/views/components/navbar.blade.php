@@ -39,7 +39,7 @@
             @if($roleCode == 'student')
 
                <a
-                    href="{{ route('students.point-history.test') }}"
+                    href="{{ route('students.point-history.index') }}"
                     class="me-2 px-3 py-2 border border-secondary-subtle rounded d-flex align-items-center text-decoration-none text-dark">
                     <i class="fa-solid fa-coins me-2 text-warning"></i>
 

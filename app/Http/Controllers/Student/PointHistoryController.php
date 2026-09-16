@@ -40,6 +40,7 @@ class PointHistoryController extends Controller
             ->with([
                 'transactionType',
                 'reservation.teacher.user',
+                'reservation.material',
             ])
             ->orderByDesc(
                 'transaction_id'
@@ -52,7 +53,7 @@ class PointHistoryController extends Controller
          * ========================================
          */
         return view(
-            'students.point_history.index',
+            'students.history.point-history',
             compact(
                 'student',
                 'pointTransactions'
