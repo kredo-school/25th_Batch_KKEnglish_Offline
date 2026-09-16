@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\PointTransaction;
 
+
 class PointHistoryController extends Controller
 {
     public function index(Request $request): View
