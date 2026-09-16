@@ -21,6 +21,7 @@ use App\Http\Controllers\Student\ReservationController;
 use App\Http\Controllers\Admin\TeacherMaterialController;
 use App\Http\Controllers\Student\TeacherLikeController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Student\LessonHistoryController;
 use App\Models\Teacher;
 
 // Test route for frontend testing
@@ -55,10 +56,15 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         return view('students.dashboard');
     })->name('student.dashboard');
 
+    // Student profile
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 
+    // Lessons history
+    Route::get('/students/history', [LessonHistoryController::class, 'index'])->name('students.history.index');
+
+    // Likes
     Route::post('/students/teacher-likes', [TeacherLikeController::class, 'store'])->name('students.teacher.like');
     Route::delete('/students/teacher-likes/{teacherLike}', [TeacherLikeController::class, 'destroy'])->name('students.teachers.unlike');
 
