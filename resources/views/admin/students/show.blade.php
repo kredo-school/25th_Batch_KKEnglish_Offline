@@ -17,11 +17,11 @@
                 <div class="card-header">Student Information</div>
                 <div class="card-body">
                     <p><strong>ID:</strong>{{ $student->id }}</p>
-                    <p><strong>Name:</strong>{{ trim(($student->first_name ?? '').' '.($student->last_name ?? '')) ?: 'Name Not Registered' }}</p>
-                    <p><strong>Enrollment Date:</strong>{{ $student->enrollment_date?->format('Y-m-d') ?? '-' }}</p>
+                    <p><strong>Name:</strong>{{ trim(($student->user->first_name ?? '').' '.($student->user->last_name ?? '')) ?: 'Name Not Registered' }}</p>
+                    <p><strong>Enrollment Date:</strong>{{ $student->created_at?->format('Y-m-d') ?? '-' }}</p>
                     <p><strong>Graduation Date:</strong>{{ $student->graduation_date?->format('Y-m-d') ?? '-' }}</p>
                     <p class="mb-0"><strong>Active:</strong>
-                        @if($student->is_active)<span class="badge bg-success">ON</span>
+                        @if(($student->user->status ?? null) === 'active')<span class="badge bg-success">ON</span>
                         @else<span class="badge bg-secondary">OFF</span>@endif
                     </p>
                 </div>

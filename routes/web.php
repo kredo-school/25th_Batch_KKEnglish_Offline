@@ -23,6 +23,7 @@ use App\Http\Controllers\Student\TeacherLikeController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Student\LessonHistoryController;
 use App\Models\Teacher;
+use App\Http\Controllers\Admin\AnnouncementController;
 
 // Test route for frontend testing
 Route::view('/student-history-test','students.history.index')
@@ -191,4 +192,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
 
     Route::delete('/shift-pattern-assignments/teacher/{teacher}', [ShiftPatternAssignmentController::class, 'destroyByTeacher'])->name('shift-pattern-assignments.destroy-by-teacher');
+
+    // Announcement Management
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+    Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 });
