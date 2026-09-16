@@ -24,7 +24,7 @@
 
     {{-- Point History --}}
     <a
-        href="{{ route('students.point-history.test') }}"
+        href="{{ route('students.point-history.index') }}"
         class="btn btn-outline-secondary"
     >
         <i class="fa-solid fa-coins me-1"></i>

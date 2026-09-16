@@ -26,8 +26,8 @@ Route::view('/student-history-test','students.history.index')
 ->name('student.history.test');
 Route::view('/teachers/lesson-history-test','teachers.reservations.history')
 ->name('teachers.reservations.history.test');
-Route::view('/students/point-history-test','students.history.point-history')
-->name('students.point-history.test');
+// Route::view('/students/point-history-test','students.history.point-history')
+// ->name('students.point-history.test');
 
 
 // Public routes
@@ -89,7 +89,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
     // Point History
-    Route::get('/students/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
+    Route::get('/students/history/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
 });
 
 // Teacher Dashboard
