@@ -9,14 +9,23 @@ use App\Services\Admin\ShiftPatternAdminService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Teacher;
 
 class ShiftPatternController extends Controller
 {
     public function index()
     {
-        $patterns = \App\Models\ShiftPattern::query()
-            ->withCount('teachers')
+        $patterns = ShiftPattern::query()
+            ->withCount([
+                'assignments as teachers_count' => function ($query) {
+                    $query->select(
+                        DB::raw(
+                            'COUNT(DISTINCT teacher_id)'
+                        )
+                    );
+                },
+            ])
             ->latest('id')
             ->paginate(20);
 

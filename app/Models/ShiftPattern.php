@@ -50,12 +50,12 @@ class ShiftPattern extends Model
 
     public function assignments(): HasMany
     {
-        return $this->hasMany(TeacherShiftAssignment::class, 'shift_pattern_id');
+        return $this->hasMany(TeacherShiftPatternAssignment::class, 'shift_pattern_id');
     }
 
     public function teachers(): BelongsToMany
     {
-        return $this->belongsToMany(Teacher::class, 'teacher_shift_assignments')
+        return $this->belongsToMany(Teacher::class, 'teacher_shift_pattern_assignments')
             ->withPivot(['effective_from', 'effective_to', 'priority'])
             ->withTimestamps();
     }

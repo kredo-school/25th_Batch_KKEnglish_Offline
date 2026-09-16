@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
-use App\Http\Controllers\Student\LessonController;
+use App\Http\Controllers\Student\PointHistoryController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\ScheduleController;
@@ -19,13 +19,15 @@ use App\Http\Controllers\Teacher\ScheduleExceptionController;
 use App\Http\Controllers\Student\AvailabilityController;
 use App\Http\Controllers\Student\ReservationController;
 use App\Http\Controllers\Admin\TeacherMaterialController;
+use App\Http\Controllers\Student\TeacherLikeController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Student\LessonHistoryController;
 use App\Models\Teacher;
+use App\Http\Controllers\Admin\AnnouncementController;
 
 // Test route for frontend testing
-Route::view('/student-history-test','students.history.index')
-->name('student.history.test');
-Route::view('/teachers/reservations-detail-test','teachers.reservations.show')
-->name('teachers.reservations.show.test');
+Route::view('/teachers/lesson-history-test','teachers.reservations.history')
+->name('teachers.reservations.history.test');
 
 
 // Public routes
@@ -54,21 +56,31 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         return view('students.dashboard');
     })->name('student.dashboard');
 
+    // Student profile
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
     Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
     Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
 
+    // Lessons history
+    Route::get('/students/history', [LessonHistoryController::class, 'index'])->name('students.history.index');
+
+    // Likes
+    Route::post('/students/teacher-likes', [TeacherLikeController::class, 'store'])->name('students.teacher.like');
+    Route::delete('/students/teacher-likes/{teacherLike}', [TeacherLikeController::class, 'destroy'])->name('students.teachers.unlike');
+
 // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
-    Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
-        ->name('student.lessons.cancel');
+    // Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
+    //     ->name('student.lessons.cancel');
     // Student reservations
      // 予約一覧・検索画面
     Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
 
-
     //　予約確認画面
     Route::post('/students/reservations/confirm', [ReservationController::class, 'confirm'])->name('students.reservations.confirm');
+
+    //　予約確認画面の表示
+    Route::get('/students/reservations/confirmation', [ReservationController::class, 'confirmation'])->name('students.reservations.confirmation');
 
     //  予約確定
     Route::post('/students/reservations', [ReservationController::class, 'store'])->name('students.reservations.store');
@@ -84,19 +96,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
+    // Point History
+    Route::get('/students/history/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
 });
-
-// Teacher/Admin 共通（Schedule編集）
-// Route::middleware(['auth', 'role:teacher,admin'])->group(function () {
-//     Route::get('/teachers/schedules', [ScheduleController::class, 'index'])->name('teacher.schedules.index');
-//     Route::get('/teachers/schedules/create', [ScheduleController::class, 'create'])->name('teacher.schedules.create');
-        // グリッド選択保存（create画面から送信）
-//     Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])->name('teacher.schedules.storeGrid');
-//     Route::post('/teachers/schedules', [ScheduleController::class, 'store'])->name('teacher.schedules.store');
-//     Route::get('/teachers/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('teacher.schedules.edit');
-//     Route::put('/teachers/schedules/{schedule}', [ScheduleController::class, 'update'])->name('teacher.schedules.update');
-//     Route::delete('/teachers/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('teacher.schedules.destroy');
-// });
 
 // Teacher Dashboard
 Route::middleware(['auth', 'role:teacher'])->group(function () {
@@ -105,8 +107,8 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     })->name('teacher.dashboard');
 
      // My Schedule 画面
-    Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
-    // Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teacher.schedules.index');
+    // Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
+    Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teachers.schedule');
     Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
     Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
     Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teacher.schedule-exceptions.destroy');
@@ -116,18 +118,17 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teachers/lessons/{reservation}', [TeacherReservationController::class, 'show'])->name('teachers.reservations.show');
 
     //　Lessons results
-    Route::patch('/teachers/lessons/{reservation}/result', [TeacherReservationController::class, 'updateResult'])->name('teachers.reservations.updateResult')
+    Route::patch('/teachers/lessons/{reservation}/result', [TeacherReservationController::class, 'updateResult'])
      ->whereNumber('reservation')
      ->name('teachers.reservations.result.update');
-// Route::post('/teachers/schedules/grid', [ScheduleController::class, 'storeGrid'])
-//     ->name('teacher.schedules.storeGrid');
+
 });
 
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // Route::get('/dashboard/details', [DashboardController::class, 'details'])->name('dashboard.details');
+    Route::get('/dashboard.details', [DashboardController::class, 'dashboardDetails'])->name('dashboard.details');
 
     // Material 編集
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');
@@ -160,6 +161,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'edit'])->name('teachers.materials.edit');
     Route::put('/teachers/{teacher}/materials', [TeacherMaterialController::class, 'update'])->name('teachers.materials.update');
 
+    // Student Management
+    Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+    Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
+    Route::get('/students/{student}/profile', [StudentController::class, 'profile'])->name('students.profile');
+    Route::get('/students/{student}/points/create', [StudentController::class, 'pointCreate'])->name('students.points.create');
+    Route::post('/students/{student}/points', [StudentController::class, 'pointStore'])->name('students.points.store');
+
+
     // Schedule Management
     Route::get('/schedules', [DashboardController::class, 'schedulesIndex'])->name('schedules.index');
     Route::get('/schedules/details', [DashboardController::class, 'details'])->name('schedules.index_details');
@@ -171,5 +180,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'index'])->name('shift-pattern-assignments.index');
     Route::get('/shift-pattern-assignments/create', [ShiftPatternAssignmentController::class, 'create'])->name('shift-pattern-assignments.create');
     Route::post('/shift-pattern-assignments', [ShiftPatternAssignmentController::class, 'store'])->name('shift-pattern-assignments.store');
+    Route::get('/shift-pattern-assignments/{assignment}/edit',[ShiftPatternAssignmentController::class, 'edit'])->name('shift-pattern-assignments.edit');
+    Route::put('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'update'])->name('shift-pattern-assignments.update');
+
     Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');
+
+    Route::get('/shift-pattern-assignments/teacher/{teacher}/bulk-edit',[ShiftPatternAssignmentController::class, 'bulkEdit'])->name('shift-pattern-assignments.bulk-edit');
+    Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
+
+    Route::delete('/shift-pattern-assignments/teacher/{teacher}', [ShiftPatternAssignmentController::class, 'destroyByTeacher'])->name('shift-pattern-assignments.destroy-by-teacher');
+
+    // Announcement Management
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+    Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 });

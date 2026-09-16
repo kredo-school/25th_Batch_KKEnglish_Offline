@@ -12,6 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+
+    /*
+     * app/Console/Commands の
+     * 自作Artisan Commandを読み込む
+     */
+    ->withCommands([
+        __DIR__.'/../app/Console/Commands',
+    ])
+    
     ->withMiddleware(function (Middleware $middleware): void {
         //
         $middleware->alias([

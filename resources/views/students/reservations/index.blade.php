@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- ===============================
          Title
@@ -170,22 +170,37 @@
                         "
                     >
 
-                        {{-- Name --}}
-                        <h5 class="fw-bold mb-2">
+                    {{-- Name + Lesson Point --}}
+                <div class="d-flex justify-content-between align-items-start mb-2">
 
-                            {{
-                                $teacher->user?->first_name
-                                ?? 'Teacher'
-                            }}
+                    {{-- Name --}}
+                    <h5 class="fw-bold mb-0">
 
-                            {{
-                                $teacher->user?->last_name
-                                ?? ''
-                            }}
+                        {{
+                            $teacher->user?->first_name
+                            ?? 'Teacher'
+                        }}
 
-                        </h5>
+                        {{
+                            $teacher->user?->last_name
+                            ?? ''
+                        }}
+
+                    </h5>
 
 
+                    {{-- Lesson Point --}}
+                    <span
+                        class="badge text-dark px-2 py-2"
+                        style="
+                            background-color: #f0c94d;
+                            font-family: Arial, sans-serif;
+                        "
+                    >
+                        {{ number_format($teacher->point_consumed ?? 0) }} pt
+                    </span>
+
+                </div>
                         {{-- Nationality --}}
                         <p class="mb-1 small">
 
@@ -470,6 +485,7 @@ document.addEventListener(
         |--------------------------------------------------------------------------
         */
 
+        // HourとMinuteを合体させる関数
         function getSelectedTime() {
 
             const hour =
@@ -826,27 +842,10 @@ document.addEventListener(
              * Dateが選択されていたら
              * その日を含む週を最初に表示
              */
-            if (date) {
-
-                params.append(
-                    'date',
-                    date
-                );
-
-
-                params.append(
-                    'mode',
-                    'date'
-                );
-
-            } else {
-
-                params.append(
-                    'mode',
-                    'material'
-                );
-
-            }
+           params.append(
+                'mode',
+                'material'
+            );
 
 
             button.href =

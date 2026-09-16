@@ -12,8 +12,14 @@
     |--------------------------------------------------------------------------
     */
 
+    // → 生徒が選んだ日,Selected表示に使用
     $selectedDate =
         $validated['date']
+        ?? null;
+
+    // カレンダーの表示開始日
+    $viewStart =
+        $validated['view_start']
         ?? null;
 
 
@@ -30,9 +36,10 @@
     |
     */
 
+    // カレンダーを作る基準日
     $startDate =
-        $selectedDate
-            ? \Carbon\Carbon::parse($selectedDate)->startOfDay()
+        $viewStart
+            ? \Carbon\Carbon::parse($viewStart)->startOfDay()
             : now()->startOfDay();
 
 
@@ -280,7 +287,7 @@
 
 
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- ===============================
          Title
@@ -320,13 +327,25 @@
                             style="object-fit: cover;"
                         >
 
+                    {{-- Lesson Point --}}
+                    <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
 
-                        <h4 class="fw-bold mb-1">
-
+                        <h4 class="fw-bold mb-0">
                             {{ $teacher->user->first_name }}
                             {{ $teacher->user->last_name }}
-
                         </h4>
+
+                          <span
+                        class="badge text-dark px-2 py-2"
+                        style="
+                            background-color: #f0c94d;
+                            font-family: Arial, sans-serif;
+                        "
+                    >
+                        {{ number_format($teacher->point_consumed ?? 0) }} pt
+                    </span>
+                    </div>
+
 
 
                         <p class="text-secondary mb-0">
@@ -549,6 +568,9 @@
                                             $material->material_id,
 
                                         'date' =>
+                                            $selectedDate,
+
+                                        'view_start' =>
                                             $startDate
                                                 ->copy()
                                                 ->subDays(7)
@@ -616,6 +638,9 @@
                                         $material->material_id,
 
                                     'date' =>
+                                        $selectedDate,
+
+                                    'view_start' =>
                                         $startDate
                                             ->copy()
                                             ->addDays(7)
@@ -945,19 +970,13 @@
 
                         </div>
 
-
                         <div class="text-secondary">
-                            Reserved = already booked
+                            Already booked = your existing lesson
                         </div>
 
 
                         <div class="text-secondary">
                             × = unavailable
-                        </div>
-
-
-                        <div class="text-secondary">
-                            Gray = past date
                         </div>
 
                     </div>
@@ -977,6 +996,7 @@
 {{-- =========================================================
      Booking Form
 ========================================================= --}}
+{{-- Bookボタンを押したらJavaScriptから値を入れて送信する --}}
 <form
     id="bookingForm"
     method="POST"
@@ -1028,7 +1048,7 @@
 
 
 <script>
-
+// HTMLが全部読み込まれてからJavaScriptを実行する
 document.addEventListener(
     'DOMContentLoaded',
     async function () {
@@ -1040,6 +1060,7 @@ document.addEventListener(
         |--------------------------------------------------------------------------
         */
 
+        // BladeのPHP変数をJavaScriptに渡している
         const teacherId =
             @json($teacher->id);
 
@@ -1048,6 +1069,7 @@ document.addEventListener(
             @json($material->material_id);
 
 
+        // JavaScript配列に変換
         const days =
             @json(
                 $days
@@ -1117,8 +1139,7 @@ document.addEventListener(
 
         }
 
-
-
+        // 日付 + 時間のHTMLのセルを探す
         function getCell(
             date,
             time
@@ -1145,6 +1166,7 @@ document.addEventListener(
         |--------------------------------------------------------------------------
         */
 
+        // 予約可能ならボタンをbookに置き換える
         function renderAvailableCell(
             cell,
             slot
@@ -1185,6 +1207,7 @@ document.addEventListener(
             slot
         ) {
 
+            // 生徒自身が同じ時間帯に予約を持っている
             if (
                 slot.student_conflict
                 === true
@@ -1207,16 +1230,15 @@ document.addEventListener(
 
             }
 
-
+            // その他の予約不可
             cell.innerHTML = `
 
                 <span
                     class="
                         text-secondary
-                        small
                     "
                 >
-                    Reserved
+                    ×
                 </span>
 
             `;
@@ -1230,6 +1252,9 @@ document.addEventListener(
         | Availability API
         |--------------------------------------------------------------------------
         */
+
+        //AvailabilityControllerを呼び出している
+        // AvailabilityController→AvailabilityService→JSONが返ってくる
 
         async function fetchAvailability(
             date
@@ -1294,24 +1319,38 @@ document.addEventListener(
                     const cellDate =
                         cell.dataset.date;
 
+                    const cellTime =
+                        cell.dataset.time;
 
-                    const today =
-                        new Date()
-                            .toLocaleDateString(
-                                'en-CA'
-                            );
+                    const cellDateTime =
+                        new Date(
+                            `${cellDate}T${cellTime}:00`
+                        );
+
+                    const now =
+                        new Date();
 
 
                     if (
-                        cellDate
+                        cellDateTime
                         <
-                        today
+                        now
                     ) {
-                        return;
-                    }
 
+                        cell.classList.add(
+                            'table-secondary'
+                        );
 
                     cell.innerHTML = `
+                        <span class="text-secondary small">
+                            Past
+                        </span>
+                    `;
+
+                    return;
+                }
+
+                        cell.innerHTML = `
 
                         <span
                             class="
@@ -1355,6 +1394,15 @@ document.addEventListener(
 
 
                     if (!cell) {
+                        return;
+                    }
+
+                    // Pastのセルは上書きしない
+                    if (
+                        cell.classList.contains(
+                            'table-secondary'
+                        )
+                    ) {
                         return;
                     }
 

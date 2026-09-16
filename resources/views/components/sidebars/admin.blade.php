@@ -1,8 +1,8 @@
     @php
         // クエリパラメータ ?menu=schedule が指定されているか、またはスケジュール関連のルートの場合に 'schedule' メニューにする
-        $isScheduleMenu = request('menu') === 'schedule' 
-            || request()->routeIs('admin.schedules.*') 
-            || request()->routeIs('admin.shift-patterns.*') 
+        $isScheduleMenu = request('menu') === 'schedule'
+            || request()->routeIs('admin.schedules.*')
+            || request()->routeIs('admin.shift-patterns.*')
             || request()->routeIs('admin.shift-pattern-assignments.*');
 
         $menu = $isScheduleMenu ? 'schedule' : 'main';
@@ -21,7 +21,7 @@
             {{-- 週間予定表 --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Weekly schedule
+                Today's schedule
             </a>
 
             {{-- シフト作成 --}}
@@ -52,8 +52,8 @@
                 Material management
             </a>
 
-            <a href="#"
-               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+            <a href="{{ route('admin.students.index') }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.students.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Student management
             </a>
 
@@ -66,6 +66,11 @@
             <a href="{{ route('admin.users.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.users.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 User management
+            </a>
+
+            <a href="{{ route('admin.announcements.index') }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.announcements.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+                Announcement management
             </a>
         @endif
     </nav>

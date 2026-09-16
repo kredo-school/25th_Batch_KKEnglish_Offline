@@ -3,8 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Services\Admin\GenarateTeacherSchedulesService; // 実在クラス
-use App\Services\Admin\GenerateTeacherSchedulesService; // 参照される名前（未実在でも文字列bindで救済可）
+use App\Services\Admin\TeacherScheduleGenerationService; // 実在クラス
 
 class AppServiceProvider extends ServiceProvider
 {

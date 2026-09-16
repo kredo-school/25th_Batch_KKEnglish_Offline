@@ -5,15 +5,15 @@
         {{-- ===============================
              Logo
         ================================ --}}
-        <a class="navbar-brand"
-           href="{{ $homeHref }}">
-
+        <a
+            class="navbar-brand"
+            href="{{ $homeHref }}"
+        >
             <img
                 src="{{ asset('images/kkenglish-logo.png') }}"
                 alt="KK English"
                 height="55"
             >
-
         </a>
 
 
@@ -29,115 +29,146 @@
 
 
         {{-- ===============================
-             Account
+             Right Side
         ================================ --}}
-        <div class="dropdown ms-auto">
+        <div class="ms-auto d-flex align-items-center">
 
-            <button
-                class="btn border-0 shadow-none dropdown-toggle d-flex align-items-center {{ $textClass }}"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-            >
+            {{-- ===============================
+                 Student Point
+            ================================ --}}
+            @if($roleCode == 'student')
 
-                {{-- ===============================
-                     Profile Image
-                ================================ --}}
-                @if($user?->profile_image)
+               <a
+                    href="{{ route('students.point-history.index') }}"
+                    class="me-2 px-3 py-2 border border-secondary-subtle rounded d-flex align-items-center text-decoration-none text-dark">
+                    <i class="fa-solid fa-coins me-2 text-warning"></i>
 
-                {{--　profile_image の保存形式がロールによって異なるため分岐
-    　　　　　　　　　　Student: storage内の相対パス
-   　　　　　　　　　　　Teacher: Seederで設定した外部URL--}}
-                    <img
-                        src="{{ str_starts_with($user->profile_image, 'http')
-                            ? $user->profile_image
-                            : asset('storage/' . $user->profile_image) }}"
-                        width="40"
-                        height="40"
-                        class="rounded-circle me-2"
-                        style="object-fit: cover;"
-                    >
+                    <span class="fw-semibold">
+                        {{ number_format($user->student->point_balance ?? 0) }} pt
+                    </span>
+                </a>
 
-                @else
-
-                    <i class="fa-solid fa-circle-user me-2 fa-2x"></i>
-
-                @endif
-
-
-                {{-- ===============================
-                     Login User Name
-                ================================ --}}
-                <span>
-                    {{ $user?->first_name }}
-                </span>
-
-            </button>
+            @endif
 
 
             {{-- ===============================
-                 Dropdown Menu
+                 Account
             ================================ --}}
-            <ul class="dropdown-menu dropdown-menu-end">
+            <div class="dropdown">
+
+                <button
+                    class="btn border-0 shadow-none dropdown-toggle d-flex align-items-center {{ $textClass }}"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                >
+
+                    {{-- ===============================
+                         Profile Image
+                    ================================ --}}
+                    @if($user?->profile_image)
+
+                        {{--
+                            profile_image の保存形式がロールによって異なるため分岐
+
+                            Student:
+                            storage内の相対パス
+
+                            Teacher:
+                            Seederで設定した外部URL
+                        --}}
+                        <img
+                            src="{{ str_starts_with($user->profile_image, 'http')
+                                ? $user->profile_image
+                                : asset('storage/' . $user->profile_image) }}"
+                            alt="{{ $user?->first_name }}"
+                            width="40"
+                            height="40"
+                            class="rounded-circle me-2"
+                            style="object-fit: cover;"
+                        >
+
+                    @else
+
+                        <i class="fa-solid fa-circle-user me-2 fa-2x"></i>
+
+                    @endif
+
+
+                    {{-- ===============================
+                         Login User Name
+                    ================================ --}}
+                    <span>
+                        {{ $user?->first_name }}
+                    </span>
+
+                </button>
+
 
                 {{-- ===============================
-                     Profile
+                     Dropdown Menu
                 ================================ --}}
-                @if($roleCode == 'student')
+                <ul class="dropdown-menu dropdown-menu-end">
 
+                    {{-- ===============================
+                         Profile
+                    ================================ --}}
+                    @if($roleCode == 'student')
+
+                        <li>
+                            <a
+                                class="dropdown-item"
+                                href="{{ route('student.profile') }}"
+                            >
+                                Profile
+                            </a>
+                        </li>
+
+                    @elseif($roleCode == 'teacher')
+
+                        <li>
+                            <a
+                                class="dropdown-item"
+                                href="{{ route('teachers.show', $user->teacher->id) }}"
+                            >
+                                Profile
+                            </a>
+                        </li>
+
+                    @endif
+
+
+                    {{-- Divider --}}
                     <li>
-                        <a
-                            class="dropdown-item"
-                            href="{{ route('student.profile') }}"
-                        >
-                            Profile
-                        </a>
+                        <hr class="dropdown-divider">
                     </li>
 
-                @elseif($roleCode == 'teacher')
 
+                    {{-- ===============================
+                         Logout
+                    ================================ --}}
                     <li>
-                        <a
-                            class="dropdown-item"
-                            href="{{ route('teachers.show', $user->teacher->id) }}"
+
+                        <form
+                            method="POST"
+                            action="{{ route('logout') }}"
                         >
-                            Profile
-                        </a>
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="dropdown-item"
+                            >
+                                Logout
+                            </button>
+
+                        </form>
+
                     </li>
 
-                @endif
+                </ul>
 
-
-                {{-- Divider --}}
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-
-
-                {{-- ===============================
-                     Logout
-                ================================ --}}
-                <li>
-
-                    <form
-                        method="POST"
-                        action="{{ route('logout') }}"
-                    >
-
-                        @csrf
-
-                        <button
-                            type="submit"
-                            class="dropdown-item"
-                        >
-                            Logout
-                        </button>
-
-                    </form>
-
-                </li>
-
-            </ul>
+            </div>
 
         </div>
 

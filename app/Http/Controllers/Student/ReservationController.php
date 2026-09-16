@@ -8,24 +8,28 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
+use App\Models\Student;
 use App\Models\Material;
 use App\Models\TeacherSchedule;
 use App\Models\Reservation;
 use App\Models\ReservationStatus;
 use App\Models\ReservationHistory;
 use Illuminate\Contracts\View\View;
-
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use App\Services\PointService;
+
 
 class ReservationController extends Controller
 {
     public function __construct(
-        private ReservationService $reservationService
+        private ReservationService $reservationService,
+        private PointService $pointService
     ) {}
 
     public function index(): View
     {
+
         /**
          * Teacher一覧
          *
@@ -58,13 +62,13 @@ class ReservationController extends Controller
             compact('teachers', 'materials')
         );
     }
-    public function confirm(Request $request): View
+    public function confirm(Request $request): RedirectResponse
     {
         /*
-     * ========================================
-     * フロントから送られてきた予約情報を確認
-     * ========================================
-     */
+         * ========================================
+         * フロントから送られてきた予約情報を確認
+         * ========================================
+         */
         $validated = $request->validate([
             'teacher_id' => [
                 'required',
@@ -98,10 +102,10 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * Teacher取得
-     * ========================================
-     */
+         * ========================================
+         * Teacher取得
+         * ========================================
+         */
         $teacher = Teacher::query()
             ->with([
                 'user',
@@ -113,10 +117,10 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * Material取得
-     * ========================================
-     */
+         * ========================================
+         * Material取得
+         * ========================================
+         */
         $material = Material::query()
             ->findOrFail(
                 $validated['material_id']
@@ -124,10 +128,10 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * TeacherSchedule取得
-     * ========================================
-     */
+         * ========================================
+         * TeacherSchedule取得
+         * ========================================
+         */
         $schedule = TeacherSchedule::query()
             ->findOrFail(
                 $validated['schedule_id']
@@ -135,10 +139,10 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * ScheduleとTeacherが一致するか
-     * ========================================
-     */
+         * ========================================
+         * ScheduleとTeacherが一致するか
+         * ========================================
+         */
         if (
             (int) $schedule->teacher_id
             !==
@@ -152,10 +156,10 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * confirmed Scheduleだけ許可
-     * ========================================
-     */
+         * ========================================
+         * confirmed Scheduleだけ許可
+         * ========================================
+         */
         if ($schedule->status !== 'confirmed') {
 
             throw ValidationException::withMessages([
@@ -166,10 +170,10 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * TeacherがMaterialを教えられるか確認
-     * ========================================
-     */
+         * ========================================
+         * TeacherがMaterialを教えられるか確認
+         * ========================================
+         */
         $canTeachMaterial = $teacher
             ->materials
             ->contains(
@@ -186,12 +190,90 @@ class ReservationController extends Controller
             ]);
         }
 
+        /*
+         * ========================================
+         * 予約確認情報をSessionへ保存
+         * ========================================
+         */
+        $request->session()->put(
+            'reservation_confirmation',
+            $validated
+        );
+
 
         /*
-     * ========================================
-     * 確認画面へ渡す
-     * ========================================
-     */
+         * ========================================
+         * GETの予約確認画面へ移動
+         * ========================================
+         */
+        return redirect()
+            ->route('students.reservations.confirmation');
+    }
+
+    public function confirmation(Request $request): View
+    {
+        /*
+         * ========================================
+         * Sessionから予約確認情報を取得
+         * ========================================
+         */
+        $validated = $request
+            ->session()
+            ->get('reservation_confirmation');
+
+
+        /*
+         * Sessionに予約情報がない場合
+         */
+        abort_unless(
+            $validated,
+            404,
+            '予約確認情報がありません。'
+        );
+
+
+        /*
+         * ========================================
+         * Teacher取得
+         * ========================================
+         */
+        $teacher = Teacher::query()
+            ->with([
+                'user',
+                'materials',
+            ])
+            ->findOrFail(
+                $validated['teacher_id']
+            );
+
+
+        /*
+         * ========================================
+         * Material取得
+         * ========================================
+         */
+        $material = Material::query()
+            ->findOrFail(
+                $validated['material_id']
+            );
+
+
+        /*
+         * ========================================
+         * TeacherSchedule取得
+         * ========================================
+         */
+        $schedule = TeacherSchedule::query()
+            ->findOrFail(
+                $validated['schedule_id']
+            );
+
+
+        /*
+         * ========================================
+         * 予約確認画面を表示
+         * ========================================
+         */
         return view(
             'students.reservations.confirm',
             compact(
@@ -232,24 +314,58 @@ class ReservationController extends Controller
                 $validated
             );
 
+        /*
+        * 最新のポイント残高を再取得
+        */
+        $student->refresh();
+
+        /*
+        * 消費ポイント
+        */
+        $usedPoints =
+            (int) $reservation->point_cost;
+
+        /*
+        * 予約後の残高
+        */
+        $remainingPoints =
+            (int) $student->point_balance;
+
+        /*
+        * 授業日時
+        */
+        $lessonDate =
+            \Carbon\Carbon::parse($reservation->start_at)
+            ->format('n/j H:i');
+
 
         return redirect()
             ->route('students.reservations.upcoming')
             ->with(
                 'success',
-                '予約が完了しました。'
+                'Reservation completed.'
+                    . '  Lesson Date：'
+                    . $lessonDate
+                    . '  < Consumption：'
+                    . number_format($usedPoints)
+                    . ' pt'
+                    . ' / Balance：'
+                    . number_format($remainingPoints)
+                    . ' pt >'
             );
     }
+
+
     public function cancel(
         Request $request,
         Reservation $reservation
     ): RedirectResponse {
 
         /*
-     * ========================================
-     * ログイン中Student取得
-     * ========================================
-     */
+         * ========================================
+         * ログイン中Student取得
+         * ========================================
+         */
         $student = $request
             ->user()
             ->student;
@@ -262,10 +378,10 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * キャンセル理由
-     * ========================================
-     */
+         * ========================================
+         * キャンセル理由
+         * ========================================
+         */
         $validated = $request->validate([
             'cancellation_reason' => [
                 'nullable',
@@ -276,23 +392,24 @@ class ReservationController extends Controller
 
 
         /*
-     * ========================================
-     * Transaction
-     * ========================================
-     */
-        DB::transaction(function () use (
-            $request,
-            $reservation,
-            $student,
-            $validated
-        ) {
-
-            /*
-         * =====================================
-         * Reservationを最新状態で再取得
-         * + ロック
-         * =====================================
+         * ========================================
+         * Transaction
+         * ========================================
          */
+        DB::transaction(function () use ($request, $reservation, $student, $validated) {
+            /*
+            * Studentをロック
+            */
+            $student = Student::query()
+                ->whereKey($student->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            /*
+             * =====================================
+             * Reservationを最新状態で再取得
+             * + ロック
+             * =====================================
+             */
             $reservation = Reservation::query()
                 ->with('status')
                 ->whereKey(
@@ -303,10 +420,10 @@ class ReservationController extends Controller
 
 
             /*
-         * =====================================
-         * 自分の予約か確認
-         * =====================================
-         */
+             * =====================================
+             * 自分の予約か確認
+             * =====================================
+             */
             abort_unless(
                 (int) $reservation->student_id
                     ===
@@ -317,10 +434,10 @@ class ReservationController extends Controller
 
 
             /*
-         * =====================================
-         * キャンセル可能statusか
-         * =====================================
-         */
+             * =====================================
+             * キャンセル可能statusか
+             * =====================================
+             */
             if (
                 !in_array(
                     $reservation->status->status_code,
@@ -347,10 +464,10 @@ class ReservationController extends Controller
             }
 
             /*
-         * =====================================
-         * cancelled status取得
-         * =====================================
-         */
+             * =====================================
+             * cancelled status取得
+             * =====================================
+             */
             $cancelledStatus =
                 ReservationStatus::query()
                 ->where(
@@ -361,19 +478,19 @@ class ReservationController extends Controller
 
 
             /*
-         * =====================================
-         * 変更前status
-         * =====================================
-         */
+             * =====================================
+             * 変更前status
+             * =====================================
+             */
             $fromStatusId =
                 $reservation->status_id;
 
 
             /*
-         * =====================================
-         * Reservation更新
-         * =====================================
-         */
+             * =====================================
+             * Reservation更新
+             * =====================================
+             */
             $reservation->update([
 
                 'status_id' =>
@@ -389,12 +506,21 @@ class ReservationController extends Controller
                 $validated['cancellation_reason'] ?? null,
             ]);
 
-
             /*
-         * =====================================
-         * History作成
-         * =====================================
-         */
+            * =====================================
+            * ポイント返還
+            * =====================================
+            */
+            $this->pointService->refund(
+                $student,
+                $reservation,
+                (int) $request->user()->id
+            );
+            /*
+             * =====================================
+             * History作成
+             * =====================================
+             */
             ReservationHistory::create([
 
                 'reservation_id' =>
@@ -415,26 +541,52 @@ class ReservationController extends Controller
         });
 
 
+
+
         /*
-     * ========================================
-     * 完了
-     * ========================================
-     */
-        return redirect()
-            ->route(
-                'students.reservations.upcoming'
-            )
-            ->with(
-                'success',
-                '予約をキャンセルしました。'
-            );
+         * ========================================
+         * 完了
+         * ========================================
+         */
+        $reservation->refresh();
+        $reservation->load('teacher.user');
+
+        $student->refresh();
+
+        $teacherName =
+            $reservation->teacher->user->name;
+
+        $lessonDate =
+            \Carbon\Carbon::parse(
+                $reservation->start_at
+            )->format('n月j日 H:i');
+
+        $refundedPoints =
+            (int) $reservation->point_cost;
+
+        $remainingPoints =
+            (int) $student->point_balance;
+
+        return back()->with(
+            'success',
+            'Cancelled the lesson reservation.'
+
+                . '   Lesson Date：'
+                . $lessonDate
+                . '   < Refunded Points：'
+                . number_format($refundedPoints)
+                . ' pt'
+                . '    Remaining Points：'
+                . number_format($remainingPoints)
+                . ' pt >'
+        );
     }
 
     public function myReservations(Request $request): View
     {
         /*
-     * ログイン中のStudent取得
-     */
+         * ログイン中のStudent取得
+         */
         $student = $request->user()->student;
 
         abort_unless(
@@ -444,11 +596,11 @@ class ReservationController extends Controller
         );
 
         /*
-     * 現在の予約
-     *
-     * ・未来の予約
-     * ・pendingまたはconfirmed
-     */
+         * 現在の予約
+         *
+         * ・未来の予約
+         * ・pendingまたはconfirmed
+         */
         $upcomingReservations = Reservation::query()
             ->where('student_id', $student->id)
             ->where('start_at', '>=', now())
@@ -467,12 +619,12 @@ class ReservationController extends Controller
             ->get();
 
         /*
-     * 予約履歴
-     *
-     * ・開始日時を過ぎている
-     * または
-     * ・pending、confirmed以外
-     */
+         * 予約履歴
+         *
+         * ・開始日時を過ぎている
+         * または
+         * ・pending、confirmed以外
+         */
         $historyReservations = Reservation::query()
             ->where('student_id', $student->id)
             ->where(function ($query) {
@@ -494,8 +646,8 @@ class ReservationController extends Controller
             ->get();
 
         /*
-     * 既存Bladeとの互換性を残す
-     */
+         * 既存Bladeとの互換性を残す
+         */
         $reservations = $upcomingReservations;
 
         return view(
@@ -508,84 +660,85 @@ class ReservationController extends Controller
         );
     }
 
-public function teacherDetail(Request $request): View
-{
-    $validated = $request->validate([
-        'teacher_id' => [
-            'required',
-            'integer',
-            'exists:teachers,id',
-        ],
+    public function teacherDetail(Request $request): View
+    {
+        $validated = $request->validate([
+            'teacher_id' => [
+                'required',
+                'integer',
+                'exists:teachers,id',
+            ],
 
-        'material_id' => [
-            'required',
-            'integer',
-            'exists:materials,material_id',
-        ],
+            'material_id' => [
+                'required',
+                'integer',
+                'exists:materials,material_id',
+            ],
 
-        'date' => [
-            'nullable',
-            'date',
-        ],
+            'date' => [
+                'nullable',
+                'date',
+            ],
 
-        // カレンダーの表示開始日
-        'view_start' => [
-            'nullable',
-            'date',
-        ],
+            // カレンダーの表示開始日
+            'view_start' => [
+                'nullable',
+                'date',
+            ],
 
-        'mode' => [
-            'required',
-            'in:material,date',
-        ],
-    ]);
+            'mode' => [
+                'required',
+                'in:material,date',
+            ],
+        ]);
 
-    $teacher = Teacher::query()
-        ->with([
-            'user',
-            'materials',
-        ])
-        ->findOrFail(
-            $validated['teacher_id']
+        $teacher = Teacher::query()
+            ->with([
+                'user',
+                'materials',
+            ])
+            ->findOrFail(
+                $validated['teacher_id']
+            );
+
+        $material = Material::query()
+            ->findOrFail(
+                $validated['material_id']
+            );
+
+        /*
+         * 生徒が選択した日
+         */
+        $selectedDate = isset($validated['date'])
+            ? CarbonImmutable::parse(
+                $validated['date']
+            )->startOfDay()
+            : null;
+
+        /*
+         * 7日間の表示開始日
+         *
+         * view_startがなければ今日から表示
+         */
+        $viewStart = isset($validated['view_start'])
+            ? CarbonImmutable::parse(
+                $validated['view_start']
+            )->startOfDay()
+            : CarbonImmutable::today();
+
+        return view(
+            'students.reservations.teacher-detail',
+            compact(
+                'teacher',
+                'material',
+                'validated',
+                'selectedDate',
+                'viewStart'
+            )
         );
-
-    $material = Material::query()
-        ->findOrFail(
-            $validated['material_id']
-        );
-
-    /*
-     * 生徒が選択した日
-     */
-    $selectedDate = isset($validated['date'])
-        ? CarbonImmutable::parse(
-            $validated['date']
-        )->startOfDay()
-        : null;
-
-    /*
-     * 7日間の表示開始日
-     *
-     * view_startがなければ今日から表示
-     */
-    $viewStart = isset($validated['view_start'])
-        ? CarbonImmutable::parse(
-            $validated['view_start']
-        )->startOfDay()
-        : CarbonImmutable::today();
-
-    return view(
-        'students.reservations.teacher-detail',
-        compact(
-            'teacher',
-            'material',
-            'validated',
-            'selectedDate',
-            'viewStart'
-        )
-    );
-}
+    }
     public function showReservation(
+
         Request $request,
         Reservation $reservation
     ): View {
@@ -599,8 +752,8 @@ public function teacherDetail(Request $request): View
         );
 
         /*
-     * 他の生徒の予約を表示させない
-     */
+         * 他の生徒の予約を表示させない
+         */
         abort_unless(
             (int) $reservation->student_id === (int) $student->id,
             403,
@@ -608,8 +761,8 @@ public function teacherDetail(Request $request): View
         );
 
         /*
-     * 詳細画面で必要な関連データを取得
-     */
+         * 詳細画面で必要な関連データを取得
+         */
         $reservation->load([
             'teacher.user',
             'material',

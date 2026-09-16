@@ -3,17 +3,38 @@
 namespace App\Services;
 
 use App\Models\TeacherSchedule;
+use App\Models\Reservation;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class AvailabilityService
 {
     /**
      * 指定した先生・日付の予約可能枠を取得
      */
+
     public function getAvailability(
         int $teacherId,
-        string $date
+        string $date,
+        int $studentId
     ): array {
+        $dayStart = Carbon::parse($date)->startOfDay();
+        $dayEnd = $dayStart->copy()->addDay();
+
+        // 生徒の有効な予約を取得
+        $studentReservations = Reservation::query()
+            ->where('student_id', $studentId)
+            ->whereHas('status', function($query) {
+                $query->whereIn('status_code', [
+                    'pending',
+                    'confirmed',
+                ]);
+            })
+            ->where('start_at', '<', $dayEnd)
+            ->where('end_at', '>', $dayStart)
+            ->get();
+
+        // 先生の有効な予約を取得
         $schedules = TeacherSchedule::query()
             ->where('teacher_id', $teacherId)
             ->whereDate('available_date', $date)
@@ -26,7 +47,10 @@ class AvailabilityService
         foreach ($schedules as $schedule) {
             $slots = array_merge(
                 $slots,
-                $this->generateSlots($schedule)
+                $this->generateSlots(
+                    $schedule,
+                    $studentReservations
+                )
             );
         }
 
@@ -37,11 +61,12 @@ class AvailabilityService
      */
 
     public function generateSlots(
-        TeacherSchedule $schedule
+        TeacherSchedule $schedule,
+        Collection $studentReservations
     ): array {
         $slots = [];
 
-        $date = $schedule->available_date
+        $date = Carbon::parse($schedule->available_date)
             ->format('Y-m-d');
 
         $current = Carbon::parse(
@@ -51,6 +76,11 @@ class AvailabilityService
         $end = Carbon::parse(
             $date . ' ' . $schedule->end_time
         );
+
+        // 日をまたぐシフトへの対応
+        if ($end->lte($current)) {
+            $end->addDay();
+        }
 
         // 有効な休止時間
         $exceptions = $schedule->exceptions()
@@ -70,13 +100,13 @@ class AvailabilityService
         // 現在時刻から10分後
         $bookingDeadline = now()->addMinutes(10);
 
-        while ($current < $end) {
-
+        while (
+            $current->copy()->addMinutes(30) ->lte($end)
+            ) {
             $slotStart = $current->copy();
-
             $slotEnd = $current
-                ->copy()
-                ->addMinutes(30);
+                    ->copy()
+                    ->addMinutes(30);
 
             /*
             * 以下は予約不可
@@ -100,8 +130,8 @@ class AvailabilityService
                     );
 
                     if (
-                        $slotStart < $exceptionEnd &&
-                        $slotEnd > $exceptionStart
+                        $slotStart -> lt($exceptionEnd) &&
+                        $slotEnd ->gt($exceptionStart)
                     ) {
                         $available = false;
                         break;
@@ -121,11 +151,29 @@ class AvailabilityService
                         $reservation->end_at
                     );
 
-                    if ($slotStart < $reservationEnd && $slotEnd > $reservationStart) {
+                    if(
+                        $slotStart -> lt($reservationEnd) &&
+                        $slotEnd -> gt($reservationStart)
+                    ) {
                         $available = false;
                         break;
                     }
                 }
+            }
+
+            $studentConflict = $studentReservations->contains(
+                function(Reservation $reservation) use ($slotStart, $slotEnd) {
+                    $studentReservationStart = Carbon::parse($reservation->start_at);
+                    $studentReservationEnd = Carbon::parse($reservation->end_at);
+
+                    return $slotStart ->lt($studentReservationEnd) && $slotEnd ->gt($studentReservationStart);
+                }
+            );
+
+            //生徒自身の予約と重複していたら予約不可
+
+            if ($studentConflict) {
+                $available = false;
             }
 
             $slots[] = [
@@ -138,6 +186,8 @@ class AvailabilityService
                     ->format('Y-m-d H:i:s'),
 
                 'available' => $available,
+
+                'student_conflict' => $studentConflict,
             ];
 
             $current->addMinutes(30);

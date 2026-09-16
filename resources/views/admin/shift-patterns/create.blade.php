@@ -33,11 +33,11 @@
 
         <div class="row">
             <div class="col-md-3 mb-3">
-                <label>Representative Start Time</label>
+                <label>Start Time</label>
                 <input type="time" name="start_time" class="form-control" value="{{ old('start_time', '09:00') }}" required>
             </div>
             <div class="col-md-3 mb-3">
-                <label>Representative End Time</label>
+                <label>End Time</label>
                 <input type="time" name="end_time" class="form-control" value="{{ old('end_time', '18:00') }}" required>
             </div>
             <div class="col-md-3 mb-3">
@@ -103,15 +103,15 @@
         </div> --}}
 
         <hr>
-        <h3>休憩</h3>
+        <h3>Break</h3>
         <div class="row mb-4">
             <div class="col-md-4">
-                <label>休憩 開始</label>
+                <label>Break Start</label>
                 <input type="time" name="breaks[0][start_time]" class="form-control"
                        value="{{ old('breaks.0.start_time') }}">
             </div>
             <div class="col-md-4">
-                <label>休憩 終了</label>
+                <label>Break End</label>
                 <input type="time" name="breaks[0][end_time]" class="form-control"
                        value="{{ old('breaks.0.end_time') }}">
             </div>
@@ -121,7 +121,7 @@
                        value="{{ old('breaks.0.reason') }}">
             </div>
             <small class="text-muted mt-2">
-                ※休憩を使わない場合は開始・終了を空欄にしてください。
+                ※If you do not use a break, leave the start and end times blank.
             </small>
         </div>
 

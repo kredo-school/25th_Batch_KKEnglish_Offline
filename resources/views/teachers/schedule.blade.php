@@ -4,138 +4,144 @@
 
 @section('content')
 
-<div class="container py-4">
+<style>
 
-    {{-- CSRF Token --}}
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    /*
+    |--------------------------------------------------------------------------
+    | Schedule Colors
+    |--------------------------------------------------------------------------
+    */
 
+    /* Available */
+    .schedule-available {
+        background-color: #F5F6F7 !important;
+    }
+
+
+    /* Booked */
+    .schedule-booked {
+        background-color: #CFE8F7 !important;
+    }
+
+
+    /* Past / Completed */
+    .schedule-past,
+    .schedule-completed {
+        background-color: #E2E3E5 !important;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Schedule Cell
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-cell {
+        transition:
+            background-color 0.15s ease;
+    }
+
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #d6d9dc !important;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Booked
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-booked-text {
+        color: #212529;
+
+        font-size: 0.8rem;
+
+        font-weight: 600;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Completed
+    |--------------------------------------------------------------------------
+    */
+
+    .schedule-completed-text {
+        color: #6c757d;
+
+        font-size: 0.8rem;
+
+        font-weight: 600;
+    }
+
+</style>
+
+
+
+<div class="container">
 
     {{-- ===============================
          Title
     ================================ --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div
+        class="
+            d-flex
+            justify-content-between
+            align-items-center
+            mb-4
+        "
+    >
 
         <h2 class="fw-bold mb-0">
             My Schedule
         </h2>
 
-        <button type="button"
-                id="editBtn"
-                class="btn btn-dark">
 
+        <button
+            type="button"
+            id="editBtn"
+            class="btn btn-dark"
+        >
             Edit Schedule
-
         </button>
 
     </div>
 
 
-    @php
-
-        use Carbon\Carbon;
-
-        /*
-        |--------------------------------------------------------------------------
-        | 表示する週
-        |--------------------------------------------------------------------------
-        |
-        | URLに week_start がある
-        | → 指定された週を表示
-        |
-        | ない
-        | → 今週を表示
-        |
-        */
-
-        $startOfWeek =
-            request('week_start')
-                ? Carbon::parse(
-                    request('week_start')
-                )->startOfWeek(Carbon::MONDAY)
-                : now()->startOfWeek(Carbon::MONDAY);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 前週・翌週
-        |--------------------------------------------------------------------------
-        */
-
-        $previousWeek =
-            $startOfWeek
-                ->copy()
-                ->subWeek()
-                ->format('Y-m-d');
-
-
-        $nextWeek =
-            $startOfWeek
-                ->copy()
-                ->addWeek()
-                ->format('Y-m-d');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 月曜日〜日曜日
-        |--------------------------------------------------------------------------
-        */
-
-        $days = collect(range(0, 6))
-            ->map(
-                fn ($i) =>
-                    $startOfWeek
-                        ->copy()
-                        ->addDays($i)
-            );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 06:00〜22:00
-        | 30分単位
-        |--------------------------------------------------------------------------
-        */
-
-        $times = collect();
-
-        $time =
-            Carbon::createFromTime(6, 0);
-
-        $endTime =
-            Carbon::createFromTime(22, 0);
-
-
-        while ($time < $endTime) {
-
-            $times->push(
-                $time->format('H:i')
-            );
-
-            $time->addMinutes(30);
-
-        }
-
-    @endphp
-
 
     {{-- ===============================
          Week Navigation
     ================================ --}}
-    <div class="
-        d-flex
-        justify-content-between
-        align-items-center
-        mb-3
-    ">
+    <div
+        class="
+            d-flex
+            justify-content-between
+            align-items-center
+            mb-3
+        "
+    >
 
         {{-- Previous Week --}}
         <a
-            href="{{ url()->current() }}?week_start={{ $previousWeek }}"
+            href="{{ route('teachers.schedule', [
+                'week_start' => $startOfWeek
+                    ->copy()
+                    ->subWeek()
+                    ->format('Y-m-d')
+            ]) }}"
             class="btn btn-outline-secondary btn-sm"
         >
 
-            <i class="fa-solid fa-chevron-left me-1"></i>
+            <i
+                class="
+                    fa-solid
+                    fa-chevron-left
+                    me-1
+                "
+            ></i>
 
             Previous Week
 
@@ -160,40 +166,176 @@
 
         {{-- Next Week --}}
         <a
-            href="{{ url()->current() }}?week_start={{ $nextWeek }}"
+            href="{{ route('teachers.schedule', [
+                'week_start' => $startOfWeek
+                    ->copy()
+                    ->addWeek()
+                    ->format('Y-m-d')
+            ]) }}"
             class="btn btn-outline-secondary btn-sm"
         >
 
             Next Week
 
-            <i class="fa-solid fa-chevron-right ms-1"></i>
+            <i
+                class="
+                    fa-solid
+                    fa-chevron-right
+                    ms-1
+                "
+            ></i>
 
         </a>
 
     </div>
 
 
+
     {{-- ===============================
-         Message
+         Legend
     ================================ --}}
-    <div id="editMessage"
-         class="alert alert-warning d-none">
+    <div
+        class="
+            d-flex
+            gap-4
+            flex-wrap
+            align-items-center
+            mb-3
+            small
+        "
+    >
 
-        Click the time slots you are unavailable.
+        {{-- Available --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="
+                    schedule-available
+                    border
+                    rounded
+                "
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                "
+            ></span>
+
+            Available
+
+        </div>
+
+
+        {{-- Unavailable --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span   class="text-dark fw-bold fs-5">
+                ×
+            </span>
+
+            Unavailable
+
+        </div>
+
+
+        {{-- Booked --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="
+                    schedule-booked
+                    border
+                    rounded
+                "
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                "
+            ></span>
+
+            Booked
+
+        </div>
+
+
+        {{-- Completed / Past --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="
+                    schedule-past
+                    border
+                    rounded
+                "
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                "
+            ></span>
+
+            Past / Completed
+
+        </div>
+
+
+        {{-- Outside shift --}}
+        <div class="d-flex align-items-center gap-2">
+
+            <span
+                class="
+                    bg-white
+                    border
+                    rounded
+                "
+                style="
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                "
+            ></span>
+
+            Outside shift
+
+        </div>
 
     </div>
 
 
-    {{-- エラー表示 --}}
-    <div id="errorMessage"
-         class="alert alert-danger d-none">
+
+    {{-- ===============================
+         Edit Message
+    ================================ --}}
+    <div
+        id="editMessage"
+        class="alert alert-warning d-none"
+    >
+        Select the available time slots you want to mark as unavailable.
     </div>
 
 
-    {{-- 成功表示 --}}
-    <div id="successMessage"
-         class="alert alert-success d-none">
+
+    {{-- ===============================
+         Error Message
+    ================================ --}}
+    <div
+        id="errorMessage"
+        class="alert alert-danger d-none"
+    >
     </div>
+
+
+
+    {{-- ===============================
+         Success Message
+    ================================ --}}
+    <div
+        id="successMessage"
+        class="alert alert-success d-none"
+    >
+    </div>
+
 
 
     {{-- ===============================
@@ -201,7 +343,14 @@
     ================================ --}}
     <div class="table-responsive">
 
-        <table class="table table-bordered text-center align-middle">
+        <table
+            class="
+                table
+                table-bordered
+                text-center
+                align-middle
+            "
+        >
 
             <thead class="table-light">
 
@@ -217,15 +366,12 @@
                         <th style="min-width: 120px;">
 
                             <div class="fw-bold">
-
                                 {{ $day->format('D') }}
-
                             </div>
 
+
                             <small class="text-secondary">
-
                                 {{ $day->format('m/d') }}
-
                             </small>
 
                         </th>
@@ -243,7 +389,7 @@
 
                     <tr>
 
-                        {{-- 時間 --}}
+                        {{-- Time --}}
                         <th class="table-light">
 
                             {{ $time }}
@@ -251,27 +397,27 @@
                         </th>
 
 
-                        {{-- 1週間分 --}}
                         @foreach ($days as $day)
 
                             <td
-                                class="schedule-cell bg-light"
+                                class="
+                                    schedule-cell
+                                    bg-white
+                                "
 
                                 data-date="{{ $day->format('Y-m-d') }}"
 
                                 data-time="{{ $time }}"
 
-                                {{-- 勤務時間内か --}}
                                 data-working="false"
 
-                                {{-- TeacherSchedule ID --}}
                                 data-schedule-id=""
 
-                                {{-- ScheduleException ID --}}
                                 data-exception-id=""
 
-                                {{-- 編集開始時の状態 --}}
                                 data-original-unavailable="false"
+
+                                data-state="outside"
 
                                 style="
                                     height: 45px;
@@ -293,56 +439,58 @@
     </div>
 
 
+
     {{-- ===============================
          Edit Actions
     ================================ --}}
-    <div id="editActions"
-         class="
+    <div
+        id="editActions"
+        class="
             d-none
             justify-content-end
             align-items-center
             gap-2
             mt-3
-         ">
+        "
+    >
 
-
-        {{-- 休み理由 --}}
-        <select id="exceptionType"
-                class="form-select"
-                style="max-width: 220px;">
+        {{-- Exception Type --}}
+        <select
+            id="exceptionType"
+            class="form-select"
+            style="max-width: 220px;"
+        >
 
             <option value="">
                 Select reason
             </option>
 
-            {{-- GETで取得したExceptionTypeを
-                 JavaScriptから追加する --}}
-
         </select>
 
 
         {{-- Cancel --}}
-        <button type="button"
-                id="cancelBtn"
-                class="btn btn-outline-secondary">
-
+        <button
+            type="button"
+            id="cancelBtn"
+            class="btn btn-outline-secondary"
+        >
             Cancel
-
         </button>
 
 
         {{-- Save --}}
-        <button type="button"
-                id="saveBtn"
-                class="btn btn-dark">
-
+        <button
+            type="button"
+            id="saveBtn"
+            class="btn btn-dark"
+        >
             Save Schedule
-
         </button>
 
     </div>
 
 </div>
+
 
 
 <script>
@@ -351,11 +499,12 @@ document.addEventListener(
     'DOMContentLoaded',
     function () {
 
+
         /*
-         * ===============================
-         * Elements
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Elements
+        |--------------------------------------------------------------------------
+        */
 
         const editBtn =
             document.getElementById(
@@ -411,15 +560,12 @@ document.addEventListener(
             );
 
 
+
         /*
-         * ===============================
-         * 表示中の週
-         * ===============================
-         *
-         * Bladeで作った
-         * $startOfWeek をJSでも使用
-         *
-         */
+        |--------------------------------------------------------------------------
+        | Current Week
+        |--------------------------------------------------------------------------
+        */
 
         const currentWeekStart =
             '{{ $startOfWeek->format('Y-m-d') }}';
@@ -427,10 +573,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * CSRF Token
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | CSRF Token
+        |--------------------------------------------------------------------------
+        */
 
         const token =
             document
@@ -442,67 +588,62 @@ document.addEventListener(
                 );
 
 
+
         /*
-         * 閲覧 / 編集モード
-         */
+        |--------------------------------------------------------------------------
+        | State
+        |--------------------------------------------------------------------------
+        */
+
         let editing =
             false;
 
 
-        /*
-         * Cancel用
-         */
         let originalSchedule =
             [];
 
 
+
         /*
-         * ===============================
-         * Initial Load
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Initial Load
+        |--------------------------------------------------------------------------
+        */
 
         loadSchedule();
 
 
 
         /*
-         * ===============================
-         * GET
-         *
-         * TeacherSchedule
-         * +
-         * ScheduleException
-         * +
-         * ExceptionType
-         *
-         * を取得
-         *
-         * 表示中のweek_startも送る
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | GET Schedule
+        |--------------------------------------------------------------------------
+        */
 
         async function loadSchedule() {
-
-            hideMessages();
-
 
             try {
 
                 const response =
                     await fetch(
                         '/teachers/schedule-exceptions'
-                        + '?week_start='
-                        + encodeURIComponent(
+                        +
+                        '?week_start='
+                        +
+                        encodeURIComponent(
                             currentWeekStart
                         ),
                         {
-                            headers: {
+                            method:
+                                'GET',
 
+                            headers: {
                                 'Accept':
                                     'application/json'
+                            },
 
-                            }
+                            credentials:
+                                'same-origin'
                         }
                     );
 
@@ -515,7 +656,8 @@ document.addEventListener(
 
                     showError(
                         data.message
-                        ?? 'Failed to load schedule.'
+                        ??
+                        'Failed to load schedule.'
                     );
 
                     return;
@@ -524,15 +666,16 @@ document.addEventListener(
 
 
                 /*
-                 * 確定勤務を表示
+                 * TeacherSchedule
                  */
                 applySchedules(
-                    data
+                    data.schedules
+                    ?? []
                 );
 
 
                 /*
-                 * 休み理由をselectへ
+                 * ExceptionType
                  */
                 applyExceptionTypes(
                     data.exception_types
@@ -558,17 +701,17 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * TeacherScheduleを画面へ反映
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | TeacherSchedule
+        |--------------------------------------------------------------------------
+        */
 
         function applySchedules(
-            data
+            schedules
         ) {
 
             /*
-             * 最初に全部勤務外にする
+             * 全セル初期化
              */
             cells.forEach(
                 function (cell) {
@@ -589,17 +732,30 @@ document.addEventListener(
                         'false';
 
 
-                    cell.classList.add(
+                    cell.dataset.state =
+                        'outside';
+
+
+                    /*
+                     * 表示状態をリセット
+                     */
+                    cell.classList.remove(
+                        'schedule-available',
+                        'schedule-booked',
+                        'schedule-past',
+                        'schedule-completed',
+                        'bg-secondary-subtle',
+                        'bg-primary-subtle',
                         'bg-light'
                     );
 
 
-                    cell.classList.remove(
-                        'table-secondary'
+                    cell.classList.add(
+                        'bg-white'
                     );
 
 
-                    cell.textContent =
+                    cell.innerHTML =
                         '';
 
 
@@ -610,15 +766,16 @@ document.addEventListener(
             );
 
 
+
             /*
              * TeacherSchedule
              */
-            data.schedules.forEach(
+            schedules.forEach(
                 function (schedule) {
 
+
                     const date =
-                        schedule
-                            .available_date;
+                        schedule.available_date;
 
 
                     const startTime =
@@ -642,8 +799,9 @@ document.addEventListener(
                     cells.forEach(
                         function (cell) {
 
+
                             /*
-                             * 日付が違う
+                             * 日付違い
                              */
                             if (
                                 cell.dataset.date
@@ -661,15 +819,6 @@ document.addEventListener(
 
                             /*
                              * 勤務時間内
-                             *
-                             * 例:
-                             *
-                             * 06:00〜12:00
-                             *
-                             * 06:00 ○
-                             * ...
-                             * 11:30 ○
-                             * 12:00 ×
                              */
                             if (
                                 time >= startTime
@@ -681,17 +830,30 @@ document.addEventListener(
                                     'true';
 
 
-                                /*
-                                 * APIの主キー名に合わせる
-                                 */
                                 cell.dataset.scheduleId =
-                                    schedule
-                                        .schedule_id;
+                                    schedule.schedule_id;
+
+
+                                cell.dataset.state =
+                                    'available';
 
 
                                 cell.classList.remove(
-                                    'bg-light'
+                                    'bg-white'
                                 );
+
+
+                                /*
+                                 * Available
+                                 * 背景のみ
+                                 */
+                                cell.classList.add(
+                                    'schedule-available'
+                                );
+
+
+                                cell.innerHTML =
+                                    '';
 
                             }
 
@@ -700,11 +862,218 @@ document.addEventListener(
 
 
                     /*
-                     * 登録済み休みを表示
+                     * Reservation
+                     */
+                    applyReservations(
+                        schedule
+                    );
+
+
+                    /*
+                     * Exception
                      */
                     applyExceptions(
-                        schedule,
-                        date
+                        schedule
+                    );
+
+                }
+            );
+
+
+            /*
+             * Past
+             */
+            applyPastCells();
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Reservations
+        |--------------------------------------------------------------------------
+        */
+
+        function applyReservations(
+            schedule
+        ) {
+
+            const reservations =
+                schedule.reservations
+                ?? [];
+
+
+            reservations.forEach(
+                function (reservation) {
+
+
+                    const statusCode =
+                        reservation.status_code;
+
+
+                    const reservationStart =
+                        new Date(
+                            reservation.start_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
+                        );
+
+
+                    const reservationEnd =
+                        new Date(
+                            reservation.end_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
+                        );
+
+
+                    cells.forEach(
+                        function (cell) {
+
+
+                            if (
+                                cell.dataset.date
+                                !==
+                                schedule.available_date
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const cellStart =
+                                new Date(
+                                    `${cell.dataset.date}T${cell.dataset.time}:00`
+                                );
+
+
+                            const cellEnd =
+                                new Date(
+                                    cellStart.getTime()
+                                    +
+                                    30
+                                    *
+                                    60
+                                    *
+                                    1000
+                                );
+
+
+                            /*
+                             * 予約時間との重複
+                             */
+                            const overlaps =
+                                cellStart
+                                <
+                                reservationEnd
+                                &&
+                                cellEnd
+                                >
+                                reservationStart;
+
+
+                            if (!overlaps) {
+
+                                return;
+
+                            }
+
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Booked
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                statusCode
+                                === 'pending'
+                                ||
+                                statusCode
+                                === 'confirmed'
+                            ) {
+
+                                cell.dataset.state =
+                                    'booked';
+
+
+                                cell.classList.remove(
+                                    'schedule-available',
+                                    'schedule-past',
+                                    'schedule-completed',
+                                    'bg-white'
+                                );
+
+
+                                cell.classList.add(
+                                    'schedule-booked'
+                                );
+
+
+                                cell.innerHTML = `
+                                    <span
+                                        class="
+                                            schedule-booked-text
+                                        "
+                                    >
+                                        Booked
+                                    </span>
+                                `;
+
+
+                                return;
+
+                            }
+
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Completed
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                statusCode
+                                === 'completed'
+                            ) {
+
+                                cell.dataset.state =
+                                    'completed';
+
+
+                                cell.classList.remove(
+                                    'schedule-available',
+                                    'schedule-booked',
+                                    'bg-white'
+                                );
+
+
+                                cell.classList.add(
+                                    'schedule-completed'
+                                );
+
+
+                                cell.innerHTML = `
+                                    <span
+                                        class="
+                                            schedule-completed-text
+                                        "
+                                    >
+                                        Completed
+                                    </span>
+                                `;
+
+                            }
+
+                        }
                     );
 
                 }
@@ -715,37 +1084,195 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Existing Exceptions
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Existing Exceptions
+        |--------------------------------------------------------------------------
+        */
 
         function applyExceptions(
-            schedule,
-            date
+            schedule
         ) {
 
-            if (
-                !schedule.exceptions
-            ) {
-
-                return;
-
-            }
+            const exceptions =
+                schedule.exceptions
+                ?? [];
 
 
-            schedule.exceptions.forEach(
+            exceptions.forEach(
                 function (exception) {
 
 
                     /*
-                     * cancelledは表示しない
+                     * activeのみ
                      */
                     if (
                         exception.status
-                        &&
-                        exception.status
-                            !== 'active'
+                        !== 'active'
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const exceptionStart =
+                        new Date(
+                            exception.start_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
+                        );
+
+
+                    const exceptionEnd =
+                        new Date(
+                            exception.end_at
+                                .replace(
+                                    ' ',
+                                    'T'
+                                )
+                        );
+
+
+                    cells.forEach(
+                        function (cell) {
+
+
+                            if (
+                                cell.dataset.date
+                                !==
+                                schedule.available_date
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const cellStart =
+                                new Date(
+                                    `${cell.dataset.date}T${cell.dataset.time}:00`
+                                );
+
+
+                            const cellEnd =
+                                new Date(
+                                    cellStart.getTime()
+                                    +
+                                    30
+                                    *
+                                    60
+                                    *
+                                    1000
+                                );
+
+
+                            const overlaps =
+                                cellStart
+                                <
+                                exceptionEnd
+                                &&
+                                cellEnd
+                                >
+                                exceptionStart;
+
+
+                            if (!overlaps) {
+
+                                return;
+
+                            }
+
+
+                            /*
+                             * Booked / Completedは
+                             * 上書きしない
+                             */
+                            if (
+                                cell.dataset.state
+                                === 'booked'
+                                ||
+                                cell.dataset.state
+                                === 'completed'
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            cell.dataset.state =
+                                'unavailable';
+
+
+                            cell.classList.remove(
+                                'schedule-available',
+                                'bg-white'
+                            );
+
+
+                            /*
+                             * Unavailable
+                             * ×のみ
+                             */
+                            cell.innerHTML = `
+                                <span
+                                    class="
+                                        schedule-unavailable-mark
+                                    "
+                                >
+                                    ×
+                                </span>
+                            `;
+
+
+                            cell.dataset.exceptionId =
+                                exception.id;
+
+
+                            cell.dataset.originalUnavailable =
+                                'true';
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Past
+        |--------------------------------------------------------------------------
+        */
+
+        function applyPastCells() {
+
+            const now =
+                new Date();
+
+
+            cells.forEach(
+                function (cell) {
+
+
+                    const cellStart =
+                        new Date(
+                            `${cell.dataset.date}T${cell.dataset.time}:00`
+                        );
+
+
+                    /*
+                     * 未来
+                     */
+                    if (
+                        cellStart
+                        >=
+                        now
                     ) {
 
                         return;
@@ -754,61 +1281,42 @@ document.addEventListener(
 
 
                     /*
-                     * start_at
-                     *
-                     * 2026-09-03 07:00:00
-                     *
-                     * ↓
-                     *
-                     * 07:00
+                     * Completedは残す
                      */
-                    const startAt =
-                        exception
-                            .start_at;
-
-
-                    const time =
-                        startAt
-                            .substring(
-                                11,
-                                16
-                            );
-
-
-                    const cell =
-                        document
-                            .querySelector(
-                                '.schedule-cell'
-                                + `[data-date="${date}"]`
-                                + `[data-time="${time}"]`
-                            );
-
-
-                    if (!cell) {
+                    if (
+                        cell.dataset.state
+                        === 'completed'
+                    ) {
 
                         return;
 
                     }
 
 
-                    cell.classList.add(
-                        'table-secondary'
+                    /*
+                     * Past
+                     */
+                    cell.dataset.state =
+                        'past';
+
+
+                    cell.classList.remove(
+                        'schedule-available',
+                        'schedule-booked',
+                        'bg-white'
                     );
 
 
-                    cell.textContent =
-                        'Unavailable';
+                    cell.classList.add(
+                        'schedule-past'
+                    );
 
 
-                    cell.dataset.exceptionId =
-                        exception.id
-                        ??
-                        exception
-                            .schedule_exception_id;
-
-
-                    cell.dataset.originalUnavailable =
-                        'true';
+                    /*
+                     * Pastは文字なし
+                     */
+                    cell.innerHTML =
+                        '';
 
                 }
             );
@@ -818,19 +1326,21 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Exception Types
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Exception Types
+        |--------------------------------------------------------------------------
+        */
 
         function applyExceptionTypes(
             types
         ) {
 
             exceptionType.innerHTML =
-                '<option value="">'
-                + 'Select reason'
-                + '</option>';
+                `
+                    <option value="">
+                        Select reason
+                    </option>
+                `;
 
 
             types.forEach(
@@ -843,19 +1353,16 @@ document.addEventListener(
 
 
                     option.value =
-                        type
-                            .exception_type_id;
+                        type.exception_type_id;
 
 
                     option.textContent =
-                        type
-                            .type_name;
+                        type.type_name;
 
 
-                    exceptionType
-                        .appendChild(
-                            option
-                        );
+                    exceptionType.appendChild(
+                        option
+                    );
 
                 }
             );
@@ -865,10 +1372,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Edit Schedule
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Edit Schedule
+        |--------------------------------------------------------------------------
+        */
 
         editBtn.addEventListener(
             'click',
@@ -881,9 +1388,6 @@ document.addEventListener(
                 hideMessages();
 
 
-                /*
-                 * Cancel用
-                 */
                 originalSchedule =
                     [];
 
@@ -899,60 +1403,31 @@ document.addEventListener(
                             className:
                                 cell.className,
 
-                            text:
-                                cell.textContent,
+                            html:
+                                cell.innerHTML,
+
+                            state:
+                                cell.dataset.state,
 
                             exceptionId:
-                                cell.dataset
-                                    .exceptionId,
+                                cell.dataset.exceptionId,
 
                             originalUnavailable:
-                                cell.dataset
-                                    .originalUnavailable
+                                cell.dataset.originalUnavailable,
 
                         });
 
-                    }
-                );
 
-
-                editBtn.classList.add(
-                    'd-none'
-                );
-
-
-                editActions
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
-
-
-                editActions
-                    .classList
-                    .add(
-                        'd-flex'
-                    );
-
-
-                editMessage
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
-
-
-                /*
-                 * 勤務時間内だけ
-                 * pointerにする
-                 */
-                cells.forEach(
-                    function (cell) {
-
+                        /*
+                         * Available / Unavailable
+                         * のみ編集可能
+                         */
                         if (
-                            cell.dataset
-                                .working
-                            === 'true'
+                            cell.dataset.state
+                            === 'available'
+                            ||
+                            cell.dataset.state
+                            === 'unavailable'
                         ) {
 
                             cell.style.cursor =
@@ -963,16 +1438,36 @@ document.addEventListener(
                     }
                 );
 
+
+                editBtn.classList.add(
+                    'd-none'
+                );
+
+
+                editActions.classList.remove(
+                    'd-none'
+                );
+
+
+                editActions.classList.add(
+                    'd-flex'
+                );
+
+
+                editMessage.classList.remove(
+                    'd-none'
+                );
+
             }
         );
 
 
 
         /*
-         * ===============================
-         * Cell Click
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Cell Click
+        |--------------------------------------------------------------------------
+        */
 
         cells.forEach(
             function (cell) {
@@ -982,9 +1477,6 @@ document.addEventListener(
                     function () {
 
 
-                        /*
-                         * 閲覧モード
-                         */
                         if (!editing) {
 
                             return;
@@ -993,12 +1485,14 @@ document.addEventListener(
 
 
                         /*
-                         * 勤務時間外
+                         * Available / Unavailableのみ
                          */
                         if (
-                            cell.dataset
-                                .working
-                            !== 'true'
+                            cell.dataset.state
+                            !== 'available'
+                            &&
+                            cell.dataset.state
+                            !== 'unavailable'
                         ) {
 
                             return;
@@ -1006,33 +1500,60 @@ document.addEventListener(
                         }
 
 
+
+                        /*
+                         * Unavailable
+                         * ↓
+                         * Available
+                         */
+                        if (
+                            cell.dataset.state
+                            === 'unavailable'
+                        ) {
+
+                            cell.dataset.state =
+                                'available';
+
+
+                            cell.classList.add(
+                                'schedule-available'
+                            );
+
+
+                            cell.innerHTML =
+                                '';
+
+
+                            return;
+
+                        }
+
+
+
                         /*
                          * Available
-                         * ⇅
+                         * ↓
                          * Unavailable
                          */
-                        cell.classList.toggle(
-                            'table-secondary'
+
+                        cell.dataset.state =
+                            'unavailable';
+
+
+                        cell.classList.remove(
+                            'schedule-available'
                         );
 
 
-                        if (
-                            cell
-                                .classList
-                                .contains(
-                                    'table-secondary'
-                                )
-                        ) {
-
-                            cell.textContent =
-                                'Unavailable';
-
-                        } else {
-
-                            cell.textContent =
-                                '';
-
-                        }
+                        cell.innerHTML = `
+                            <span
+                                class="
+                                    schedule-unavailable-mark
+                                "
+                            >
+                                ×
+                            </span>
+                        `;
 
                     }
                 );
@@ -1043,10 +1564,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Cancel
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Cancel
+        |--------------------------------------------------------------------------
+        */
 
         cancelBtn.addEventListener(
             'click',
@@ -1059,8 +1580,12 @@ document.addEventListener(
                             item.className;
 
 
-                        item.cell.textContent =
-                            item.text;
+                        item.cell.innerHTML =
+                            item.html;
+
+
+                        item.cell.dataset.state =
+                            item.state;
 
 
                         item.cell.dataset.exceptionId =
@@ -1082,10 +1607,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Save Schedule
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Save
+        |--------------------------------------------------------------------------
+        */
 
         saveBtn.addEventListener(
             'click',
@@ -1094,16 +1619,10 @@ document.addEventListener(
                 hideMessages();
 
 
-                /*
-                 * 休み理由
-                 */
                 const exceptionTypeId =
                     exceptionType.value;
 
 
-                /*
-                 * 変更されたセル
-                 */
                 const createCells =
                     [];
 
@@ -1115,26 +1634,38 @@ document.addEventListener(
                 cells.forEach(
                     function (cell) {
 
+
+                        /*
+                         * Available / Unavailableのみ
+                         */
+                        if (
+                            cell.dataset.state
+                            !== 'available'
+                            &&
+                            cell.dataset.state
+                            !== 'unavailable'
+                        ) {
+
+                            return;
+
+                        }
+
+
                         const wasUnavailable =
-                            cell.dataset
-                                .originalUnavailable
+                            cell.dataset.originalUnavailable
                             === 'true';
 
 
                         const isUnavailable =
-                            cell
-                                .classList
-                                .contains(
-                                    'table-secondary'
-                                );
+                            cell.dataset.state
+                            === 'unavailable';
+
 
 
                         /*
                          * Available
                          * ↓
                          * Unavailable
-                         *
-                         * POST
                          */
                         if (
                             !wasUnavailable
@@ -1149,12 +1680,11 @@ document.addEventListener(
                         }
 
 
+
                         /*
                          * Unavailable
                          * ↓
                          * Available
-                         *
-                         * DELETE
                          */
                         if (
                             wasUnavailable
@@ -1172,9 +1702,9 @@ document.addEventListener(
                 );
 
 
+
                 /*
-                 * 新しい休みを登録する場合
-                 * 理由必須
+                 * Exception理由必須
                  */
                 if (
                     createCells.length > 0
@@ -1189,6 +1719,7 @@ document.addEventListener(
                     return;
 
                 }
+
 
 
                 /*
@@ -1207,17 +1738,15 @@ document.addEventListener(
                 }
 
 
-                /*
-                 * Saveボタン連打防止
-                 */
                 saveBtn.disabled =
                     true;
 
 
                 try {
 
+
                     /*
-                     * 新規Unavailable
+                     * Exception作成
                      */
                     for (
                         const cell
@@ -1232,8 +1761,9 @@ document.addEventListener(
                     }
 
 
+
                     /*
-                     * Unavailable解除
+                     * Exception解除
                      */
                     for (
                         const cell
@@ -1247,18 +1777,19 @@ document.addEventListener(
                     }
 
 
-                    showSuccess(
-                        'Schedule updated successfully.'
-                    );
-
 
                     /*
-                     * DB最新状態を再取得
+                     * DB最新状態
                      */
                     await loadSchedule();
 
 
                     finishEditing();
+
+
+                    showSuccess(
+                        'Schedule updated successfully.'
+                    );
 
 
                 } catch (error) {
@@ -1270,7 +1801,8 @@ document.addEventListener(
 
                     showError(
                         error.message
-                        ?? 'Failed to save schedule.'
+                        ??
+                        'Failed to save schedule.'
                     );
 
 
@@ -1287,12 +1819,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * POST
-         *
-         * ScheduleException登録
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Create Exception
+        |--------------------------------------------------------------------------
+        */
 
         async function createException(
             cell,
@@ -1307,9 +1837,6 @@ document.addEventListener(
                 cell.dataset.time;
 
 
-            /*
-             * 30分後をend_atにする
-             */
             const start =
                 new Date(
                     `${date}T${time}:00`
@@ -1320,14 +1847,19 @@ document.addEventListener(
                 new Date(
                     start.getTime()
                     +
-                    30 * 60 * 1000
+                    30
+                    *
+                    60
+                    *
+                    1000
                 );
 
 
             const endHour =
                 String(
                     end.getHours()
-                ).padStart(
+                )
+                .padStart(
                     2,
                     '0'
                 );
@@ -1336,7 +1868,8 @@ document.addEventListener(
             const endMinute =
                 String(
                     end.getMinutes()
-                ).padStart(
+                )
+                .padStart(
                     2,
                     '0'
                 );
@@ -1354,7 +1887,6 @@ document.addEventListener(
                             'POST',
 
                         headers: {
-
                             'Content-Type':
                                 'application/json',
 
@@ -1362,18 +1894,18 @@ document.addEventListener(
                                 'application/json',
 
                             'X-CSRF-TOKEN':
-                                token
-
+                                token,
                         },
+
+                        credentials:
+                            'same-origin',
 
                         body:
                             JSON.stringify({
 
                                 schedule_id:
                                     Number(
-                                        cell
-                                            .dataset
-                                            .scheduleId
+                                        cell.dataset.scheduleId
                                     ),
 
                                 exception_type_id:
@@ -1385,10 +1917,9 @@ document.addEventListener(
                                     `${date} ${time}:00`,
 
                                 end_at:
-                                    `${date} ${endTime}`
+                                    `${date} ${endTime}`,
 
-                            })
-
+                            }),
                     }
                 );
 
@@ -1399,18 +1930,25 @@ document.addEventListener(
 
             if (!response.ok) {
 
+                const firstError =
+                    result.errors
+                        ? Object.values(
+                            result.errors
+                        )[0]?.[0]
+                        : null;
+
+
                 throw new Error(
+                    firstError
+                    ??
                     result.message
-                    ?? 'Failed to create exception.'
+                    ??
+                    'Failed to create exception.'
                 );
 
             }
 
 
-            /*
-             * DBで作成された
-             * ScheduleException ID
-             */
             cell.dataset.exceptionId =
                 result.exception.id
                 ??
@@ -1422,20 +1960,17 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * DELETE
-         *
-         * ScheduleException解除
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Cancel Exception
+        |--------------------------------------------------------------------------
+        */
 
         async function cancelException(
             cell
         ) {
 
             const exceptionId =
-                cell.dataset
-                    .exceptionId;
+                cell.dataset.exceptionId;
 
 
             if (!exceptionId) {
@@ -1447,23 +1982,23 @@ document.addEventListener(
 
             const response =
                 await fetch(
-                    '/teachers/'
-                    + 'schedule-exceptions/'
-                    + exceptionId,
+                    '/teachers/schedule-exceptions/'
+                    +
+                    exceptionId,
                     {
                         method:
                             'DELETE',
 
                         headers: {
-
                             'Accept':
                                 'application/json',
 
                             'X-CSRF-TOKEN':
-                                token
+                                token,
+                        },
 
-                        }
-
+                        credentials:
+                            'same-origin'
                     }
                 );
 
@@ -1474,9 +2009,20 @@ document.addEventListener(
 
             if (!response.ok) {
 
+                const firstError =
+                    result.errors
+                        ? Object.values(
+                            result.errors
+                        )[0]?.[0]
+                        : null;
+
+
                 throw new Error(
+                    firstError
+                    ??
                     result.message
-                    ?? 'Failed to cancel exception.'
+                    ??
+                    'Failed to cancel exception.'
                 );
 
             }
@@ -1490,10 +2036,10 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Finish Editing
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Finish Editing
+        |--------------------------------------------------------------------------
+        */
 
         function finishEditing() {
 
@@ -1506,25 +2052,19 @@ document.addEventListener(
             );
 
 
-            editActions
-                .classList
-                .add(
-                    'd-none'
-                );
+            editActions.classList.add(
+                'd-none'
+            );
 
 
-            editActions
-                .classList
-                .remove(
-                    'd-flex'
-                );
+            editActions.classList.remove(
+                'd-flex'
+            );
 
 
-            editMessage
-                .classList
-                .add(
-                    'd-none'
-                );
+            editMessage.classList.add(
+                'd-none'
+            );
 
 
             exceptionType.value =
@@ -1545,25 +2085,21 @@ document.addEventListener(
 
 
         /*
-         * ===============================
-         * Messages
-         * ===============================
-         */
+        |--------------------------------------------------------------------------
+        | Messages
+        |--------------------------------------------------------------------------
+        */
 
         function hideMessages() {
 
-            errorMessage
-                .classList
-                .add(
-                    'd-none'
-                );
+            errorMessage.classList.add(
+                'd-none'
+            );
 
 
-            successMessage
-                .classList
-                .add(
-                    'd-none'
-                );
+            successMessage.classList.add(
+                'd-none'
+            );
 
         }
 
@@ -1576,11 +2112,9 @@ document.addEventListener(
                 message;
 
 
-            errorMessage
-                .classList
-                .remove(
-                    'd-none'
-                );
+            errorMessage.classList.remove(
+                'd-none'
+            );
 
         }
 
@@ -1593,11 +2127,9 @@ document.addEventListener(
                 message;
 
 
-            successMessage
-                .classList
-                .remove(
-                    'd-none'
-                );
+            successMessage.classList.remove(
+                'd-none'
+            );
 
         }
 

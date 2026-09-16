@@ -4,23 +4,39 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
-    {{-- Title --}}
-    <div class="mb-4">
+    {{-- ===============================
+         Title
+    ================================ --}}
+    <div class="d-flex justify-content-between align-items-start mb-4">
 
-        <h2 class="fw-bold mb-1">
-            Lesson History
-        </h2>
+        <div>
+            <h2 class="fw-bold mb-1">
+                Lesson History
+            </h2>
 
-        <p class="text-secondary mb-0">
-            View your completed lessons.
-        </p>
+            <p class="text-secondary mb-0">
+                View your completed lessons.
+            </p>
+        </div>
+
+
+        {{-- Point History --}}
+        <a
+            href="{{ route('students.point-history.index') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="fa-solid fa-coins me-1"></i>
+            Point History
+        </a>
 
     </div>
 
 
-    {{-- History List --}}
+    {{-- ===============================
+         History List
+    ================================ --}}
     <div class="card">
 
         <div class="card-header bg-white py-3">
@@ -38,6 +54,7 @@
 
                 <table class="table table-hover align-middle mb-0">
 
+                    {{-- Header --}}
                     <thead class="table-light">
 
                         <tr>
@@ -58,7 +75,7 @@
                                 Material
                             </th>
 
-                            <th class="py-3">
+                            <th class="py-3 text-center">
                                 Status
                             </th>
 
@@ -67,100 +84,221 @@
                     </thead>
 
 
+                    {{-- Body --}}
                     <tbody>
 
-                        {{-- Dummy Lesson 1 --}}
-                        <tr>
+                        @forelse ($reservations as $reservation)
 
-                            <td class="px-4">
-                                Sep 02, 2026
-                            </td>
+                            @php
 
-                            <td>
-                                09:00 - 09:30
-                            </td>
+                                $startAt = \Carbon\Carbon::parse(
+                                    $reservation->start_at
+                                );
 
-                            <td>
+                                $endAt = \Carbon\Carbon::parse(
+                                    $reservation->end_at
+                                );
 
-                                <div class="d-flex align-items-center">
-
-                                    <img
-                                        src="{{ asset('images/teacher1.jpg') }}"
-                                        alt="John Smith"
-                                        class="rounded-circle me-2"
-                                        width="40"
-                                        height="40"
-                                        style="object-fit: cover;"
-                                    >
-
-                                    <span>
-                                        John Smith
-                                    </span>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-                                Daily Conversation
-                            </td>
-
-                            <td>
-
-                                <span class="badge text-bg-success">
-                                    Completed
-                                </span>
-
-                            </td>
-
-                        </tr>
+                            @endphp
 
 
-                        {{-- Dummy Lesson 2 --}}
-                        <tr>
+                            <tr>
 
-                            <td class="px-4">
-                                Sep 01, 2026
-                            </td>
+                                {{-- ===============================
+                                     Date
+                                ================================ --}}
+                                <td class="px-4">
 
-                            <td>
-                                10:30 - 11:00
-                            </td>
+                                    <div class="fw-semibold">
+                                        {{ $startAt->format('M d, Y') }}
+                                    </div>
 
-                            <td>
+                                    <small class="text-secondary">
+                                        {{ $startAt->format('l') }}
+                                    </small>
 
-                                <div class="d-flex align-items-center">
+                                </td>
 
-                                    <img
-                                        src="{{ asset('images/teacher2.jpg') }}"
-                                        alt="Jane Doe"
-                                        class="rounded-circle me-2"
-                                        width="40"
-                                        height="40"
-                                        style="object-fit: cover;"
-                                    >
 
-                                    <span>
-                                        Jane Doe
-                                    </span>
+                                {{-- ===============================
+                                     Time
+                                ================================ --}}
+                                <td>
 
-                                </div>
+                                    {{ $startAt->format('h:i A') }}
+                                    -
+                                    {{ $endAt->format('h:i A') }}
 
-                            </td>
+                                </td>
 
-                            <td>
-                                Grammar
-                            </td>
 
-                            <td>
+                                {{-- ===============================
+                                     Teacher
+                                ================================ --}}
+                                <td>
 
-                                <span class="badge text-bg-success">
-                                    Completed
-                                </span>
+                                    <div class="d-flex align-items-center">
 
-                            </td>
+                                        {{-- Teacher Image --}}
+                                        @if (
+                                            $reservation
+                                                ->teacher
+                                                ?->user
+                                                ?->profile_image
+                                        )
 
-                        </tr>
+                                            <img
+                                                src="{{ $reservation->teacher->user->profile_image }}"
+                                                alt="Teacher"
+                                                width="40"
+                                                height="40"
+                                                class="rounded-circle me-2"
+                                                style="object-fit: cover;"
+                                            >
+
+                                        @else
+
+                                            <div
+                                                class="
+                                                    rounded-circle
+                                                    bg-light
+                                                    d-flex
+                                                    justify-content-center
+                                                    align-items-center
+                                                    text-secondary
+                                                    me-2
+                                                "
+                                                style="
+                                                    width: 40px;
+                                                    height: 40px;
+                                                "
+                                            >
+                                                <i class="fa-solid fa-user"></i>
+                                            </div>
+
+                                        @endif
+
+
+                                        {{-- Teacher Name --}}
+                                        <span class="fw-semibold">
+
+                                            {{
+                                                $reservation
+                                                    ->teacher
+                                                    ?->user
+                                                    ?->first_name
+                                                ?? ''
+                                            }}
+
+                                            {{
+                                                $reservation
+                                                    ->teacher
+                                                    ?->user
+                                                    ?->last_name
+                                                ?? ''
+                                            }}
+
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                {{-- ===============================
+                                     Material
+                                ================================ --}}
+                                <td>
+
+                                    {{
+                                        $reservation
+                                            ->material
+                                            ?->name
+                                        ?? '-'
+                                    }}
+
+                                </td>
+
+
+                                {{-- ===============================
+                                     Status
+                                ================================ --}}
+                                <td class="text-center">
+
+                                    @if (
+                                        $reservation
+                                            ->status
+                                            ?->status_code
+                                        === 'completed'
+                                    )
+
+                                        <span class="badge text-bg-success">
+                                            Completed
+                                        </span>
+
+                                    @elseif (
+                                        $reservation
+                                            ->status
+                                            ?->status_code
+                                        === 'absent'
+                                    )
+
+                                        <span class="badge text-bg-secondary">
+                                            Absent
+                                        </span>
+
+                                    @else
+
+                                        <span class="badge text-bg-secondary">
+                                            {{
+                                                ucfirst(
+                                                    $reservation
+                                                        ->status
+                                                        ?->status_code
+                                                    ?? 'unknown'
+                                                )
+                                            }}
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                            </tr>
+
+
+                        @empty
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    class="text-center py-5"
+                                >
+
+                                    <i
+                                        class="
+                                            fa-solid
+                                            fa-book-open
+                                            fa-2x
+                                            text-secondary
+                                            mb-3
+                                        "
+                                    ></i>
+
+                                    <h5 class="fw-bold">
+                                        No lesson history
+                                    </h5>
+
+                                    <p class="text-secondary mb-0">
+                                        You don't have any completed lessons yet.
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
 
                     </tbody>
 
@@ -171,28 +309,6 @@
         </div>
 
     </div>
-
-
-    {{-- Empty State --}}
-    {{--
-    <div class="card">
-
-        <div class="card-body text-center py-5">
-
-            <i class="fa-solid fa-book-open fa-2x text-secondary mb-3"></i>
-
-            <h5 class="fw-bold">
-                No lesson history
-            </h5>
-
-            <p class="text-secondary mb-0">
-                You don't have any completed lessons yet.
-            </p>
-
-        </div>
-
-    </div>
-    --}}
 
 </div>
 

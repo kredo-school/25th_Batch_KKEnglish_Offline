@@ -42,6 +42,10 @@ class DatabaseSeeder extends Seeder
             ShiftPatternSeeder::class,
             TeacherScheduleSeeder::class,
             MaterialTeacherSeeder::class,
+<<<<<<< HEAD
+=======
+            TransactionTypeSeeder::class,
+>>>>>>> 33ed112abf095cc369ec0a77a705cda47f6dc63d
         ]);
 
         $student = User::firstOrCreate(
