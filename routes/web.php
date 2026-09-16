@@ -65,8 +65,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/history', [LessonHistoryController::class, 'index'])->name('students.history.index');
 
     // Likes
-    Route::post('/students/teacher-likes', [TeacherLikeController::class, 'store'])->name('students.teacher.like');
-    Route::delete('/students/teacher-likes/{teacherLike}', [TeacherLikeController::class, 'destroy'])->name('students.teachers.unlike');
+    Route::post('/students/teachers/{teacher}/like', [TeacherLikeController::class, 'store'])->name('students.teacher.like');
+    Route::delete('/students/teachers/{teacher}/unlike', [TeacherLikeController::class, 'destroy'])->name('students.teachers.unlike');
 
 // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
