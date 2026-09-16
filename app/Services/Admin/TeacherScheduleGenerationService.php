@@ -112,7 +112,7 @@ class TeacherScheduleGenerationService
                     'available_date' => $date->toDateString(),
                     'start_time' => $period['start']->format('H:i:s'),
                     'end_time' => $period['end']->format('H:i:s'),
-                    'status' => 'draft',
+                    'status' => 'confirmed',
                     'created_by' => $createdBy,
                 ]);
 
@@ -223,7 +223,7 @@ class TeacherScheduleGenerationService
                         'available_date' => $period['available_date'],
                         'start_time' => $start,
                         'end_time' => $end,
-                        'status' => 'draft',
+                        'status' => 'confirmed',
                         'created_by' => $createdBy,
                     ]);
                     $generated++;
