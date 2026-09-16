@@ -32,4 +32,13 @@ class PointTransaction extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function reservation(): BelongsTo
+{
+    return $this->belongsTo(
+        Reservation::class,
+        'related_reservation_id',
+        'id'
+    );
+}
 }
