@@ -12,7 +12,7 @@
     <div class="mb-4">
 
         <h2 class="fw-bold mb-1">
-            My Lessons
+           Upcoming Lessons
         </h2>
 
         <p class="text-secondary mb-0">
