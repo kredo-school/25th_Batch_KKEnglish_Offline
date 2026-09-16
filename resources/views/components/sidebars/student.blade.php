@@ -24,9 +24,9 @@
             Teacher list
         </a>
 
-        <a href="{{ route('student.history.test') }}"
+        <a href="{{ route('students.history.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('student.history.test') ? 'student-active fw-semibold' : '' }}">
+           {{ request()->routeIs('student.history.index') ? 'student-active fw-semibold' : '' }}">
             Learning history
         </a>
 
