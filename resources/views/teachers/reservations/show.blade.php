@@ -22,6 +22,39 @@
             $reservation->end_at
         );
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Previous Lesson Record
+    |--------------------------------------------------------------------------
+    |
+    | 表示確認用ダミーデータ
+    |
+    | 今回予約しているMaterialについての
+    | 最新LessonRecord 1件を想定
+    |
+    | Controller完成後は削除
+    |
+    */
+
+    $previousLessonRecord = [
+
+        'date' => 'Sep 15, 2026',
+
+        'teacher' => 'Anna Cruz',
+
+        'material' =>
+            $reservation->material->name
+            ?? 'Grammar Beginner',
+
+        'subject' =>
+            'Unit 3 / Page 25-30',
+
+        'progress_note' =>
+            'Practiced past tense. The student understood the basic structure but needs more practice with irregular verbs.',
+
+    ];
+
 @endphp
 
 
@@ -80,7 +113,7 @@
 
 
     {{-- ===============================
-         Lesson Details
+         Reservation Details
     ================================ --}}
     <div class="card">
 
@@ -234,158 +267,110 @@
     </div>
 
 
+
     {{-- ===============================
-         Lesson Record
+         Previous Lesson Record
     ================================ --}}
     <div class="card mt-4">
 
         <div class="card-header bg-white py-3">
 
             <h5 class="fw-bold mb-0">
-                Lesson Record
+                Previous Lesson Record
             </h5>
+
+            <p class="text-secondary small mb-0 mt-1">
+                Latest record for this material.
+            </p>
 
         </div>
 
 
         <div class="card-body p-4">
 
-            <form
-                method="POST"
-                action="{{ route(
-                    'teachers.reservations.result.update',
-                    $reservation
-                ) }}"
-            >
+            {{-- Material --}}
+            <div class="row border-bottom py-3">
 
-                @csrf
-                @method('PATCH')
+                <div class="col-md-4 fw-bold">
+                    Material
+                </div>
 
+                <div class="col-md-8">
 
-                {{-- ===============================
-                     Lesson Status
-                ================================ --}}
-                <div class="mb-4">
-
-                    <label
-                        for="lessonResult"
-                        class="form-label fw-bold"
-                    >
-                        Lesson Status
-                    </label>
-
-
-                    <select
-                        id="lessonResult"
-                        name="result"
-                        class="form-select"
-                        required
-                    >
-
-                        <option value="">
-                            Select status
-                        </option>
-
-
-                        <option
-                            value="completed"
-                            @selected(
-                                old('result')
-                                ===
-                                'completed'
-                            )
-                        >
-                            Completed
-                        </option>
-
-
-                        <option
-                            value="absent"
-                            @selected(
-                                old('result')
-                                ===
-                                'absent'
-                            )
-                        >
-                            Absent
-                        </option>
-
-                    </select>
+                    {{ $previousLessonRecord['material'] }}
 
                 </div>
 
-
-                {{-- ===============================
-                     Completed Only Fields
-                ================================ --}}
-                <div id="completedFields">
+            </div>
 
 
-                    {{-- Subject --}}
-                    <div class="mb-4">
+            {{-- Last Lesson --}}
+            <div class="row border-bottom py-3">
 
-                        <label
-                            for="subject"
-                            class="form-label fw-bold"
-                        >
-                            Subject
-                        </label>
+                <div class="col-md-4 fw-bold">
+                    Last Lesson
+                </div>
 
-                      <div class="form-control bg-light">
-                        {{ $reservation->material->name ?? '-' }}
-                    </div>
+                <div class="col-md-8">
+
+                    {{ $previousLessonRecord['date'] }}
 
                 </div>
 
+            </div>
 
-                    {{-- Progress Note --}}
-                    <div class="mb-4">
 
-                        <label
-                            for="progressNote"
-                            class="form-label fw-bold"
-                        >
-                            Progress Note
-                        </label>
+            {{-- Teacher --}}
+            <div class="row border-bottom py-3">
 
-                        <textarea
-                            id="progressNote"
-                            name="progress_note"
-                            class="form-control"
-                            rows="4"
-                            placeholder="Enter lesson progress or notes..."
-                        >{{ old(
-                            'progress_note',
-                            $reservation
-                                ->lessonRecord
-                                ?->progress_note
-                            ?? ''
-                        ) }}</textarea>
+                <div class="col-md-4 fw-bold">
+                    Teacher
+                </div>
 
-                    </div>
+                <div class="col-md-8">
+
+                    {{ $previousLessonRecord['teacher'] }}
 
                 </div>
 
+            </div>
 
-                {{-- ===============================
-                     Save
-                ================================ --}}
-                <div class="text-end">
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
-                        Save Lesson Record
-                    </button>
+            {{-- Subject --}}
+            <div class="row border-bottom py-3">
+
+                <div class="col-md-4 fw-bold">
+                    Subject
+                </div>
+
+                <div class="col-md-8">
+
+                    {{ $previousLessonRecord['subject'] }}
 
                 </div>
 
-            </form>
+            </div>
+
+
+            {{-- Progress Note --}}
+            <div class="row py-3">
+
+                <div class="col-md-4 fw-bold">
+                    Progress Note
+                </div>
+
+                <div class="col-md-8">
+
+                    {{ $previousLessonRecord['progress_note'] }}
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
+
 
 
     {{-- ===============================
@@ -405,122 +390,5 @@
     </div>
 
 </div>
-
-
-{{-- ===============================
-     JavaScript
-================================ --}}
-<script>
-
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
-
-        const lessonResult =
-            document.getElementById(
-                'lessonResult'
-            );
-
-
-        const completedFields =
-            document.getElementById(
-                'completedFields'
-            );
-
-
-        const subject =
-            document.getElementById(
-                'subject'
-            );
-
-
-        const progressNote =
-            document.getElementById(
-                'progressNote'
-            );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Completed / Absent 切り替え
-        |--------------------------------------------------------------------------
-        */
-
-        function updateLessonFields() {
-
-            if (
-                lessonResult.value
-                ===
-                'completed'
-            ) {
-
-                /*
-                 * Completedの場合
-                 * Subject / Progress Noteを表示
-                 */
-                completedFields
-                    .classList
-                    .remove(
-                        'd-none'
-                    );
-
-
-                subject.required =
-                    true;
-
-
-                progressNote.required =
-                    true;
-
-
-            } else {
-
-                /*
-                 * Absent または未選択の場合
-                 * Subject / Progress Noteを非表示
-                 */
-                completedFields
-                    .classList
-                    .add(
-                        'd-none'
-                    );
-
-
-                subject.required =
-                    false;
-
-
-                progressNote.required =
-                    false;
-
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Status変更時
-        |--------------------------------------------------------------------------
-        */
-
-        lessonResult.addEventListener(
-            'change',
-            updateLessonFields
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 初期表示
-        |--------------------------------------------------------------------------
-        */
-
-        updateLessonFields();
-
-    }
-);
-
-</script>
 
 @endsection
