@@ -128,7 +128,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
 
     //　Lessons history
     Route::get('/teachers/lesson_history/', [TeacherLessonHistoryController::class, 'lessonHistory'])->name('teachers.reservations.history');
-    Route::get('/teachers/lesson_history/{reservation}', [TeacherLessonHistoryController::class, 'historyDetail'])->name('teachers.reservations.results.show');
+    Route::get('/teachers/lesson_history/{reservation}', [TeacherLessonHistoryController::class, 'historyDetail'])->name('teachers.reservations.show');
 
 
 });
