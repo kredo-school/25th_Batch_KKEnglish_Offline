@@ -28,37 +28,20 @@
     | Previous Lesson Record
     |--------------------------------------------------------------------------
     |
-    | 表示確認用ダミーデータ
-    |
-    | 今回予約しているMaterialについての
-    | 最新LessonRecord 1件を想定
-    |
-    | Controller完成後は削除
+    | Controllerで
+    | start_at DESC の順番で取得しているため、
+    | first() = 同じ教材の最新LessonRecord
     |
     */
 
-    $previousLessonRecord = [
-
-        'date' => 'Sep 15, 2026',
-
-        'teacher' => 'Anna Cruz',
-
-        'material' =>
-            $reservation->material->name
-            ?? 'Grammar Beginner',
-
-        'subject' =>
-            'Unit 3 / Page 25-30',
-
-        'progress_note' =>
-            'Practiced past tense. The student understood the basic structure but needs more practice with irregular verbs.',
-
-    ];
+    $previousReservation =
+        $pastReservations->first();
 
 @endphp
 
 
 <div class="container-fluid">
+
 
     {{-- ===============================
          Title
@@ -82,7 +65,9 @@
     @if (session('success'))
 
         <div class="alert alert-success">
+
             {{ session('success') }}
+
         </div>
 
     @endif
@@ -112,6 +97,7 @@
     @endif
 
 
+
     {{-- ===============================
          Reservation Details
     ================================ --}}
@@ -128,6 +114,7 @@
 
         <div class="card-body p-4">
 
+
             {{-- Date --}}
             <div class="row border-bottom py-3">
 
@@ -140,7 +127,9 @@
                     {{ $startAt->format('M d, Y') }}
 
                     <span class="text-secondary ms-2">
+
                         {{ $startAt->format('l') }}
+
                     </span>
 
                 </div>
@@ -191,18 +180,35 @@
                         )
 
                             <img
-                                src="{{ str_starts_with(
-                                    $reservation->student->user->profile_image,
-                                    'http'
-                                )
-                                    ? $reservation->student->user->profile_image
-                                    : asset(
-                                        'storage/'
-                                        .
-                                        $reservation->student->user->profile_image
+                                src="{{
+                                    str_starts_with(
+                                        $reservation
+                                            ->student
+                                            ->user
+                                            ->profile_image,
+                                        'http'
                                     )
+                                        ?
+                                        $reservation
+                                            ->student
+                                            ->user
+                                            ->profile_image
+                                        :
+                                        asset(
+                                            'storage/'
+                                            .
+                                            $reservation
+                                                ->student
+                                                ->user
+                                                ->profile_image
+                                        )
                                 }}"
-                                alt="{{ $reservation->student->user->first_name }}"
+                                alt="{{
+                                    $reservation
+                                        ->student
+                                        ->user
+                                        ->first_name
+                                }}"
                                 width="45"
                                 height="45"
                                 class="rounded-circle me-2"
@@ -217,6 +223,7 @@
                                     fa-circle-user
                                     me-2
                                     fa-2x
+                                    text-secondary
                                 "
                             ></i>
 
@@ -225,9 +232,19 @@
 
                         <span>
 
-                            {{ $reservation->student->user->first_name }}
+                            {{
+                                $reservation
+                                    ->student
+                                    ->user
+                                    ->first_name
+                            }}
 
-                            {{ $reservation->student->user->last_name }}
+                            {{
+                                $reservation
+                                    ->student
+                                    ->user
+                                    ->last_name
+                            }}
 
                         </span>
 
@@ -254,7 +271,9 @@
                 <div class="col-md-8">
 
                     {{
-                        $reservation->material->name
+                        $reservation
+                            ->material
+                            ->name
                         ?? '-'
                     }}
 
@@ -280,7 +299,9 @@
             </h5>
 
             <p class="text-secondary small mb-0 mt-1">
+
                 Latest record for this material.
+
             </p>
 
         </div>
@@ -288,84 +309,147 @@
 
         <div class="card-body p-4">
 
-            {{-- Material --}}
-            <div class="row border-bottom py-3">
-
-                <div class="col-md-4 fw-bold">
-                    Material
-                </div>
-
-                <div class="col-md-8">
-
-                    {{ $previousLessonRecord['material'] }}
-
-                </div>
-
-            </div>
+            @if ($previousReservation)
 
 
-            {{-- Last Lesson --}}
-            <div class="row border-bottom py-3">
+                {{-- Material --}}
+                <div class="row border-bottom py-3">
 
-                <div class="col-md-4 fw-bold">
-                    Last Lesson
-                </div>
+                    <div class="col-md-4 fw-bold">
+                        Material
+                    </div>
 
-                <div class="col-md-8">
+                    <div class="col-md-8">
 
-                    {{ $previousLessonRecord['date'] }}
+                        {{
+                            $previousReservation
+                                ->material
+                                ->name
+                            ?? '-'
+                        }}
+
+                    </div>
 
                 </div>
 
-            </div>
 
+                {{-- Last Lesson --}}
+                <div class="row border-bottom py-3">
 
-            {{-- Teacher --}}
-            <div class="row border-bottom py-3">
+                    <div class="col-md-4 fw-bold">
+                        Last Lesson
+                    </div>
 
-                <div class="col-md-4 fw-bold">
-                    Teacher
-                </div>
+                    <div class="col-md-8">
 
-                <div class="col-md-8">
+                        {{
+                            \Carbon\Carbon::parse(
+                                $previousReservation
+                                    ->start_at
+                            )->format('M d, Y')
+                        }}
 
-                    {{ $previousLessonRecord['teacher'] }}
-
-                </div>
-
-            </div>
-
-
-            {{-- Subject --}}
-            <div class="row border-bottom py-3">
-
-                <div class="col-md-4 fw-bold">
-                    Subject
-                </div>
-
-                <div class="col-md-8">
-
-                    {{ $previousLessonRecord['subject'] }}
+                    </div>
 
                 </div>
 
-            </div>
 
+                {{-- Teacher --}}
+                <div class="row border-bottom py-3">
 
-            {{-- Progress Note --}}
-            <div class="row py-3">
+                    <div class="col-md-4 fw-bold">
+                        Teacher
+                    </div>
 
-                <div class="col-md-4 fw-bold">
-                    Progress Note
+                    <div class="col-md-8">
+
+                        {{
+                            $previousReservation
+                                ->teacher
+                                ->user
+                                ->first_name
+                            ?? '-'
+                        }}
+
+                        {{
+                            $previousReservation
+                                ->teacher
+                                ->user
+                                ->last_name
+                            ?? ''
+                        }}
+
+                    </div>
+
                 </div>
 
-                <div class="col-md-8">
 
-                    {{ $previousLessonRecord['progress_note'] }}
+                {{-- Subject --}}
+                <div class="row border-bottom py-3">
+
+                    <div class="col-md-4 fw-bold">
+                        Subject
+                    </div>
+
+                    <div class="col-md-8">
+
+                        {{
+                            $previousReservation
+                                ->lessonRecord
+                                ->subject
+                            ?? '-'
+                        }}
+
+                    </div>
 
                 </div>
 
-            </div>
+
+                {{-- Progress Note --}}
+                <div class="row py-3">
+
+                    <div class="col-md-4 fw-bold">
+                        Progress Note
+                    </div>
+
+                    <div class="col-md-8">
+
+                        {{
+                            $previousReservation
+                                ->lessonRecord
+                                ->progress_note
+                            ?? '-'
+                        }}
+
+                    </div>
+
+                </div>
+
+
+            @else
+
+                <div class="text-center py-4">
+
+                    <i
+                        class="
+                            fa-regular
+                            fa-file-lines
+                            fa-2x
+                            text-secondary
+                            mb-3
+                        "
+                    ></i>
+
+                    <p class="text-secondary mb-0">
+
+                        No previous lesson record
+                        for this material.
+
+                    </p>
+
+                </div>
+
+            @endif
 
         </div>
 
@@ -379,9 +463,11 @@
     <div class="mt-4">
 
         <a
-            href="{{ route(
-                'teachers.reservations.index'
-            ) }}"
+            href="{{
+                route(
+                    'teachers.reservations.index'
+                )
+            }}"
             class="btn btn-outline-secondary"
         >
             Back
