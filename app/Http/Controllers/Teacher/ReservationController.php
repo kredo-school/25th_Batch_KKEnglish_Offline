@@ -143,6 +143,11 @@ class ReservationController extends Controller
         )
 
         ->where(
+                'material_id',
+                $reservation->material_id
+        )
+
+        ->where(
             'start_at',
             '<',
             $reservation->start_at
@@ -153,7 +158,6 @@ class ReservationController extends Controller
         ->with([
             'teacher.user',
             'material',
-            'status',
             'lessonRecord',
         ])
 
