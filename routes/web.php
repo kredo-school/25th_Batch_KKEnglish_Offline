@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\TeacherMaterialController;
 use App\Http\Controllers\Student\TeacherLikeController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Student\LessonHistoryController;
+use App\Http\Controllers\Teacher\LessonHistoryController as TeacherLessonHistoryController;
 use App\Models\Teacher;
 use App\Http\Controllers\Admin\AnnouncementController;
 
@@ -96,8 +97,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     // Teacher reservations
     Route::get('/students/availability', [AvailabilityController::class, 'index'])->name('students.availability.index');
+
     // Point History
     Route::get('/students/history/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
+
 });
 
 // Teacher Dashboard
@@ -106,21 +109,27 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
         return view('teachers.dashboard');
     })->name('teacher.dashboard');
 
-     // My Schedule 画面
+    // My Schedule 画面
     // Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
     Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teachers.schedule');
     Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
     Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
     Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teacher.schedule-exceptions.destroy');
 
-    // My Lessons　画面
+    // My upcoming　画面
     Route::get('/teachers/lessons', [TeacherReservationController::class, 'index'])->name('teachers.reservations.index');
-    Route::get('/teachers/lessons/{reservation}', [TeacherReservationController::class, 'show'])->name('teachers.reservations.show');
+    Route::get('/teachers/lessons/{reservation}', [TeacherReservationController::class, 'show'])
+        ->whereNumber('reservation')
+        ->name('teachers.reservations.show');
 
-    //　Lessons results
     Route::patch('/teachers/lessons/{reservation}/result', [TeacherReservationController::class, 'updateResult'])
-     ->whereNumber('reservation')
-     ->name('teachers.reservations.result.update');
+        ->whereNumber('reservation')
+        ->name('teachers.reservations.result.update');
+
+    //　Lessons history
+    Route::get('/teachers/lesson_history/', [TeacherLessonHistoryController::class, 'lessonHistory'])->name('teachers.reservations.history');
+    Route::get('/teachers/lesson_history/{reservation}', [TeacherLessonHistoryController::class, 'historyDetail'])->name('teachers.reservations.results.show');
+
 
 });
 

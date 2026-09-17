@@ -129,12 +129,44 @@ class ReservationController extends Controller
             'lessonRecord',
         ]);
 
+
+            /*
+     * このStudentの過去の授業記録
+     *
+     * 他のTeacherが記録したLessonRecordも含む
+     */
+    $pastReservations = Reservation::query()
+
+        ->where(
+            'student_id',
+            $reservation->student_id
+        )
+
+        ->where(
+            'start_at',
+            '<',
+            $reservation->start_at
+        )
+
+        ->whereHas('lessonRecord')
+
+        ->with([
+            'teacher.user',
+            'material',
+            'status',
+            'lessonRecord',
+        ])
+
+        ->orderByDesc('start_at')
+
+        ->get();
+
         /*
          * Bladeへ渡す
          */
         return view(
             'teachers.reservations.show',
-            compact('reservation')
+            compact('reservation', 'pastReservations')
         );
     }
 
