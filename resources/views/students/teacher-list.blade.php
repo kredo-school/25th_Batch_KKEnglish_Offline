@@ -11,6 +11,10 @@
     </h2>
 
 
+    {{-- ===============================
+         表示確認用
+         Favorite TeachersをBlade側で作る
+    ================================ --}}
     @php
 
         $studentId = auth()->user()->student->id;
@@ -37,7 +41,7 @@
     </h5>
 
 
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3 mb-5">
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3 mb-5">
 
         @forelse ($favoriteTeachers as $teacher)
 
@@ -51,49 +55,27 @@
                         alt="{{ $teacher->user->first_name }}"
                         class="card-img-top"
                         style="
-                            height: 180px;
+                            height: 120px;
                             object-fit: cover;
                         "
                     >
 
 
-                    <div class="card-body d-flex flex-column">
-
+                    <div class="card-body p-2 d-flex flex-column">
 
                         {{-- ===============================
-                             Name + Point + Favorite
+                             Name + Favorite
                         ================================ --}}
-                        <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
 
-                            <div>
+                            <h6 class="fw-bold mb-1 small">
 
-                                {{-- Name --}}
-                                <h5
-                                    class="fw-bold mb-1"
-                                    style="min-height: 48px;"
-                                >
-                                    {{ $teacher->user->first_name }}
-                                    {{ $teacher->user->last_name }}
-                                </h5>
+                                {{ $teacher->user->first_name }}
+
+                            </h6>
 
 
-                                {{-- Lesson Point --}}
-                                <span
-                                    class="badge text-dark px-2 py-2"
-                                    style="
-                                        background-color: #f0c94d;
-                                        font-family: Arial, sans-serif;
-                                    "
-                                >
-                                    {{ number_format($teacher->point_consumed ?? 0) }} pt
-                                </span>
-
-                            </div>
-
-
-                            {{-- ===============================
-                                 Unlike
-                            ================================ --}}
+                            {{-- Favorite Teachersなので必ずUnlike --}}
                             <form
                                 method="POST"
                                 action="{{ route('students.teachers.unlike', $teacher) }}"
@@ -108,13 +90,7 @@
                                     class="btn p-0 border-0 bg-transparent"
                                     aria-label="Remove from favorites"
                                 >
-                                    <i
-                                        class="
-                                            fa-solid
-                                            fa-heart
-                                            text-danger
-                                        "
-                                    ></i>
+                                    <i class="fa-solid fa-heart text-danger small"></i>
                                 </button>
 
                             </form>
@@ -123,41 +99,28 @@
 
 
                         {{-- ===============================
-                             Nationality
+                             Point
                         ================================ --}}
-                        <p class="mb-1 small">
-
-                            <span class="text-secondary">
-                                Nationality:
-                            </span>
-
-                            {{
-                                $teacher
-                                    ->user
-                                    ->nationality
-                                ?? '-'
-                            }}
-
-                        </p>
+                        <span
+                            class="badge text-dark align-self-start mb-1"
+                            style="
+                                background-color: #f0c94d;
+                                font-family: Arial, sans-serif;
+                                font-size: 11px;
+                            "
+                        >
+                            {{ number_format($teacher->point_consumed ?? 0) }} pt
+                        </span>
 
 
                         {{-- ===============================
-                             Specialty
+                             Nationality
                         ================================ --}}
                         <p
-                            class="mb-3 small"
-                            style="min-height: 60px;"
+                            class="text-secondary mb-2"
+                            style="font-size: 12px;"
                         >
-
-                            <span class="text-secondary">
-                                Specialty:
-                            </span>
-
-                            {{
-                                $teacher->specialty
-                                ?? '-'
-                            }}
-
+                            {{ $teacher->user->nationality ?? '-' }}
                         </p>
 
 
@@ -166,13 +129,8 @@
                         ================================ --}}
                         <a
                             href="{{ route('teachers.show', $teacher->id) }}"
-                            class="
-                                btn
-                                btn-outline-primary
-                                btn-sm
-                                w-100
-                                mt-auto
-                            "
+                            class="btn btn-outline-primary btn-sm w-100 mt-auto"
+                            style="font-size: 12px;"
                         >
                             View Profile
                         </a>
@@ -182,7 +140,6 @@
                 </div>
 
             </div>
-
 
         @empty
 
@@ -208,17 +165,17 @@
     </h5>
 
 
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3">
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
 
         @foreach ($teachers as $teacher)
 
+            {{-- この先生がお気に入りか判定 --}}
             @php
 
-                $teacherLike = $teacher
-                    ->teacherLikes
-                    ->firstWhere(
-                        'student_id',
-                        $studentId
+                $isFavorite = $favoriteTeachers
+                    ->contains(
+                        'id',
+                        $teacher->id
                     );
 
             @endphp
@@ -234,50 +191,30 @@
                         alt="{{ $teacher->user->first_name }}"
                         class="card-img-top"
                         style="
-                            height: 180px;
+                            height: 120px;
                             object-fit: cover;
                         "
                     >
 
 
-                    <div class="card-body d-flex flex-column">
-
+                    <div class="card-body p-2 d-flex flex-column">
 
                         {{-- ===============================
-                             Name + Point + Favorite
+                             Name + Favorite
                         ================================ --}}
-                        <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
 
-                            <div>
+                            <h6 class="fw-bold mb-1 small">
 
-                                {{-- Name --}}
-                                <h5
-                                    class="fw-bold mb-1"
-                                    style="min-height: 48px;"
-                                >
-                                    {{ $teacher->user->first_name }}
-                                    {{ $teacher->user->last_name }}
-                                </h5>
+                                {{ $teacher->user->first_name }}
 
-
-                                {{-- Lesson Point --}}
-                                <span
-                                    class="badge text-dark px-2 py-2"
-                                    style="
-                                        background-color: #f0c94d;
-                                        font-family: Arial, sans-serif;
-                                    "
-                                >
-                                    {{ number_format($teacher->point_consumed ?? 0) }} pt
-                                </span>
-
-                            </div>
+                            </h6>
 
 
                             {{-- ===============================
                                  Favorite
                             ================================ --}}
-                            @if ($teacherLike)
+                            @if ($isFavorite)
 
                                 {{-- Unlike --}}
                                 <form
@@ -294,13 +231,7 @@
                                         class="btn p-0 border-0 bg-transparent"
                                         aria-label="Remove from favorites"
                                     >
-                                        <i
-                                            class="
-                                                fa-solid
-                                                fa-heart
-                                                text-danger
-                                            "
-                                        ></i>
+                                        <i class="fa-solid fa-heart text-danger small"></i>
                                     </button>
 
                                 </form>
@@ -321,13 +252,7 @@
                                         class="btn p-0 border-0 bg-transparent"
                                         aria-label="Add to favorites"
                                     >
-                                        <i
-                                            class="
-                                                fa-regular
-                                                fa-heart
-                                                text-secondary
-                                            "
-                                        ></i>
+                                        <i class="fa-regular fa-heart text-secondary small"></i>
                                     </button>
 
                                 </form>
@@ -338,41 +263,28 @@
 
 
                         {{-- ===============================
-                             Nationality
+                             Point
                         ================================ --}}
-                        <p class="mb-1 small">
-
-                            <span class="text-secondary">
-                                Nationality:
-                            </span>
-
-                            {{
-                                $teacher
-                                    ->user
-                                    ->nationality
-                                ?? '-'
-                            }}
-
-                        </p>
+                        <span
+                            class="badge text-dark align-self-start mb-1"
+                            style="
+                                background-color: #f0c94d;
+                                font-family: Arial, sans-serif;
+                                font-size: 11px;
+                            "
+                        >
+                            {{ number_format($teacher->point_consumed ?? 0) }} pt
+                        </span>
 
 
                         {{-- ===============================
-                             Specialty
+                             Nationality
                         ================================ --}}
                         <p
-                            class="mb-3 small"
-                            style="min-height: 60px;"
+                            class="text-secondary mb-2"
+                            style="font-size: 12px;"
                         >
-
-                            <span class="text-secondary">
-                                Specialty:
-                            </span>
-
-                            {{
-                                $teacher->specialty
-                                ?? '-'
-                            }}
-
+                            {{ $teacher->user->nationality ?? '-' }}
                         </p>
 
 
@@ -381,13 +293,8 @@
                         ================================ --}}
                         <a
                             href="{{ route('teachers.show', $teacher->id) }}"
-                            class="
-                                btn
-                                btn-outline-primary
-                                btn-sm
-                                w-100
-                                mt-auto
-                            "
+                            class="btn btn-outline-primary btn-sm w-100 mt-auto"
+                            style="font-size: 12px;"
                         >
                             View Profile
                         </a>
@@ -401,6 +308,18 @@
         @endforeach
 
     </div>
+
+
+    {{-- ===============================
+         Pagination
+    ================================ --}}
+    @if (method_exists($teachers, 'links'))
+
+        <div class="mt-4">
+            {{ $teachers->links() }}
+        </div>
+
+    @endif
 
 </div>
 
