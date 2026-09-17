@@ -25,6 +25,9 @@ use App\Http\Controllers\Student\LessonHistoryController;
 use App\Http\Controllers\Teacher\LessonHistoryController as TeacherLessonHistoryController;
 use App\Models\Teacher;
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\ScheduleMatrixController;
+use App\Http\Controllers\Admin\ExpectedReservationSettingController;
+use App\Http\Controllers\Admin\SeasonPeriodController;
 
 // Test route for frontend testing
 Route::view('/teachers/lesson-history-test','teachers.history.index')
@@ -183,6 +186,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     // Schedule Management
     Route::get('/schedules', [DashboardController::class, 'schedulesIndex'])->name('schedules.index');
     Route::get('/schedules/details', [DashboardController::class, 'details'])->name('schedules.index_details');
+
+    Route::get('/schedules/matrix', [ScheduleMatrixController::class, 'index'])->name('schedules.matrix');
+    Route::get('/schedules/matrix/details', [ScheduleMatrixController::class, 'details'])->name('schedules.matrix_details');
+
+    // Expected Reservations (予想予約数) 設定
+    Route::get('/expected-reservations', [ExpectedReservationSettingController::class, 'edit'])->name('expected-reservations.edit');
+    Route::put('/expected-reservations', [ExpectedReservationSettingController::class, 'update'])->name('expected-reservations.update');
+
+    // 期間(シーズン)設定
+    Route::get('/season-periods', [SeasonPeriodController::class, 'index'])->name('season-periods.index');
+    Route::post('/season-periods', [SeasonPeriodController::class, 'store'])->name('season-periods.store');
+    Route::delete('/season-periods/{season_period}', [SeasonPeriodController::class, 'destroy'])->name('season-periods.destroy');
 
     // Shift Pattern Management
     Route::resource('shift-patterns', ShiftPatternController::class)->only(['index', 'create', 'store','show', 'edit', 'update', 'destroy']);

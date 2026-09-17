@@ -24,6 +24,26 @@
                 Today's schedule
             </a>
 
+            {{-- 稼働状況マトリクス --}}
+            <a href="{{ route('admin.schedules.matrix', ['menu' => 'schedule']) }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.matrix*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+                Operational Status
+            </a>
+
+            {{-- 予想期間設定 --}}
+            <a href="{{ route('admin.season-periods.index', ['menu' => 'schedule']) }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.season-periods.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+                Season settings
+            </a>
+
+            {{-- 予想予約数設定 --}}
+            <a href="{{ route('admin.expected-reservations.edit', ['menu' => 'schedule']) }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.expected-reservations.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+                Expected reservations settings
+            </a>
+
+            <hr>
+            
             {{-- シフト作成 --}}
             <a href="{{ route('admin.shift-patterns.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.shift-patterns.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">

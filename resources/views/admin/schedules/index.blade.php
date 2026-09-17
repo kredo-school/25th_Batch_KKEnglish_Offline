@@ -156,7 +156,7 @@
     <div class="row g-3 m-0">
 
         {{-- 1. 上部バー: 検索 & +新規作成 --}}
-        <div class="col-12 p-0">
+        {{-- <div class="col-12 p-0">
             <div class="dashboard-header-bar p-3">
                 <div class="row align-items-center justify-content-between g-2">
                     <div class="col-md-6 col-8">
@@ -172,7 +172,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         {{-- 2. サマリー領域 & モード切り替え --}}
         <div class="col-12 p-0">
