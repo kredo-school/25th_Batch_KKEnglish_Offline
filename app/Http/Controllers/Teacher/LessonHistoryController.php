@@ -61,7 +61,7 @@ class LessonHistoryController extends Controller
             ->get();
 
         return view(
-            'teachers.lessons.history',
+            'teachers.reservations.history',
             compact(
                 'teacher',
                 'reservations'
