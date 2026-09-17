@@ -26,8 +26,10 @@ use App\Models\Teacher;
 use App\Http\Controllers\Admin\AnnouncementController;
 
 // Test route for frontend testing
-Route::view('/teachers/lesson-history-test','teachers.reservations.history')
-->name('teachers.reservations.history.test');
+Route::view('/teachers/lesson-history-test','teachers.history.index')
+->name('teachers.history.index');
+Route::view('/teachers/history-show-test','teachers.history.show')
+->name('teachers.history.show.test');
 
 
 // Public routes

@@ -15,6 +15,9 @@
 
     $pastReservations = collect([
 
+        /*
+         * Completed
+         */
         (object) [
             'id' => 2,
 
@@ -39,6 +42,9 @@
         ],
 
 
+        /*
+         * Absent
+         */
         (object) [
             'id' => 3,
 
@@ -63,6 +69,13 @@
         ],
 
 
+        /*
+         * Not Recorded
+         *
+         * DB上は confirmed
+         * 授業終了後もconfirmedのまま
+         * = Lesson Record未入力
+         */
         (object) [
             'id' => 4,
 
@@ -82,7 +95,7 @@
             ],
 
             'status' => (object) [
-                'status_code' => 'cancelled',
+                'status_code' => 'confirmed',
             ],
         ],
 
@@ -180,12 +193,29 @@
                                             $reservation->end_at
                                         );
 
+
+                                    /*
+                                     * 授業終了済み
+                                     * かつconfirmedのまま
+                                     *
+                                     * = Lesson Record未入力
+                                     */
+                                    $isNotRecorded =
+                                        $reservation
+                                            ->status
+                                            ->status_code
+                                        === 'confirmed'
+                                        &&
+                                        $endAt->isPast();
+
                                 @endphp
 
 
                                 <tr>
 
-                                    {{-- Date --}}
+                                    {{-- ===============================
+                                         Date
+                                    ================================ --}}
                                     <td class="px-4">
 
                                         <div class="fw-bold">
@@ -199,7 +229,9 @@
                                     </td>
 
 
-                                    {{-- Time --}}
+                                    {{-- ===============================
+                                         Time
+                                    ================================ --}}
                                     <td>
 
                                         {{ $startAt->format('h:i A') }}
@@ -211,7 +243,9 @@
                                     </td>
 
 
-                                    {{-- Student --}}
+                                    {{-- ===============================
+                                         Student
+                                    ================================ --}}
                                     <td>
 
                                         <div class="d-flex align-items-center">
@@ -229,9 +263,19 @@
 
                                             <div class="fw-semibold">
 
-                                                {{ $reservation->student->user->first_name }}
+                                                {{
+                                                    $reservation
+                                                        ->student
+                                                        ->user
+                                                        ->first_name
+                                                }}
 
-                                                {{ $reservation->student->user->last_name }}
+                                                {{
+                                                    $reservation
+                                                        ->student
+                                                        ->user
+                                                        ->last_name
+                                                }}
 
                                             </div>
 
@@ -240,19 +284,29 @@
                                     </td>
 
 
-                                    {{-- Material --}}
+                                    {{-- ===============================
+                                         Material
+                                    ================================ --}}
                                     <td>
 
-                                        {{ $reservation->material->name }}
+                                        {{
+                                            $reservation
+                                                ->material
+                                                ->name
+                                        }}
 
                                     </td>
 
 
-                                    {{-- Status --}}
+                                    {{-- ===============================
+                                         Status
+                                    ================================ --}}
                                     <td class="text-center">
 
                                         @if (
-                                            $reservation->status->status_code
+                                            $reservation
+                                                ->status
+                                                ->status_code
                                             === 'completed'
                                         )
 
@@ -262,32 +316,21 @@
 
 
                                         @elseif (
-                                            $reservation->status->status_code
+                                            $reservation
+                                                ->status
+                                                ->status_code
                                             === 'absent'
                                         )
 
-                                            <span class="badge text-bg-warning">
+                                            <span class="badge text-bg-secondary">
                                                 Absent
                                             </span>
 
 
-                                        @elseif (
-                                            $reservation->status->status_code
-                                            === 'cancelled'
-                                        )
+                                        @elseif ($isNotRecorded)
 
-                                            <span class="badge text-bg-secondary">
-                                                Cancelled
-                                            </span>
-
-
-                                        @elseif (
-                                            $reservation->status->status_code
-                                            === 'confirmed'
-                                        )
-
-                                            <span class="badge text-bg-primary">
-                                                Confirmed
+                                            <span class="badge text-bg-warning">
+                                                Not Recorded
                                             </span>
 
                                         @endif
@@ -295,15 +338,34 @@
                                     </td>
 
 
-                                    {{-- Action --}}
+                                    {{-- ===============================
+                                         Action
+                                    ================================ --}}
                                     <td class="text-center">
 
-                                        <a
-                                            href="#"
-                                            class="btn btn-outline-primary btn-sm"
-                                        >
-                                            View Details
-                                        </a>
+                                        @if ($isNotRecorded)
+
+                                            <a
+                                                href="{{ route(
+                                                    'teachers.history.show.test'
+                                                ) }}"
+                                                class="btn btn-danger btn-sm"
+                                            >
+                                                Add Record
+                                            </a>
+
+                                        @else
+
+                                            <a
+                                                href="{{ route(
+                                                    'teachers.history.show.test'
+                                                ) }}"
+                                                class="btn btn-outline-primary btn-sm"
+                                            >
+                                                View Details
+                                            </a>
+
+                                        @endif
 
                                     </td>
 
@@ -353,11 +415,15 @@
     @endif
 
 
-    {{-- Back --}}
+    {{-- ===============================
+         Back
+    ================================ --}}
     <div class="mt-4">
 
         <a
-            href="{{ route('teachers.reservations.index') }}"
+            href="{{ route(
+                'teachers.reservations.index'
+            ) }}"
             class="btn btn-outline-secondary"
         >
             Back
