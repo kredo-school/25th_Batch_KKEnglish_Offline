@@ -55,6 +55,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('teacher_shift_assignments');
         Schema::dropIfExists('shift_pattern_breaks');
-        Schema::dropIfExists('shift_pattern_rules');
+        Schema::dropIfExists('shift_pattern_related_tables');
     }
 };
