@@ -9,3 +9,7 @@ Schedule::command('schedule:generate-teacher')->dailyAt('00:10')->withoutOverlap
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Schedule::command(
+    'reservations:update-awaiting-results'
+)->everyMinute();
