@@ -69,11 +69,19 @@ class Reservation extends Model
         return $this->hasOne(LessonRecord::class);
     }
 
-    public function pointTransactions()
+    public function pointTransactions(): HasMany
+    {
+        return $this->hasMany(
+            PointTransaction::class,
+            'related_reservation_id'
+        );
+    }
+
+    public function review(): HasOne
 {
-    return $this->hasMany(
-        PointTransaction::class,
-        'related_reservation_id'
+    return $this->hasOne(
+        Review::class,
+        'reservation_id'
     );
 }
 }

@@ -9,12 +9,18 @@ use App\Models\Reservation;
 
 class LessonHistoryController extends Controller
 {
+    /*
+    * ========================================
+    * Lesson History 一覧
+    * ========================================
+    */
     public function lessonHistory(Request $request): View
     {
         /*
          * ログイン中Teacher取得
          */
         $teacher = $request->user()->teacher;
+
 
         abort_unless(
             $teacher,
@@ -23,9 +29,12 @@ class LessonHistoryController extends Controller
         );
 
         /*
-         * 過去のレッスン取得
+         * ========================================
+         * 結果入力待ち
+         * awaiting_result
+         * ========================================
          */
-        $reservations = Reservation::query()
+        $awaitingReservations = Reservation::query()
 
             /*
              * 自分が担当した授業だけ
@@ -35,25 +44,63 @@ class LessonHistoryController extends Controller
                 $teacher->id
             )
 
-            /*
-             * 授業終了済み
-             */
-            ->where(
-                'end_at',
-                '<=',
-                now()
+            ->whereHas(
+                'status',
+                function ($query) {
+                    $query->where(
+                        'status_code',
+                        'awaiting_result'
+                    );
+                }
             )
 
-            /*
-             * Bladeで使う関連データ
-             */
             ->with([
                 'student.user',
                 'material',
                 'status',
                 'lessonRecord',
             ])
+            /*
+             * 新しい授業から表示
+             */
+            ->orderByDesc('start_at')
+            ->get();
 
+        /*
+         * ========================================
+         * 登録済みの過去授業
+         * completed / absent
+         * ========================================
+         */
+        $completedReservations = Reservation::query()
+
+            /*
+             * 自分が担当した授業だけ
+             */
+            ->where(
+                'teacher_id',
+                $teacher->id
+            )
+
+            ->whereHas(
+                'status',
+                function ($query) {
+                    $query->whereIn(
+                        'status_code',
+                        [
+                            'completed',
+                            'absent',
+                        ]
+                    );
+                }
+            )
+
+            ->with([
+                'student.user',
+                'material',
+                'status',
+                'lessonRecord',
+            ])
             /*
              * 新しい授業から表示
              */
@@ -64,10 +111,17 @@ class LessonHistoryController extends Controller
             'teachers.reservations.history',
             compact(
                 'teacher',
-                'reservations'
+                'awaitingReservations',
+                'completedReservations'
             )
         );
     }
+
+    /*
+     * ========================================
+     * Lesson History 詳細
+     * ========================================
+     */
 
     public function historyDetail(
         Request $request,
@@ -94,20 +148,29 @@ class LessonHistoryController extends Controller
         );
 
         /*
-        * 過去の授業であることを確認
-        */
-        abort_unless(
-            $reservation->end_at <= now(),
-            404,
-            'この授業は履歴ではありません。'
-        );
-
+         * History画面で使用できるstatusか確認
+         */
         $reservation->load([
             'student.user',
             'material',
             'status',
             'lessonRecord',
         ]);
+
+        abort_unless(
+            in_array(
+                $reservation->status->status->status_code,
+                [
+                    'awaiting_result',
+                    'completed',
+                    'absent',
+                ],
+                true
+            ),
+            404,
+            'この授業は履歴ではありません。'
+        );
+
 
         return view(
             'teachers.lessons.history-detail',

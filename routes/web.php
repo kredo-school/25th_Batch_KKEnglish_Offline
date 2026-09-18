@@ -28,7 +28,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ScheduleMatrixController;
 use App\Http\Controllers\Admin\ExpectedReservationSettingController;
 use App\Http\Controllers\Admin\SeasonPeriodController;
-
+use App\Http\Controllers\Student\ReviewController;
 // Test route for frontend testing
 Route::view('/teachers/lesson-history-test','teachers.history.index')
 ->name('teachers.history.index');
@@ -78,6 +78,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
     // Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
     //     ->name('student.lessons.cancel');
+
+    // Review routes
+    Route::get('/students/reviews', [ReviewController::class, 'index'])->name('students.reviews.index');
+    Route::post('/students/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
     // Student reservations
      // 予約一覧・検索画面
     Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
@@ -105,6 +109,11 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     // Point History
     Route::get('/students/history/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
+
+    // Review routes
+    Route::get('/students/reviews', [ReviewController::class, 'index'])->name('students.reviews.index');
+    Route::post('/students/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
+
 
 });
 
