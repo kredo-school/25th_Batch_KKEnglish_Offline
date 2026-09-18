@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Shift Pattern Management</h1>
+        <h1 class="h2 mb-0 fw-bold">Shift Pattern Management</h1>
         <a href="{{ route('admin.shift-patterns.create') }}" class="btn btn-primary btn-sm">＋ New Pattern</a>
     </div>
 

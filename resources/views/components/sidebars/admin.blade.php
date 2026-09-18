@@ -13,7 +13,7 @@
             {{-- Schedule専用サイドバー --}}
             <a href="{{ route('admin.dashboard', ['menu' => 'main']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-                ← Back
+                <i class="fa-solid fa-angles-left"></i> Back
             </a>
 
             <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6">Schedule management</div>
@@ -31,19 +31,19 @@
             </a>
 
             {{-- 予想期間設定 --}}
-            <a href="{{ route('admin.season-periods.index', ['menu' => 'schedule']) }}"
+            {{-- <a href="{{ route('admin.season-periods.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.season-periods.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Season settings
-            </a>
+            </a> --}}
 
             {{-- 予想予約数設定 --}}
-            <a href="{{ route('admin.expected-reservations.edit', ['menu' => 'schedule']) }}"
+            {{-- <a href="{{ route('admin.expected-reservations.edit', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.expected-reservations.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Expected reservations settings
-            </a>
+            </a> --}}
 
             <hr>
-            
+
             {{-- シフト作成 --}}
             <a href="{{ route('admin.shift-patterns.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.shift-patterns.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
@@ -64,17 +64,17 @@
 
             <a href="{{ route('admin.teachers.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teachers.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Teacher management
+                Teacher List
             </a>
 
             <a href="{{ route('admin.materials.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.materials.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Material management
+                Material List
             </a>
 
             <a href="{{ route('admin.students.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.students.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Student management
+                Student List
             </a>
 
             {{-- Schedule management (クリックすると Schedule専用メニューに切り替わります) --}}
@@ -85,12 +85,12 @@
 
             <a href="{{ route('admin.users.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.users.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                User management
+                User List
             </a>
 
             <a href="{{ route('admin.announcements.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.announcements.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Announcement management
+                Announcement
             </a>
         @endif
     </nav>

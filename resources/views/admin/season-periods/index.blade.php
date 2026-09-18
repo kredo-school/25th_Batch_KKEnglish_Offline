@@ -33,7 +33,7 @@
                             <label class="form-label">Season Type</label>
                             <select name="season_type" class="form-select" required>
                                 <option value="normal">Normal (通常期)</option>
-                                <option value="busy">Busy (混雑期)</option>
+                                <option value="busy">Busy (繁忙期)</option>
                                 <option value="quiet">Quiet (閑散期)</option>
                             </select>
                         </div>

@@ -11,7 +11,7 @@
             <p><strong>Role:</strong> {{ $user->role->role_code ?? '-' }}</p>
             <p><strong>Status:</strong> {{ $user->status }}</p>
             <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-outline-primary btn-sm">Edit</a>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Back</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back</a>
         </div>
     </div>
 </div>

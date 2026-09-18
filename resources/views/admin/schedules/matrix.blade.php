@@ -6,8 +6,8 @@
         <h1 class="h4 mb-0">Operational Status</h1>
         <div class="d-flex gap-2">
             {{-- 1週間前/後へのナビゲーション --}}
-            <a href="{{ route('admin.schedules.matrix', ['start_date' => $start->copy()->subDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm">＜ Prev</a>
-            <a href="{{ route('admin.schedules.matrix', ['start_date' => $start->copy()->addDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm">Next ＞</a>
+            <a href="{{ route('admin.schedules.matrix', ['start_date' => $start->copy()->subDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Prev</a>
+            <a href="{{ route('admin.schedules.matrix', ['start_date' => $start->copy()->addDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm">Next <i class="fa-solid fa-angles-right"></i></a>
         </div>
     </div>
 

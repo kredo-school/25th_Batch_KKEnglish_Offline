@@ -36,7 +36,7 @@
                                 @elseif($announcement->target === 'students')
                                     <span class="badge bg-info">Students Only</span>
                                 @elseif($announcement->target === 'teachers')
-                                    <span class="badge bg-success">Teachers Only</span>
+                                    <span class="badge bg-warning">Teachers Only</span>
                                 @else
                                     <span class="badge bg-secondary">Unknown</span>
                                 @endif

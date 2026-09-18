@@ -4,7 +4,7 @@
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">Add Points</h1>
-        <a href="{{ route('admin.students.show', $student) }}" class="btn btn-outline-secondary btn-sm">Back</a>
+        <a href="{{ route('admin.students.show', $student) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back</a>
     </div>
 
     @if($errors->any())

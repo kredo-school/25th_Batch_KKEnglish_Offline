@@ -13,7 +13,7 @@ class ExpectedReservationSettingController extends Controller
     {
         // 既存の設定をすべて取得
         $records = ExpectedReservationSetting::all();
-        
+
         // データを扱いやすいように配列に整理
         $settings = [];
         foreach ($records as $record) {
@@ -32,7 +32,7 @@ class ExpectedReservationSettingController extends Controller
 
         $seasons = [
             'normal' => '通常期 (Normal)',
-            'busy' => '混雑期 (Busy)',
+            'busy' => '繁忙期 (Busy)',
             'quiet' => '閑散期 (Quiet)',
         ];
 

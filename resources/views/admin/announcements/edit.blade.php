@@ -4,7 +4,7 @@
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h4 mb-0">Edit Announcement</h1>
-        <a href="{{ route('admin.announcements.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+        <a href="{{ route('admin.announcements.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to List</a>
     </div>
 
     @if($errors->any())
@@ -48,13 +48,13 @@
                 </div>
             </form>
 
-            <hr class="my-4">
+            {{-- <hr class="my-4"> --}}
 
             {{-- 削除用フォーム（DELETEメソッド） --}}
-            <form action="{{ route('admin.announcements.destroy', $announcement) }}" method="POST" class="text-end" onsubmit="return confirm('本当にこのお知らせを削除しますか？この操作は元に戻せません。');">
+            <form action="{{ route('admin.announcements.destroy', $announcement) }}" method="POST" class="text-start" onsubmit="return confirm('本当にこのお知らせを削除しますか？この操作は元に戻せません。');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                <button type="submit" class="btn btn-outline-danger btn-sm my-3">Delete</button>
             </form>
         </div>
     </div>

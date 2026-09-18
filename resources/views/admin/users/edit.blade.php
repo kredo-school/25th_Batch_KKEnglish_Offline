@@ -53,7 +53,8 @@
 
         <div class="mt-4 d-flex gap-2">
             <button type="submit" class="btn btn-primary">Update</button>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">Back</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-angles-left"></i> Back</a>
         </div>
     </form>
 </div>

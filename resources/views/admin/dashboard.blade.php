@@ -33,7 +33,7 @@
                 <div class="btn-group" role="group" aria-label="week navigation">
                     <a class="btn btn-outline-secondary"
                        href="{{ route('admin.dashboard', ['week_start' => $prev]) }}">
-                        ← Prev
+                        <i class="fa-solid fa-angles-left"></i> Prev
                     </a>
                     <a class="btn btn-outline-primary"
                        href="{{ route('admin.dashboard', ['week_start' => $curr]) }}">
@@ -41,7 +41,7 @@
                     </a>
                     <a class="btn btn-outline-secondary"
                        href="{{ route('admin.dashboard', ['week_start' => $next]) }}">
-                        Next →
+                        Next <i class="fa-solid fa-angles-right"></i>
                     </a>
                 </div>
                 <div class="small text-secondary">
@@ -97,7 +97,7 @@
                                 @endforeach
                             </tr>
 
-                            <tr>
+                            {{-- <tr>
                                 <th class="text-start">Auto-Booked Students</th>
                                 @foreach(($dashboardRows ?? []) as $row)
                                     <td>
@@ -110,7 +110,7 @@
                                         @endif
                                     </td>
                                 @endforeach
-                            </tr>
+                            </tr> --}}
 
                             <tr>
                                 <th class="text-start">Working Teachers</th>
@@ -168,9 +168,9 @@
                                             @if(($announcement->target ?? null) === 'all')
                                                 <span class="badge bg-primary">All</span>
                                             @elseif(($announcement->target ?? null) === 'students')
-                                                <span class="badge bg-info text-dark">Students Only</span>
+                                                <span class="badge bg-info">Students Only</span>
                                             @elseif(($announcement->target ?? null) === 'teachers')
-                                                <span class="badge bg-success">Teachers Only</span>
+                                                <span class="badge bg-warning">Teachers Only</span>
                                             @else
                                                 <span class="badge bg-secondary">Unknown</span>
                                             @endif
