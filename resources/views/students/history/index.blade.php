@@ -79,6 +79,10 @@
                                 Status
                             </th>
 
+                            <th class="py-3 text-center">
+                                Review
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -245,6 +249,37 @@
 
                                         <span class="badge text-bg-secondary">
                                             Absent
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                                {{-- ===============================
+                                    Review
+                                ================================ --}}
+                                <td class="text-center">
+
+                                    @if (
+                                        $reservation
+                                            ->status
+                                            ?->status_code
+                                        === 'completed'
+                                    )
+
+                                        <a
+                                            href="{{ route(
+                                               'students.reviews.create.test'
+                                            ) }}"
+                                            class="btn btn-outline-primary btn-sm"
+                                        >
+                                            Write a Review
+                                        </a>
+
+                                    @else
+
+                                        <span class="text-secondary">
+                                            -
                                         </span>
 
                                     @endif
