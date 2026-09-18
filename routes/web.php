@@ -30,10 +30,6 @@ use App\Http\Controllers\Admin\ExpectedReservationSettingController;
 use App\Http\Controllers\Admin\SeasonPeriodController;
 use App\Http\Controllers\Student\ReviewController;
 // Test route for frontend testing
-Route::view('/teachers/lesson-history-test','teachers.history.index')
-->name('teachers.history.index');
-Route::view('/teachers/history-show-test','teachers.history.show')
-->name('teachers.history.show.test');
 
 
 // Public routes
@@ -141,8 +137,8 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
         ->name('teachers.reservations.result.update');
 
     //　Lessons history
-    Route::get('/teachers/lesson_history/', [TeacherLessonHistoryController::class, 'lessonHistory'])->name('teachers.reservations.history');
-    Route::get('/teachers/lesson_history/{reservation}', [TeacherLessonHistoryController::class, 'historyDetail'])->name('teachers.reservations.show');
+    Route::get('/teachers/lesson_history/', [TeacherLessonHistoryController::class, 'lessonHistory'])->name('teachers.history.index');
+    Route::get('/teachers/lesson_history/{reservation}', [TeacherLessonHistoryController::class, 'historyDetail'])->name('teachers.history.show');
 
 
 });

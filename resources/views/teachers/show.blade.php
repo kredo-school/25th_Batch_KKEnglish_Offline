@@ -114,6 +114,46 @@
 
             </div>
 
+            {{-- ===============================
+                    Teaching Materials
+                ================================ --}}
+                <div class="row border-bottom py-3">
+
+                    <div class="col-md-3 fw-bold text-secondary">
+                        Teaching Materials
+                    </div>
+
+                    <div class="col-md-9">
+
+                        @forelse ($teacher->materials as $material)
+
+                            <span
+                                class="
+                                    badge
+                                    bg-secondary-subtle
+                                    text-dark
+                                    border
+                                    me-1
+                                    mb-1
+                                    px-2
+                                    py-2
+                                "
+                            >
+                                {{ $material->name }}
+                            </span>
+
+                        @empty
+
+                            <span class="text-secondary">
+                                -
+                            </span>
+
+                        @endforelse
+
+                    </div>
+
+                </div>
+
 
             {{-- ===============================
                  Teaching Background

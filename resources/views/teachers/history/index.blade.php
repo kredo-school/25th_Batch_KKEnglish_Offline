@@ -4,146 +4,6 @@
 
 @section('content')
 
-@php
-
-    /*
-    |--------------------------------------------------------------------------
-    | Dummy Data
-    |--------------------------------------------------------------------------
-    | バック側実装後はこの部分を削除
-    */
-
-    $pastReservations = collect([
-
-        /*
-         * Completed
-         */
-        (object) [
-            'id' => 2,
-
-            'start_at' => '2026-09-13 14:00:00',
-            'end_at' => '2026-09-13 14:30:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Taro',
-                    'last_name' => 'Yamada',
-                    'profile_image' => null,
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Grammar',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'completed',
-            ],
-        ],
-
-
-        /*
-         * Absent
-         */
-        (object) [
-            'id' => 3,
-
-            'start_at' => '2026-09-12 09:00:00',
-            'end_at' => '2026-09-12 09:30:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Hanako',
-                    'last_name' => 'Sato',
-                    'profile_image' => null,
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Business English',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'absent',
-            ],
-        ],
-
-
-        /*
-         * Awaiting Result
-         */
-        (object) [
-            'id' => 4,
-
-            'start_at' => '2026-09-11 16:00:00',
-            'end_at' => '2026-09-11 16:30:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Ken',
-                    'last_name' => 'Suzuki',
-                    'profile_image' => null,
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Pronunciation',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'awaiting_result',
-            ],
-        ],
-
-    ]);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Action Required
-    |--------------------------------------------------------------------------
-    */
-
-    $awaitingReservations =
-        $pastReservations->filter(
-            function ($reservation) {
-
-                return
-                    $reservation
-                        ->status
-                        ->status_code
-                    === 'awaiting_result';
-
-            }
-        );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Past Lessons
-    |--------------------------------------------------------------------------
-    */
-
-    $completedReservations =
-        $pastReservations->filter(
-            function ($reservation) {
-
-                return in_array(
-                    $reservation
-                        ->status
-                        ->status_code,
-                    [
-                        'completed',
-                        'absent',
-                    ]
-                );
-
-            }
-        );
-
-@endphp
-
-
 <div class="container-fluid">
 
     {{-- ===============================
@@ -162,37 +22,248 @@
     </div>
 
 
+    {{-- ===============================
+         Pending Lesson Records
+    ================================ --}}
+    @if ($awaitingReservations->isNotEmpty())
 
- {{-- ===============================
-     Pending Lesson Records
-================================ --}}
-@if ($awaitingReservations->isNotEmpty())
+        <div class="card shadow-sm mb-5">
 
-    <div class="card shadow-sm mb-5">
+            <div class="card-header bg-light py-3">
 
-        <div class="card-header bg-light py-3">
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                    "
+                >
 
-            <div
-                class="
-                    d-flex
-                    justify-content-between
-                    align-items-center
-                "
-            >
+                    <div>
 
-                <div>
+                        <h5 class="fw-bold mb-1">
 
-                    <h5 class="fw-bold mb-1">
+                            <i class="fa-regular fa-clipboard me-1"></i>
 
-                        <i class="fa-regular fa-clipboard me-1"></i>
+                            Pending Lesson Records
 
-                        Pending Lesson Records
+                        </h5>
 
-                    </h5>
+                        <p class="text-secondary small mb-0">
+                            Please complete these lesson records when you have time.
+                        </p>
 
-                    <p class="text-secondary small mb-0">
-                        Please complete these lesson records when you have time.
-                    </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th class="px-4 py-3">
+                                    Date
+                                </th>
+
+                                <th class="py-3">
+                                    Time
+                                </th>
+
+                                <th class="py-3">
+                                    Student
+                                </th>
+
+                                <th class="py-3">
+                                    Material
+                                </th>
+
+                                <th class="py-3 text-center">
+                                    Status
+                                </th>
+
+                                <th class="py-3 text-center">
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach ($awaitingReservations as $reservation)
+
+                                @php
+
+                                    $startAt =
+                                        \Carbon\Carbon::parse(
+                                            $reservation->start_at
+                                        );
+
+                                    $endAt =
+                                        \Carbon\Carbon::parse(
+                                            $reservation->end_at
+                                        );
+
+                                @endphp
+
+
+                                <tr>
+
+                                    {{-- Date --}}
+                                    <td class="px-4">
+
+                                        <div class="fw-bold">
+                                            {{ $startAt->format('M d, Y') }}
+                                        </div>
+
+                                        <small class="text-secondary">
+                                            {{ $startAt->format('l') }}
+                                        </small>
+
+                                    </td>
+
+
+                                    {{-- Time --}}
+                                    <td>
+
+                                        {{ $startAt->format('h:i A') }}
+
+                                        -
+
+                                        {{ $endAt->format('h:i A') }}
+
+                                    </td>
+
+
+                                    {{-- Student --}}
+                                    <td>
+
+                                        <div class="d-flex align-items-center">
+
+                                            @if (
+                                                $reservation
+                                                    ->student
+                                                    ?->user
+                                                    ?->profile_image
+                                            )
+
+                                                <img
+                                                    src="{{ $reservation->student->user->profile_image }}"
+                                                    alt="{{ $reservation->student->user->first_name }}"
+                                                    width="40"
+                                                    height="40"
+                                                    class="rounded-circle me-2"
+                                                    style="object-fit: cover;"
+                                                >
+
+                                            @else
+
+                                                <i
+                                                    class="
+                                                        fa-solid
+                                                        fa-circle-user
+                                                        fa-2x
+                                                        text-secondary
+                                                        me-2
+                                                    "
+                                                ></i>
+
+                                            @endif
+
+
+                                            <div class="fw-semibold">
+
+                                                {{
+                                                    $reservation
+                                                        ->student
+                                                        ?->user
+                                                        ?->first_name
+                                                    ?? ''
+                                                }}
+
+                                                {{
+                                                    $reservation
+                                                        ->student
+                                                        ?->user
+                                                        ?->last_name
+                                                    ?? ''
+                                                }}
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    {{-- Material --}}
+                                    <td>
+
+                                        {{
+                                            $reservation
+                                                ->material
+                                                ?->name
+                                            ?? '-'
+                                        }}
+
+                                    </td>
+
+
+                                    {{-- Status --}}
+                                    <td class="text-center">
+
+                                        <span
+                                            class="
+                                                badge
+                                                bg-light
+                                                text-danger
+                                                border
+                                                border-danger
+                                            "
+                                        >
+                                            Awaiting Result
+                                        </span>
+
+                                    </td>
+
+
+                                    {{-- Action --}}
+                                    <td class="text-center">
+
+                                        <a
+                                            href="{{ route(
+                                                'teachers.history.show',
+                                                $reservation
+                                            ) }}"
+                                            class="
+                                                btn
+                                                btn-outline-primary
+                                                btn-sm
+                                            "
+                                        >
+                                            Add Record
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
 
                 </div>
 
@@ -201,170 +272,31 @@
         </div>
 
 
-        <div class="card-body p-0">
+    @else
 
-            <div class="table-responsive">
+        <div class="card shadow-sm mb-5">
 
-                <table class="table table-hover align-middle mb-0">
+            <div class="card-body text-center py-4">
 
-                    <thead class="table-light">
+                <i
+                    class="
+                        fa-regular
+                        fa-circle-check
+                        fa-2x
+                        text-secondary
+                        mb-2
+                    "
+                ></i>
 
-                        <tr>
-
-                            <th class="px-4 py-3">
-                                Date
-                            </th>
-
-                            <th class="py-3">
-                                Time
-                            </th>
-
-                            <th class="py-3">
-                                Student
-                            </th>
-
-                            <th class="py-3">
-                                Material
-                            </th>
-
-                            <th class="py-3 text-center">
-                                Status
-                            </th>
-
-                            <th class="py-3 text-center">
-                                Action
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        @foreach ($awaitingReservations as $reservation)
-
-                            @php
-
-                                $startAt =
-                                    \Carbon\Carbon::parse(
-                                        $reservation->start_at
-                                    );
-
-                                $endAt =
-                                    \Carbon\Carbon::parse(
-                                        $reservation->end_at
-                                    );
-
-                            @endphp
-
-
-                            <tr>
-
-                                <td class="px-4">
-
-                                    <div class="fw-bold">
-                                        {{ $startAt->format('M d, Y') }}
-                                    </div>
-
-                                    <small class="text-secondary">
-                                        {{ $startAt->format('l') }}
-                                    </small>
-
-                                </td>
-
-
-                                <td>
-
-                                    {{ $startAt->format('h:i A') }}
-
-                                    -
-
-                                    {{ $endAt->format('h:i A') }}
-
-                                </td>
-
-
-                                <td>
-
-                                    {{
-                                        $reservation
-                                            ->student
-                                            ->user
-                                            ->first_name
-                                    }}
-
-                                    {{
-                                        $reservation
-                                            ->student
-                                            ->user
-                                            ->last_name
-                                    }}
-
-                                </td>
-
-
-                                <td>
-
-                                    {{
-                                        $reservation
-                                            ->material
-                                            ->name
-                                    }}
-
-                                </td>
-
-
-                                <td class="text-center">
-
-                                    <span
-                                        class="
-                                            badge
-                                            bg-light
-                                            text-danger
-                                            border
-                                            border-danger
-                                        "
-                                    >
-                                        Awaiting Result
-                                    </span>
-
-                                </td>
-
-
-                                <td class="text-center">
-
-                                    <a
-                                        href="{{ route(
-                                            'teachers.history.show.test',
-                                            ['status' => 'awaiting_result']
-                                        ) }}"
-                                        class="
-                                            btn
-                                            btn-outline-primary
-                                            btn-sm
-                                        "
-                                    >
-                                        Add Record
-                                    </a>
-
-                                </td>
-
-                            </tr>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
+                <p class="text-secondary mb-0">
+                    No pending lesson records.
+                </p>
 
             </div>
 
         </div>
 
-    </div>
-
-@endif
+    @endif
 
 
 
@@ -486,30 +418,53 @@
 
                                         <div class="d-flex align-items-center">
 
-                                            <i
-                                                class="
-                                                    fa-solid
-                                                    fa-circle-user
-                                                    fa-2x
-                                                    text-secondary
-                                                    me-2
-                                                "
-                                            ></i>
+                                            @if (
+                                                $reservation
+                                                    ->student
+                                                    ?->user
+                                                    ?->profile_image
+                                            )
+
+                                                <img
+                                                    src="{{ $reservation->student->user->profile_image }}"
+                                                    alt="{{ $reservation->student->user->first_name }}"
+                                                    width="40"
+                                                    height="40"
+                                                    class="rounded-circle me-2"
+                                                    style="object-fit: cover;"
+                                                >
+
+                                            @else
+
+                                                <i
+                                                    class="
+                                                        fa-solid
+                                                        fa-circle-user
+                                                        fa-2x
+                                                        text-secondary
+                                                        me-2
+                                                    "
+                                                ></i>
+
+                                            @endif
+
 
                                             <div class="fw-semibold">
 
                                                 {{
                                                     $reservation
                                                         ->student
-                                                        ->user
-                                                        ->first_name
+                                                        ?->user
+                                                        ?->first_name
+                                                    ?? ''
                                                 }}
 
                                                 {{
                                                     $reservation
                                                         ->student
-                                                        ->user
-                                                        ->last_name
+                                                        ?->user
+                                                        ?->last_name
+                                                    ?? ''
                                                 }}
 
                                             </div>
@@ -525,7 +480,8 @@
                                         {{
                                             $reservation
                                                 ->material
-                                                ->name
+                                                ?->name
+                                            ?? '-'
                                         }}
 
                                     </td>
@@ -537,7 +493,7 @@
                                         @if (
                                             $reservation
                                                 ->status
-                                                ->status_code
+                                                ?->status_code
                                             === 'completed'
                                         )
 
@@ -549,7 +505,7 @@
                                         @elseif (
                                             $reservation
                                                 ->status
-                                                ->status_code
+                                                ?->status_code
                                             === 'absent'
                                         )
 
@@ -567,8 +523,8 @@
 
                                         <a
                                             href="{{ route(
-                                                'teachers.history.show.test',
-                                                ['status' => $reservation->status->status_code]
+                                                'teachers.history.show',
+                                                $reservation
                                             ) }}"
                                             class="
                                                 btn
