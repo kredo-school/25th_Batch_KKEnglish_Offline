@@ -84,27 +84,90 @@
                                 </div>
                             </div>
 
-                            {{-- レッスン1 --}}
-                            <div class="border rounded p-3 mb-3">
-                                <p class="mb-1 fw-bold">
-                                    10:00 - 10:50
-                                </p>
+                {{-- ===============================
+                    Today's Lessons
+                ================================ --}}
+                @forelse ($todayLessons as $lesson)
 
-                                <p class="mb-0">
-                                    Sarah Mitchell
-                                </p>
-                            </div>
+                    @php
+                        $startAt = \Carbon\Carbon::parse(
+                            $lesson->start_at
+                        );
 
-                            {{-- レッスン2 --}}
-                            <div class="border rounded p-3">
-                                <p class="mb-1 fw-bold">
-                                    14:00 - 14:50
-                                </p>
+                        $endAt = \Carbon\Carbon::parse(
+                            $lesson->end_at
+                        );
+                    @endphp
 
-                                <p class="mb-0">
-                                    Sarah Mitchell
-                                </p>
-                            </div>
+                    <div class="border rounded p-3 mb-3">
+
+                        {{-- Time --}}
+                        <p class="mb-1 fw-bold">
+
+                            {{ $startAt->format('H:i') }}
+
+                            -
+
+                            {{ $endAt->format('H:i') }}
+
+                        </p>
+
+
+                        {{-- Teacher --}}
+                        <p class="mb-1">
+
+                            {{
+                                $lesson
+                                    ->teacher
+                                    ->user
+                                    ->first_name
+                            }}
+
+                            {{
+                                $lesson
+                                    ->teacher
+                                    ->user
+                                    ->last_name
+                            }}
+
+                        </p>
+
+
+                        {{-- Material --}}
+                        <p class="text-secondary small mb-0">
+
+                            {{
+                                $lesson
+                                    ->material
+                                    ->name
+                                ?? '-'
+                            }}
+
+                        </p>
+
+                    </div>
+
+                @empty
+
+                    <div class="text-center py-4">
+
+                        <i
+                            class="
+                                fa-regular
+                                fa-calendar-check
+                                fa-2x
+                                text-secondary
+                                mb-2
+                            "
+                        ></i>
+
+                        <p class="text-secondary mb-0">
+                            No lessons scheduled for today.
+                        </p>
+
+                    </div>
+
+                @endforelse
 
                         </div>
                     </div>

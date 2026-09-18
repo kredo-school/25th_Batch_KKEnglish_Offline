@@ -108,7 +108,7 @@ class LessonHistoryController extends Controller
             ->get();
 
         return view(
-            'teachers.reservations.history',
+            'teachers.history.index',
             compact(
                 'teacher',
                 'awaitingReservations',
@@ -159,7 +159,7 @@ class LessonHistoryController extends Controller
 
         abort_unless(
             in_array(
-                $reservation->status->status->status_code,
+                $reservation->status->status_code,
                 [
                     'awaiting_result',
                     'completed',
