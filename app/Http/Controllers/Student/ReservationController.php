@@ -664,6 +664,7 @@ class ReservationController extends Controller
                 'teacher.user',
                 'material',
                 'status',
+                'review',
             ])
             ->orderByDesc('start_at')
             ->get();
