@@ -173,7 +173,7 @@ class LessonHistoryController extends Controller
 
 
         return view(
-            'teachers.lessons.history-detail',
+            'teachers.history.show',
             compact(
                 'teacher',
                 'reservation'
