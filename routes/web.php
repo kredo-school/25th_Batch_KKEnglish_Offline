@@ -96,7 +96,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/my-reservations',
     [ReservationController::class, 'myReservations'])->name('students.reservations.upcoming');
 
-    //先生詳細
+    // Teacher dtail
     Route::get('/students/reservations/teacher-detail', [ReservationController::class, 'teacherDetail'])->name('students.reservations.teacher-detail');
 
     // Teacher reservations
@@ -107,7 +107,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     // Review routes
     Route::get('/students/reviews', [ReviewController::class, 'index'])->name('students.reviews.index');
-    Route::post('/students/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
+    Route::post('/students/reservations/{reservation}/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
 
 
 });

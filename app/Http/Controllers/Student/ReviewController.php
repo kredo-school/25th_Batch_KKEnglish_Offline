@@ -47,7 +47,6 @@ class ReviewController extends Controller
          */
         $reservation->load('status');
 
-
         /*
          * completedのみレビュー可能
          */
