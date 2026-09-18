@@ -17,7 +17,7 @@
     <div class="table-responsive">
         <table class="table table-striped align-middle">
             <thead>
-                <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr>
+                <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr>
             </thead>
             <tbody>
             @forelse($users as $user)
@@ -26,8 +26,11 @@
                     <td>{{ $user->first_name }} {{ $user->last_name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->role->role_code ?? '-' }}</td>
-                    <td>{{ $user->status ?? '-' }}</td>
-                    <td><a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <td><span class="badge {{ $user->status === 'active' ? 'bg-success' : 'bg-secondary' }}">
+                            {{ $user->status }}
+                        </span></td>
+                    <td>
+                        {{-- <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">Edit</a> --}}
                     <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-secondary">Details</a>
                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="d-inline" onsubmit="return confirm('このユーザーを停止しますか？');">
     @csrf

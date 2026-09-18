@@ -179,11 +179,11 @@
             <div class="summary-card-bg p-3">
                 <div class="row align-items-center mb-3 g-2">
                     <div class="col-xl-7 col-lg-6 col-md-12">
-                        <h6 class="fw-bold mb-2">各時間の情報まとめ</h6>
+                        <h6 class="fw-bold mb-2">Summary of each time slot</h6>
                         <div class="d-flex flex-wrap gap-3 text-dark small">
-                            <div><strong>全レッスン可能数 :</strong> {{ $capacity ?? 100 }}</div>
-                            <div><strong>予約済数 :</strong> {{ $booked ?? 45 }}</div>
-                            <div><strong>自動予約生徒数 :</strong> {{ $autoBooked ?? 20 }}</div>
+                            <div><strong>All available slots :</strong> {{ $capacity ?? 100 }}</div>
+                            <div><strong>Booked :</strong> {{ $booked ?? 45 }}</div>
+                            {{-- <div><strong>自動予約生徒数 :</strong> {{ $autoBooked ?? 20 }}</div> --}}
                         </div>
                     </div>
 
@@ -233,12 +233,12 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="modalBookingTitle">予約詳細</h5>
+                <h5 class="modal-title fw-bold" id="modalBookingTitle">Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-2"><strong>時間:</strong> <span id="modalBookingTime"></span></p>
-                <p class="mb-0"><strong>詳細:</strong> <span id="modalBookingDesc"></span></p>
+                <p class="mb-2"><strong>Time:</strong> <span id="modalBookingTime"></span></p>
+                <p class="mb-0"><strong>Details:</strong> <span id="modalBookingDesc"></span></p>
             </div>
         </div>
     </div>
@@ -285,7 +285,7 @@
         currentMode = mode;
         document.getElementById('btn-mode-teacher').classList.toggle('active', mode === 'teacher');
         document.getElementById('btn-mode-location').classList.toggle('active', mode === 'location');
-        document.getElementById('mode-header-label').innerText = mode === 'teacher' ? '先生' : '場所';
+        document.getElementById('mode-header-label').innerText = mode === 'teacher' ? 'Teacher' : 'Location';
         renderTimeline();
     }
 
@@ -303,8 +303,8 @@
             td.colSpan = 25; // label1 + 24h
             td.className = 'text-center text-muted py-4';
             td.textContent = currentMode === 'teacher'
-                ? '表示できる先生データがありません'
-                : '表示できるStationデータがありません';
+                ? 'No teacher data available'
+                : 'No station data available';
             tr.appendChild(td);
             tbody.appendChild(tr);
             return;
@@ -412,7 +412,7 @@
                 emptyMsg.className = 'text-muted small position-absolute top-50 start-50 translate-middle';
                 emptyMsg.style.pointerEvents = 'none';
                 emptyMsg.style.zIndex = '4';
-                emptyMsg.innerHTML = '<span class="badge bg-light text-secondary border px-2 py-1" style="font-size:0.65rem;">データなし</span>';
+                emptyMsg.innerHTML = '<span class="badge bg-light text-secondary border px-2 py-1" style="font-size:0.65rem;">No data</span>';
                 timelineTd.appendChild(emptyMsg);
             }
 
@@ -430,7 +430,7 @@
             const modal = new bootstrap.Modal(document.getElementById('bookingDetailModal'));
             modal.show();
         } else {
-            alert(`予約詳細:\n${block.title}\n时间: ${block.start_time} - ${block.end_time}`);
+            alert(`Booking Details:\n${block.title}\nTime: ${block.start_time} - ${block.end_time}`);
         }
     }
 

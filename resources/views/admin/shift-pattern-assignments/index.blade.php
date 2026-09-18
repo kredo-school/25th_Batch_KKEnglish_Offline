@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Teacher Assignment List</h1>
+        <h1 class="h2 mb-0 fw-bold">Teacher Assignment List</h1>
         <a href="{{ route('admin.shift-pattern-assignments.create', ['menu' => 'schedule']) }}" class="btn btn-primary btn-sm">＋ Assign Shift Pattern</a>
     </div>
 
@@ -136,7 +136,7 @@
                                                     </form>
                                                 </div>
                                             @endforeach
-                                            
+
                                             {{-- Teacher単位の一括変更 --}}
                                             <div class="mt-1">
                                                 <a href="{{ route('admin.shift-pattern-assignments.bulk-edit', $teacher) }}"

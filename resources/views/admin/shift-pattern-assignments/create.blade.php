@@ -21,15 +21,15 @@
 
         {{-- シフト種別の選択 --}}
         <div class="mb-4">
-            <label class="form-label fw-semibold">シフト種別</label>
+            <label class="form-label fw-semibold">Shift Type</label>
             <div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="assignment_type" id="type_weekly" value="weekly" checked onchange="toggleShiftType()">
-                    <label class="form-check-label" for="type_weekly">通常シフト (曜日指定)</label>
+                    <label class="form-check-label" for="type_weekly">Regular Shift (Weekly)</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="assignment_type" id="type_specific" value="specific_date" onchange="toggleShiftType()">
-                    <label class="form-check-label" for="type_specific">臨時シフト (日付指定)</label>
+                    <label class="form-check-label" for="type_specific">Temporary Shift (Specific Date)</label>
                 </div>
             </div>
         </div>
@@ -91,13 +91,14 @@
                 <label>Priority</label>
                 <input type="number" min="0" name="priority" class="form-control" value="{{ old('priority', 0) }}">
             </div> --}}
-
+        </div>
+        </div>
             {{-- 臨時シフト用の入力エリア --}}
             <div id="specific_section" style="display: none;">
                 <div class="mb-3 w-50">
-                    <label class="fw-semibold">対象の日付 (Specific Date)</label>
+                    <label class="fw-semibold">Specific Date</label>
                     <input type="date" name="specific_start_date" id="specific_start" class="form-control">
-                    <small class="text-muted">指定した日のシフトを上書きします</small>
+                    <small class="text-muted">Updates the shift for the specified date.</small>
                 </div>
             </div>
 

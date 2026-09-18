@@ -3,8 +3,8 @@
 @section('content')
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Student Details</h1>
-        <a href="{{ route('admin.students.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+        <h1 class="h2 mb-0 fw-bold">Student Details</h1>
+        <a href="{{ route('admin.students.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to List</a>
     </div>
 
     @if(session('status'))

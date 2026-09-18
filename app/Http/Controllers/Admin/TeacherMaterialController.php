@@ -27,7 +27,7 @@ class TeacherMaterialController extends Controller
         $teacher->materials()->sync($data['material_ids'] ?? []);
 
         return redirect()
-            ->route('admin.teachers.materials.edit', $teacher)
+            ->route('admin.teachers.show', $teacher)
             ->with('status', '科目割り当てを更新しました。');
     }
 }

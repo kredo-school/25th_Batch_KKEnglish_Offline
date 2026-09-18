@@ -8,7 +8,7 @@
         <div class="d-flex gap-2">
             <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-outline-primary btn-sm">Edit</a>
             <a href="{{ route('admin.teachers.materials.edit', $teacher) }}" class="btn btn-outline-info btn-sm">Materials</a>
-            <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+            <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to List</a>
         </div>
     </div>
 

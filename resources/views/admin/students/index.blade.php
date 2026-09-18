@@ -7,7 +7,7 @@
          ページタイトル
     ============================================================ --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Student Management</h1>
+        <h1 class="h2 mb-0 fw-bold">Student List</h1>
     </div>
 
 
@@ -163,7 +163,7 @@
                         {{-- View --}}
                         <td class="text-center">
                             <a href="{{ route('admin.students.show', $student) }}" class="btn btn-outline-primary btn-sm">
-                                View
+                                Point Transactions
                             </a>
                             <a href="{{ route('admin.students.profile', $student) }}" class="btn btn-outline-primary btn-sm ms-1">
                                 Profile

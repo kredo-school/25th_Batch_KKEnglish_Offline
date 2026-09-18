@@ -4,7 +4,18 @@
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">Details ({{ $date->format('Y-m-d') }})</h1>
-        <a href="{{ route('admin.schedules.matrix', ['start_date' => $date->copy()->startOfWeek()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm">Back</a>
+        {{-- 予想期間設定 --}}
+        <a href="{{ route('admin.season-periods.index', ['menu' => 'schedule']) }}"
+            class="d-block px-3 py-2 rounded mb-1 text-decoration-none btn btn-outline-secondary btn-sm {{ request()->routeIs('admin.season-periods.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+            Season settings
+        </a>
+
+        {{-- 予想予約数設定 --}}
+        <a href="{{ route('admin.expected-reservations.edit', ['menu' => 'schedule']) }}"
+            class="d-block px-3 py-2 rounded mb-1 text-decoration-none btn btn-outline-secondary btn-sm {{ request()->routeIs('admin.expected-reservations.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+            Expected reservations settings
+        </a>
+        <a href="{{ route('admin.schedules.matrix', ['start_date' => $date->copy()->startOfWeek()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i>Back</a>
     </div>
 
     <div class="card">
@@ -33,13 +44,13 @@
                                 <td>{{ $weekMap[$date->dayOfWeek] }}</td>
                                 <td>{{ $item['start'] }}</td>
                                 <td>{{ $item['end'] }}</td>
-                                
+
                                 <td class="bg-warning bg-opacity-10">{{ $item['booked'] }}</td>
                                 <td class="bg-warning bg-opacity-10">{{ $item['spare'] }}</td>
                                 <td class="bg-warning bg-opacity-10 fw-bold">{{ $item['required'] }}</td>
-                                
+
                                 <td class="bg-success bg-opacity-10 fw-bold">{{ $item['capacity'] }}</td>
-                                
+
                                 @if($item['diff'] >= 0)
                                     <td class="text-success fw-bold">{{ $item['diff'] }}</td>
                                     <td class="text-success fw-bold">Sufficient</td>

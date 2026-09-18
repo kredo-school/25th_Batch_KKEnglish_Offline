@@ -8,7 +8,7 @@
     ============================================================ --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h4 mb-0 text-bold">ID: {{ $student->id }} {{ $student->user->first_name }} {{ $student->user->last_name }}</h1>
-        <a href="{{ route('admin.students.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+        <a href="{{ route('admin.students.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to List</a>
     </div>
 
     @if(session('status'))
