@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\ScheduleMatrixController;
 use App\Http\Controllers\Admin\ExpectedReservationSettingController;
 use App\Http\Controllers\Admin\SeasonPeriodController;
 use App\Http\Controllers\Student\ReviewController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 // Test route for frontend testing
 
 
@@ -54,9 +55,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Student Routes
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/students/dashboard', function () {
-        return view('students.dashboard');
-    })->name('student.dashboard');
+    Route::get('/students/dashboard',[StudentDashboardController::class, 'index'])->name('student.dashboard');
 
     // Student profile
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');

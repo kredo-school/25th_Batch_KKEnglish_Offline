@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $todayLessons = Reservation::query()
 
             // ログイン中の生徒だけ
-            ->where('student_id', $student->student_id)
+            ->where('student_id', $student->id)
 
             // 今日の予約だけ
             ->whereBetween('start_at', [
@@ -52,7 +52,7 @@ class DashboardController extends Controller
             ->get();
 
         return view(
-            'student.dashboard',
+            'students.dashboard',
             compact('todayLessons')
         );
     }
