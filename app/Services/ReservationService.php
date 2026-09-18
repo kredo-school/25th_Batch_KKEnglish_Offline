@@ -396,7 +396,7 @@ class ReservationService
             if (
                 $reservation->status->status_code
                 !==
-                'confirmed'
+                'awaiting_result'
             ) {
                 throw ValidationException::withMessages([
                     'reservation' =>
