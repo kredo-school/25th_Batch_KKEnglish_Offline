@@ -8,97 +8,6 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Dummy Status
-    |--------------------------------------------------------------------------
-    |
-    | 一覧画面から
-    |
-    | ?status=awaiting_result
-    | ?status=completed
-    | ?status=absent
-    |
-    | を受け取って表示を切り替える
-    |
-    | Controller完成後は削除
-    |
-    */
-
-    $dummyStatus =
-        request(
-            'status',
-            'awaiting_result'
-        );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Dummy Data
-    |--------------------------------------------------------------------------
-    | Controller完成後は削除
-    */
-
-    $reservation = (object) [
-
-        'start_at' =>
-            '2026-09-17 10:00:00',
-
-        'end_at' =>
-            '2026-09-17 10:30:00',
-
-
-        'student' => (object) [
-
-            'user' => (object) [
-
-                'first_name' =>
-                    'John',
-
-                'last_name' =>
-                    'Smith',
-
-            ],
-
-        ],
-
-
-        'material' => (object) [
-
-            'name' =>
-                'Grammar Beginner',
-
-        ],
-
-
-        /*
-         * URLから受け取ったStatusを使用
-         */
-        'status' => (object) [
-
-            'status_code' =>
-                $dummyStatus,
-
-        ],
-
-
-        /*
-         * Completedの場合に表示する
-         * Lesson Record
-         */
-        'lessonRecord' => (object) [
-
-            'subject' =>
-                'Unit 3 / Page 25-30',
-
-            'progress_note' =>
-                'Practiced past tense and irregular verbs.',
-
-        ],
-
-    ];
-
-
-    /*
-    |--------------------------------------------------------------------------
     | Date / Time
     |--------------------------------------------------------------------------
     */
@@ -107,7 +16,6 @@
         \Carbon\Carbon::parse(
             $reservation->start_at
         );
-
 
     $endAt =
         \Carbon\Carbon::parse(
@@ -124,10 +32,9 @@
     $statusCode =
         $reservation
             ->status
-            ->status_code;
+            ?->status_code;
 
 @endphp
-
 
 
 <div class="container py-4">
@@ -192,15 +99,17 @@
                     {{
                         $reservation
                             ->student
-                            ->user
-                            ->first_name
+                            ?->user
+                            ?->first_name
+                        ?? '-'
                     }}
 
                     {{
                         $reservation
                             ->student
-                            ->user
-                            ->last_name
+                            ?->user
+                            ?->last_name
+                        ?? ''
                     }}
 
                 </div>
@@ -267,7 +176,8 @@
                     {{
                         $reservation
                             ->material
-                            ->name
+                            ?->name
+                        ?? '-'
                     }}
 
                 </div>
@@ -282,7 +192,6 @@
 
     {{-- =========================================================
          Awaiting Result
-         未入力
     ========================================================== --}}
     @if (
         $statusCode
@@ -313,8 +222,16 @@
 
             <div class="card-body p-4">
 
-                {{-- 表示確認用Form --}}
-                <form>
+                <form
+                    action="{{ route(
+                        'teachers.reservations.result.update',
+                        $reservation
+                    ) }}"
+                    method="POST"
+                >
+
+                    @csrf
+                    @method('PATCH')
 
 
                     {{-- Attendance --}}
@@ -332,21 +249,42 @@
                             id="lessonResult"
                             name="result"
                             class="form-select"
+                            required
                         >
 
                             <option value="">
                                 Select attendance
                             </option>
 
-                            <option value="completed">
+                            <option
+                                value="completed"
+                                @selected(
+                                    old('result')
+                                    === 'completed'
+                                )
+                            >
                                 Present
                             </option>
 
-                            <option value="absent">
+                            <option
+                                value="absent"
+                                @selected(
+                                    old('result')
+                                    === 'absent'
+                                )
+                            >
                                 Absent
                             </option>
 
                         </select>
+
+                        @error('result')
+
+                            <div class="text-danger small mt-1">
+                                {{ $message }}
+                            </div>
+
+                        @enderror
 
                     </div>
 
@@ -384,7 +322,8 @@
                                 {{
                                     $reservation
                                         ->material
-                                        ->name
+                                        ?->name
+                                    ?? '-'
                                 }}
 
                             </div>
@@ -412,10 +351,16 @@
                                 id="subject"
                                 name="subject"
                                 class="form-control"
-                                placeholder="
-                                    e.g. Unit 3 / Page 25-30
-                                "
+                                value="{{ old('subject') }}"
                             >
+
+                            @error('subject')
+
+                                <div class="text-danger small mt-1">
+                                    {{ $message }}
+                                </div>
+
+                            @enderror
 
                         </div>
 
@@ -441,7 +386,15 @@
                                 class="form-control"
                                 rows="4"
                                 placeholder="Enter lesson progress or notes..."
-                            ></textarea>
+                            >{{ old('progress_note') }}</textarea>
+
+                            @error('progress_note')
+
+                                <div class="text-danger small mt-1">
+                                    {{ $message }}
+                                </div>
+
+                            @enderror
 
                         </div>
 
@@ -453,7 +406,7 @@
                     <div class="text-end">
 
                         <button
-                            type="button"
+                            type="submit"
                             class="btn btn-primary"
                         >
                             Save Lesson Record
@@ -471,7 +424,6 @@
 
     {{-- =========================================================
          Completed
-         入力済みLesson Recordを閲覧
     ========================================================== --}}
     @elseif (
         $statusCode
@@ -539,7 +491,8 @@
                         {{
                             $reservation
                                 ->material
-                                ->name
+                                ?->name
+                            ?? '-'
                         }}
 
                     </div>
@@ -560,7 +513,7 @@
                         {{
                             $reservation
                                 ->lessonRecord
-                                ->subject
+                                ?->subject
                             ?? '-'
                         }}
 
@@ -582,7 +535,7 @@
                         {{
                             $reservation
                                 ->lessonRecord
-                                ->progress_note
+                                ?->progress_note
                             ?? '-'
                         }}
 
@@ -637,7 +590,6 @@
 
             <div class="card-body p-4">
 
-                {{-- Attendance --}}
                 <div class="row py-3">
 
                     <div class="col-md-3 fw-bold">
@@ -664,7 +616,9 @@
     <div class="mt-4">
 
         <a
-            href="{{ url()->previous() }}"
+            href="{{ route(
+                'teachers.history.index'
+            ) }}"
             class="btn btn-outline-secondary"
         >
             Back
@@ -695,24 +649,14 @@ document.addEventListener(
                 'lessonResult'
             );
 
-
         const completedFields =
             document.getElementById(
                 'completedFields'
             );
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Attendanceによって入力欄を切り替える
-        |--------------------------------------------------------------------------
-        */
-
         function updateLessonFields() {
 
-            /*
-             * Present
-             */
             if (
                 lessonResult.value
                 === 'completed'
@@ -724,21 +668,14 @@ document.addEventListener(
                         'd-none'
                     );
 
-
                 return;
-
             }
 
-
-            /*
-             * 未選択 / Absent
-             */
             completedFields
                 .classList
                 .add(
                     'd-none'
                 );
-
         }
 
 
@@ -748,9 +685,6 @@ document.addEventListener(
         );
 
 
-        /*
-         * 初期表示
-         */
         updateLessonFields();
 
     }
