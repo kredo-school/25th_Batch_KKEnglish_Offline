@@ -31,6 +31,9 @@ use App\Http\Controllers\Admin\SeasonPeriodController;
 use App\Http\Controllers\Student\ReviewController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 // Test route for frontend testing
+// Review create test
+Route::view('/students/reviews/create-test','students.reviews.create')
+->name('students.reviews.create.test');
 
 
 // Public routes
