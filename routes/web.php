@@ -78,7 +78,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     //     ->name('student.lessons.cancel');
 
     // Review routes
-    Route::get('/students/reviews', [ReviewController::class, 'index'])->name('students.reviews.index');
+    Route::get('/students/reviews', [ReviewController::class, 'create'])->name('students.reviews.create');
     Route::post('/students/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
     // Student reservations
      // 予約一覧・検索画面
@@ -109,7 +109,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/history/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
 
     // Review routes
-    Route::get('/students/reviews', [ReviewController::class, 'index'])->name('students.reviews.index');
+    Route::get('/students/reviews', [ReviewController::class, 'create'])->name('students.reviews.create');
     Route::post('/students/reservations/{reservation}/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
 
 
@@ -141,7 +141,6 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     //　Lessons history
     Route::get('/teachers/lesson_history/', [TeacherLessonHistoryController::class, 'lessonHistory'])->name('teachers.history.index');
     Route::get('/teachers/lesson_history/{reservation}', [TeacherLessonHistoryController::class, 'historyDetail'])->name('teachers.history.show');
-
 
 });
 
