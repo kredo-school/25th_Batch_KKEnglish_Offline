@@ -19,7 +19,7 @@
                     <div class="card-body d-flex align-items-center">
 
                         {{-- 教材画像 --}}
-                        <img src="{{ asset('storage/' . $material->cover_image) }}"
+                        <img src="{{ $material->cover_image }}"
                              alt="{{ $material->name }}"
                              width="90"
                              height="90"

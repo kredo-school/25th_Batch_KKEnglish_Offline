@@ -4,152 +4,409 @@
 
 @section('content')
 
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<link
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
+    rel="stylesheet"
+>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"
+></script>
+
 
 <style>
+
     #calendar a {
         color: #000;
         text-decoration: none;
     }
+
+
+    /* =========================================
+       Dashboard Titles
+    ========================================= */
+
+    .dashboard-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    .dashboard-card-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+
+    /* =========================================
+       Today's Lessons
+    ========================================= */
+
+    .today-lesson-item {
+        transition: background-color 0.2s;
+    }
+
+    .today-lesson-item:hover {
+        background-color: #f8f9fa;
+    }
+
+
+    /* =========================================
+       FullCalendar
+    ========================================= */
+
+    #calendar .fc-toolbar-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
 </style>
 
+
+
 <div class="container-fluid">
-    <div class="row">
 
 
-        {{-- Dashboard --}}
-      <div class="col-12">
+    {{-- =====================================================
+         Hello Header
+    ====================================================== --}}
+    <div
+        class="
+            bg-light
+            mb-4
+            d-flex
+            justify-content-between
+            align-items-center
+            px-4
+            py-3
+        "
+    >
 
-         {{-- Hello Header --}}
-        <div class="bg-light mb-4 d-flex justify-content-between align-items-center px-4 py-3">
+        {{-- Name / Date --}}
+        <div>
 
-         {{-- 名前・日付 --}}
-      <div>
-        <h2 class="fw-bold mb-1">
-            Hello, {{ auth()->user()->first_name }}
+            <h2 class="fw-bold mb-1">
+                Hello, {{ auth()->user()->first_name }}
+            </h2>
 
-        </h2>
+            <p class="text-secondary mb-0">
+                {{ now()->format('l, F j') }}
+            </p>
 
-        <p class="text-secondary mb-0">
-           {{ now()->format('l, F j') }}
-        </p>
+            <p class="fw-semibold mb-0">
 
-         <p class="fw-semibold mb-0">
-            <i class="fa-regular fa-clock me-1"></i>
-            {{ now()->format('H:i') }}
-          </p>
+                <i class="fa-regular fa-clock me-1"></i>
 
-      </div>
+                <span id="currentTime">
+                    {{ now()->format('H:i') }}
+                </span>
 
-    {{-- レッスン予約ボタン --}}
-    <a href="{{ route('students.reservations.index') }}" class="btn btn-primary me-3">
-        レッスンを予約
-    </a>
+            </p>
 
-</div>
+        </div>
 
-            {{-- Main --}}
-            <div class="row g-3">
 
-                {{-- 左側：本日のレッスン --}}
-                <div class="col-md-7">
+        {{-- Book Lesson --}}
+        <a
+            href="{{ route('students.reservations.index') }}"
+            class="btn btn-primary"
+        >
+            Book a Lesson
+        </a>
 
-                    <div class="card">
-                        <div class="card-body">
+    </div>
 
-                            {{-- タイトル＋日付切り替え --}}
-                            <div class="d-flex align-items-center gap-4 mb-4">
 
-                                <h5 class="mb-0">
-                                    本日のレッスン
-                                </h5>
 
-                                <div class="d-flex align-items-center gap-3">
+ {{-- =====================================================
+     Main Dashboard
+====================================================== --}}
+<div class="row g-4 align-items-stretch">
 
-                                    <a href="#"
-                                       class="text-dark text-decoration-none fw-bold">
-                                        &lt; 前日
-                                    </a>
 
-                                    <span class="fw-bold">
-                                        {{ now()->format('n月j日') }}
-                                    </span>
+    {{-- =================================================
+         Left : Today's Lessons
+    ================================================== --}}
+    <div class="col-lg-7">
 
-                                    <a href="#"
-                                       class="text-dark text-decoration-none fw-bold">
-                                        翌日 &gt;
-                                    </a>
+        <div class="card h-100">
 
-                                </div>
-                            </div>
+            <div class="card-body p-4">
 
-                {{-- ===============================
-                    Today's Lessons
-                ================================ --}}
+
+                {{-- Title --}}
+                <div class="mb-4">
+
+                    <h5 class="dashboard-section-title mb-1">
+                        Today's Lessons
+                    </h5>
+
+                    <div class="text-secondary small">
+                        {{ now()->format('F j') }}
+                    </div>
+
+                </div>
+
+
                 @forelse ($todayLessons as $lesson)
 
                     @php
-                        $startAt = \Carbon\Carbon::parse(
-                            $lesson->start_at
-                        );
+                        $startAt =
+                            \Carbon\Carbon::parse(
+                                $lesson->start_at
+                            );
 
-                        $endAt = \Carbon\Carbon::parse(
-                            $lesson->end_at
-                        );
+                        $endAt =
+                            \Carbon\Carbon::parse(
+                                $lesson->end_at
+                            );
                     @endphp
 
-                    <div class="border rounded p-3 mb-3">
 
-                        {{-- Time --}}
-                        <p class="mb-1 fw-bold">
+                    <div
+                        class="
+                            today-lesson-item
+                            border
+                            rounded
+                            px-3
+                            py-3
+                            mb-3
+                        "
+                    >
 
-                            {{ $startAt->format('H:i') }}
+                        <div
+                            class="
+                                d-flex
+                                justify-content-between
+                                align-items-center
+                                gap-3
+                            "
+                        >
 
-                            -
+                            <div>
 
-                            {{ $endAt->format('H:i') }}
+                                {{-- Time --}}
+                                <div class="fw-bold mb-2">
 
-                        </p>
+                                    {{ $startAt->format('H:i') }}
+                                    -
+                                    {{ $endAt->format('H:i') }}
 
-
-                        {{-- Teacher --}}
-                        <p class="mb-1">
-
-                            {{
-                                $lesson
-                                    ->teacher
-                                    ->user
-                                    ->first_name
-                            }}
-
-                            {{
-                                $lesson
-                                    ->teacher
-                                    ->user
-                                    ->last_name
-                            }}
-
-                        </p>
+                                </div>
 
 
-                        {{-- Material --}}
-                        <p class="text-secondary small mb-0">
+                              {{-- Teacher / Material --}}
+                            <div
+                                class="
+                                    d-flex
+                                    align-items-center
+                                    gap-2
+                                    flex-wrap
+                                "
+                            >
 
-                            {{
-                                $lesson
-                                    ->material
-                                    ->name
-                                ?? '-'
-                            }}
+                                {{-- Teacher Image --}}
+                                @if ($lesson->teacher?->user?->profile_image)
 
-                        </p>
+                                    <img
+                                        src="{{ $lesson->teacher->user->profile_image }}"
+                                        alt="Teacher"
+                                        class="rounded-circle"
+                                        style="
+                                            width: 36px;
+                                            height: 36px;
+                                            object-fit: cover;
+                                        "
+                                    >
+
+                                @else
+
+                                    <div
+                                        class="
+                                            rounded-circle
+                                            bg-secondary-subtle
+                                            d-flex
+                                            align-items-center
+                                            justify-content-center
+                                        "
+                                        style="
+                                            width: 36px;
+                                            height: 36px;
+                                        "
+                                    >
+                                        <i class="fa-solid fa-user text-secondary"></i>
+                                    </div>
+
+                                @endif
+
+
+                                {{-- Teacher Name --}}
+                                <span>
+
+                                    {{ $lesson->teacher?->user?->first_name ?? '' }}
+                                    {{ $lesson->teacher?->user?->last_name ?? '' }}
+
+                                </span>
+
+
+                                {{-- Material --}}
+                                <span
+                                    class="
+                                        badge
+                                        bg-secondary-subtle
+                                        text-dark
+                                        border
+                                    "
+                                >
+                                    {{ $lesson->material?->name ?? '-' }}
+                                </span>
+
+                            </div>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#cancelModal{{ $lesson->id }}"
+                            >
+                                Cancel
+                            </button>
+
+                        </div>
 
                     </div>
 
+
+                    {{-- Cancel Modal は今のまま --}}
+                    <div
+                        class="modal fade"
+                        id="cancelModal{{ $lesson->id }}"
+                        tabindex="-1"
+                        aria-hidden="true"
+                    >
+
+                        <div class="modal-dialog modal-dialog-centered">
+
+                            <div class="modal-content">
+
+                                <form
+                                    action="{{ route(
+                                        'students.reservations.cancel',
+                                        $lesson
+                                    ) }}"
+                                    method="POST"
+                                >
+
+                                    @csrf
+                                    @method('PATCH')
+
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Cancel Lesson
+                                        </h5>
+
+                                        <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                        ></button>
+
+                                    </div>
+
+
+                                    <div class="modal-body">
+
+                                        <p class="mb-3">
+                                            Are you sure you want to cancel this lesson?
+                                        </p>
+
+                                        <div class="bg-light rounded p-3 mb-4">
+
+                                            <div class="fw-bold mb-1">
+                                                {{ $startAt->format('F j') }}
+                                            </div>
+
+                                            <div class="mb-1">
+                                                {{ $startAt->format('H:i') }}
+                                                -
+                                                {{ $endAt->format('H:i') }}
+                                            </div>
+
+                                            <div class="mb-2">
+                                                {{ $lesson->teacher?->user?->first_name ?? '' }}
+                                                {{ $lesson->teacher?->user?->last_name ?? '' }}
+                                            </div>
+
+                                            <span
+                                                class="
+                                                    badge
+                                                    bg-secondary-subtle
+                                                    text-dark
+                                                    border
+                                                "
+                                            >
+                                                {{ $lesson->material?->name ?? '-' }}
+                                            </span>
+
+                                        </div>
+
+
+                                        <label
+                                            for="reason{{ $lesson->id }}"
+                                            class="form-label fw-bold"
+                                        >
+                                            Cancellation Reason
+                                        </label>
+
+                                        <textarea
+                                            id="reason{{ $lesson->id }}"
+                                            name="cancellation_reason"
+                                            class="form-control"
+                                            rows="3"
+                                            maxlength="500"
+                                            placeholder="Optional"
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <div class="modal-footer">
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-secondary"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            Back
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger"
+                                        >
+                                            Cancel Lesson
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
                 @empty
 
-                    <div class="text-center py-4">
+                    <div class="text-center py-5">
 
                         <i
                             class="
@@ -157,7 +414,7 @@
                                 fa-calendar-check
                                 fa-2x
                                 text-secondary
-                                mb-2
+                                mb-3
                             "
                         ></i>
 
@@ -169,94 +426,683 @@
 
                 @endforelse
 
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    {{-- =================================================
+         Right
+    ================================================== --}}
+    <div class="col-lg-5">
+
+        <div class="d-flex flex-column h-100 gap-3">
+
+
+            {{-- =========================================
+                 Point / Level
+            ========================================== --}}
+            <div class="row g-3">
+
+
+                {{-- Available Points --}}
+                <div class="col-5">
+
+                    <div class="card h-100">
+
+                        <div class="card-body p-3">
+
+                            <div class="dashboard-card-label mb-2">
+                                Available Points
+                            </div>
+
+                            <div
+                                class="
+                                    d-flex
+                                    align-items-center
+                                    gap-2
+                                "
+                            >
+
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-coins
+                                        text-warning
+                                    "
+                                ></i>
+
+                                <h5 class="fw-bold mb-0">
+
+                                    {{
+                                        number_format(
+                                            $student->point_balance ?? 0
+                                        )
+                                    }}
+
+                                </h5>
+
+                                <span class="text-secondary small">
+                                    pt
+                                </span>
+
+                            </div>
+
                         </div>
+
                     </div>
 
                 </div>
 
-                {{-- 右側 --}}
-                <div class="col-md-5">
 
-                    {{-- ポイント・レベル --}}
-                    <div class="row g-3 mb-3">
 
-                        {{-- Point --}}
-                        <div class="col-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    保有ポイント
-                                </div>
+                {{-- My Level --}}
+                <div class="col-7">
+
+                    <div class="card h-100">
+
+                        <div class="card-body p-3">
+
+                            <div class="dashboard-card-label mb-2">
+                                My Level
                             </div>
-                        </div>
 
-                        {{-- Level --}}
-                        <div class="col-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    現在のレベル
-                                </div>
+
+                            <div
+                                class="
+                                    d-flex
+                                    align-items-center
+                                    gap-2
+                                    flex-wrap
+                                "
+                            >
+
+                                <h5 class="fw-bold mb-0">
+                                    B1
+                                </h5>
+
+                                <span
+                                    class="
+                                        badge
+                                        bg-secondary-subtle
+                                        text-dark
+                                        border
+                                    "
+                                >
+                                    Intermediate
+                                </span>
+
+                                <button
+                                    type="button"
+                                    class="
+                                        btn
+                                        btn-outline-primary
+                                        btn-sm
+                                        ms-auto
+                                    "
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#levelModal"
+                                >
+                                    Change
+                                </button>
+
                             </div>
+
                         </div>
 
                     </div>
 
-                    {{-- Information --}}
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="mb-0">
-                                お知らせ
-                            </h5>
+                </div>
+
+
+            </div>
+
+
+
+            {{-- =========================================
+                 Announcements
+            ========================================== --}}
+            <div class="card flex-grow-1">
+
+                <div class="card-body p-4">
+
+                    <h5 class="dashboard-section-title mb-3">
+                        Announcements
+                    </h5>
+
+
+                    {{-- Dummy --}}
+                    <div class="border-bottom pb-3 mb-3">
+
+                        <div class="fw-semibold">
+                            Welcome to KKEnglish
                         </div>
+
+                        <div class="text-secondary small">
+                            Check the latest information from the school.
+                        </div>
+
+                    </div>
+
+
+                    <div class="border-bottom pb-3">
+
+                        <div class="fw-semibold">
+                            Lesson Information
+                        </div>
+
+                        <div class="text-secondary small">
+                            Please check your reservation before the lesson starts.
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
+
+
         </div>
-
-
-        {{-- Reservation Calendar --}}
-<div class="card mt-4">
-    <div class="card-body">
-
-        <div class="d-flex align-items-center mb-3">
-            <i class="fa-regular fa-calendar me-2"></i>
-
-            <h5 class="mb-0">
-                Reservation Calendar
-            </h5>
-        </div>
-
-        <div id="calendar"></div>
 
     </div>
+
+
 </div>
+
+
+
+    {{-- =====================================================
+         Reservation Calendar
+    ====================================================== --}}
+    <div class="row mt-5">
+
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+
+                    <div
+                        class="
+                            d-flex
+                            align-items-center
+                            mb-3
+                        "
+                    >
+
+                        <i
+                            class="
+                                fa-regular
+                                fa-calendar
+                                me-2
+                            "
+                        ></i>
+
+                        <h5 class="dashboard-section-title">
+                            Reservation Calendar
+                        </h5>
+
+                    </div>
+
+
+                    <div id="calendar"></div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+{{-- =============================================================
+     English Level Modal
+============================================================= --}}
+<div
+    class="modal fade"
+    id="levelModal"
+    tabindex="-1"
+    aria-labelledby="levelModalLabel"
+    aria-hidden="true"
+>
+
+    <div
+        class="
+            modal-dialog
+            modal-dialog-centered
+        "
+    >
+
+        <div class="modal-content">
+
+
+            {{-- Header --}}
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="levelModalLabel"
+                >
+                    Select Your English Level
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+
+            </div>
+
+
+
+            {{-- Body --}}
+            <div class="modal-body">
+
+
+                <div class="list-group">
+
+
+                    {{-- A1 --}}
+                    <label class="list-group-item py-3">
+
+                        <div
+                            class="
+                                d-flex
+                                align-items-start
+                                gap-3
+                            "
+                        >
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="english_level"
+                                value="a1"
+                            >
+
+                            <div>
+
+                                <div class="fw-bold">
+                                    A1 - Beginner
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can understand and use very basic English.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </label>
+
+
+
+                    {{-- A2 --}}
+                    <label class="list-group-item py-3">
+
+                        <div
+                            class="
+                                d-flex
+                                align-items-start
+                                gap-3
+                            "
+                        >
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="english_level"
+                                value="a2"
+                            >
+
+                            <div>
+
+                                <div class="fw-bold">
+                                    A2 - Elementary
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can communicate in simple everyday situations.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </label>
+
+
+
+                    {{-- B1 --}}
+                    <label class="list-group-item py-3">
+
+                        <div
+                            class="
+                                d-flex
+                                align-items-start
+                                gap-3
+                            "
+                        >
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="english_level"
+                                value="b1"
+                                checked
+                            >
+
+                            <div>
+
+                                <div class="fw-bold">
+                                    B1 - Intermediate
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can handle most everyday conversations.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </label>
+
+
+
+                    {{-- B2 --}}
+                    <label class="list-group-item py-3">
+
+                        <div
+                            class="
+                                d-flex
+                                align-items-start
+                                gap-3
+                            "
+                        >
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="english_level"
+                                value="b2"
+                            >
+
+                            <div>
+
+                                <div class="fw-bold">
+                                    B2 - Upper Intermediate
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can communicate clearly on a wide range of topics.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </label>
+
+
+
+                    {{-- C1 --}}
+                    <label class="list-group-item py-3">
+
+                        <div
+                            class="
+                                d-flex
+                                align-items-start
+                                gap-3
+                            "
+                        >
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="english_level"
+                                value="c1"
+                            >
+
+                            <div>
+
+                                <div class="fw-bold">
+                                    C1 - Advanced
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can express ideas fluently and in detail.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </label>
+
+
+
+                    {{-- C2 --}}
+                    <label class="list-group-item py-3">
+
+                        <div
+                            class="
+                                d-flex
+                                align-items-start
+                                gap-3
+                            "
+                        >
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="english_level"
+                                value="c2"
+                            >
+
+                            <div>
+
+                                <div class="fw-bold">
+                                    C2 - Proficient
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can understand and communicate almost like a fluent speaker.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </label>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            {{-- Footer --}}
+            <div class="modal-footer">
+
+
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Cancel
+                </button>
+
+
+                {{-- Dummy --}}
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                >
+                    Save
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
 
-    const calendarEl = document.getElementById('calendar');
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        // ==========================
+        // Current Time
+        // ==========================
+        function updateCurrentTime() {
 
-        locale: 'ja',
+            const now = new Date();
 
-        headerToolbar: {
-            left: 'title',
-            center: '',
-            right: 'prev,next'
-        },
+            const hours = String(
+                now.getHours()
+            ).padStart(2, '0');
 
-        height: 'auto'
-    });
+            const minutes = String(
+                now.getMinutes()
+            ).padStart(2, '0');
 
-    calendar.render();
-});
+            document
+                .getElementById('currentTime')
+                .textContent =
+                    `${hours}:${minutes}`;
+        }
+
+
+        updateCurrentTime();
+
+        setInterval(
+            updateCurrentTime,
+            60000
+        );
+
+
+        // ==========================
+        // FullCalendar
+        // ==========================
+        const calendarEl =
+            document.getElementById('calendar');
+
+
+        const calendar =
+            new FullCalendar.Calendar(
+                calendarEl,
+                {
+
+                    initialView:
+                        'dayGridMonth',
+
+                    locale:
+                        'ja',
+
+                    headerToolbar: {
+                        left: 'title',
+                        center: '',
+                        right: 'prev,next'
+                    },
+
+
+                    // ==========================
+                    // Today's Reservations
+                    // ==========================
+                    events: [
+
+                        @foreach ($todayLessons as $lesson)
+
+                            {
+                                title:
+                                    '{{ \Carbon\Carbon::parse($lesson->start_at)->format("H:i") }} ' +
+                                    '{{ $lesson->teacher?->user?->first_name ?? "" }}',
+
+                                start:
+                                    '{{ \Carbon\Carbon::parse($lesson->start_at)->format("Y-m-d\TH:i:s") }}',
+
+                                end:
+                                    '{{ \Carbon\Carbon::parse($lesson->end_at)->format("Y-m-d\TH:i:s") }}'
+                            },
+
+                        @endforeach
+
+                    ],
+
+
+                    // ==========================
+                    // Event Design
+                    // ==========================
+                eventContent: function (info) {
+
+                    const wrapper =
+                        document.createElement('div');
+
+                    wrapper.className =
+                        'w-100 rounded px-2 py-1';
+
+                    wrapper.style.backgroundColor =
+                        '#ffffff';
+
+                    wrapper.style.color =
+                        '#3b82f6';
+
+                    wrapper.style.border =
+                        '1px solid #3b82f6';
+
+                    wrapper.style.fontSize =
+                        '0.8rem';
+
+                    wrapper.style.fontWeight =
+                        '500';
+
+                    wrapper.textContent =
+                        info.event.title;
+
+                    return {
+                        domNodes: [wrapper]
+                    };
+
+                },
+
+                    height:
+                        'auto'
+
+                }
+            );
+
+
+        calendar.render();
+
+    }
+);
+
 </script>
 
-
-    </div>
-</div>
 
 @endsection

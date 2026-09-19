@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Reservation;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -49,6 +50,6 @@ class DashboardController extends Controller
 
             ->get();
 
-        return view('teacher.dashboard', compact('teacher','todayLessons'));
+        return view('teachers.dashboard', compact('teacher','todayLessons'));
     }
 }

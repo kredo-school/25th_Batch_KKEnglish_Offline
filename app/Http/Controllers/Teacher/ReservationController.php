@@ -246,7 +246,7 @@ class ReservationController extends Controller
      */
         return redirect()
             ->route(
-                'teachers.reservations.show',
+                'teachers.history.index',
                 $reservation
             )
             ->with(
