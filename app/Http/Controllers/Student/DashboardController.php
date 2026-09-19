@@ -53,7 +53,7 @@ class DashboardController extends Controller
 
         return view(
             'students.dashboard',
-            compact('todayLessons')
+            compact('student','todayLessons')
         );
     }
 
