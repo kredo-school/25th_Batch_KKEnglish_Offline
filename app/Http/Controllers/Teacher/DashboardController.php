@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Reservation;
 use App\Models\Announcement;
-
+use App\Models\Reservation;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -21,40 +20,58 @@ class DashboardController extends Controller
             '講師ユーザーではありません。'
         );
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Today's Lessons
+        |--------------------------------------------------------------------------
+        */
+
         $todayLessons = Reservation::query()
 
-            // ログイン中の講師だけ
-            ->where('teacher_id', $teacher->id)
+            ->where(
+                'teacher_id',
+                $teacher->id
+            )
 
-            // 今日の予約だけ
-            ->whereBetween('start_at', [
-                now()->startOfDay(),
-                now()->endOfDay(),
-            ])
+            ->whereBetween(
+                'start_at',
+                [
+                    now()->startOfDay(),
+                    now()->endOfDay(),
+                ]
+            )
 
-            // 有効な予約だけ
-            ->whereHas('status', function ($query) {
-                $query->whereIn('status_code', [
-                    'pending',
-                    'confirmed',
-                ]);
-            })
+            ->whereHas(
+                'status',
+                function ($query) {
+                    $query->whereIn(
+                        'status_code',
+                        [
+                            'pending',
+                            'confirmed',
+                        ]
+                    );
+                }
+            )
 
-            // 関連データも一緒に取得
             ->with([
                 'student.user',
                 'material',
                 'status',
             ])
 
-            // 時間順
             ->orderBy('start_at')
 
             ->get();
 
+
         /*
-         * 次の授業・現在授業
-         */
+        |--------------------------------------------------------------------------
+        | Next Lessons
+        |--------------------------------------------------------------------------
+        */
+
         $nextLessons = Reservation::query()
 
             ->where(
@@ -91,12 +108,19 @@ class DashboardController extends Controller
 
             ->get();
 
-        $nextLesson = $nextLessons->first();
-        
+
+        $nextLesson =
+            $nextLessons->first();
+
+
         /*
-         * Teacher向けお知らせ
-         */
+        |--------------------------------------------------------------------------
+        | Teacher Announcements
+        |--------------------------------------------------------------------------
+        */
+
         $announcements = Announcement::query()
+
             ->whereIn(
                 'target',
                 [
@@ -104,9 +128,27 @@ class DashboardController extends Controller
                     'teachers',
                 ]
             )
+
             ->latest()
+
             ->get();
 
-        return view('teacher.dashboard', compact('teacher','todayLessons','nextLessons','nextLesson','announcements'));
+
+        /*
+        |--------------------------------------------------------------------------
+        | View
+        |--------------------------------------------------------------------------
+        */
+
+        return view(
+            'teachers.dashboard',
+            compact(
+                'teacher',
+                'todayLessons',
+                'nextLessons',
+                'nextLesson',
+                'announcements'
+            )
+        );
     }
 }

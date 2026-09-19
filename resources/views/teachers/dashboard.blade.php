@@ -4,77 +4,6 @@
 
 @section('content')
 
-@php
-
-    /*
-    |--------------------------------------------------------------------------
-    | Dummy Data
-    |--------------------------------------------------------------------------
-    |
-    | 現在はフロント表示確認用。
-    |
-    | 最終的には
-    | Teacher\ReservationController
-    | または DashboardController から
-    |
-    | $todayReservations
-    |
-    | を受け取る。
-    |
-    */
-
-    $todayReservations = collect([
-
-        (object) [
-            'id' => 1,
-
-            'start_at' => '2026-09-07 10:00:00',
-            'end_at' => '2026-09-07 10:30:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Ayako',
-                    'last_name' => 'Kobayashi',
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Daily Conversation',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'confirmed',
-            ],
-        ],
-
-
-        (object) [
-            'id' => 2,
-
-            'start_at' => '2026-09-07 14:00:00',
-            'end_at' => '2026-09-07 14:30:00',
-
-            'student' => (object) [
-                'user' => (object) [
-                    'first_name' => 'Taro',
-                    'last_name' => 'Yamada',
-                ],
-            ],
-
-            'material' => (object) [
-                'name' => 'Business English',
-            ],
-
-            'status' => (object) [
-                'status_code' => 'confirmed',
-            ],
-        ],
-
-    ]);
-
-@endphp
-
-
 <div class="container-fluid">
 
     {{-- ===============================
@@ -89,13 +18,11 @@
 
         </h2>
 
-
         <p class="text-secondary mb-1">
 
             {{ now()->format('l, F j') }}
 
         </p>
-
 
         <p class="fw-semibold mb-0">
 
@@ -115,11 +42,13 @@
 
         <div class="card-header bg-white py-3">
 
-            <div class="
-                d-flex
-                justify-content-between
-                align-items-center
-            ">
+            <div
+                class="
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                "
+            >
 
                 <div>
 
@@ -132,7 +61,9 @@
 
                 {{-- My Lessons --}}
                 <a
-                    href="{{ route('teachers.reservations.index') }}"
+                    href="{{ route(
+                        'teachers.reservations.index'
+                    ) }}"
                     class="btn btn-outline-primary btn-sm"
                 >
                     View My Lessons
@@ -147,7 +78,14 @@
 
             <div class="table-responsive">
 
-                <table class="table table-hover align-middle mb-0">
+                <table
+                    class="
+                        table
+                        table-hover
+                        align-middle
+                        mb-0
+                    "
+                >
 
                     {{-- Header --}}
                     <thead class="table-light">
@@ -182,7 +120,10 @@
                     {{-- Body --}}
                     <tbody>
 
-                        @forelse ($todayReservations as $reservation)
+                        @forelse (
+                            $todayLessons
+                            as $reservation
+                        )
 
                             @php
 
@@ -201,72 +142,144 @@
 
                             <tr>
 
-                                {{-- Time --}}
+                                {{-- ===============================
+                                     Time
+                                ================================ --}}
                                 <td class="px-4">
 
                                     <div class="fw-bold">
 
-                                        {{ $startAt->format('h:i A') }}
+                                        {{
+                                            $startAt->format(
+                                                'h:i A'
+                                            )
+                                        }}
 
                                         -
 
-                                        {{ $endAt->format('h:i A') }}
+                                        {{
+                                            $endAt->format(
+                                                'h:i A'
+                                            )
+                                        }}
 
                                     </div>
 
                                 </td>
 
 
-                                {{-- Student --}}
+                                {{-- ===============================
+                                     Student
+                                ================================ --}}
                                 <td>
 
-                                    <i class="fa-solid fa-circle-user me-2"></i>
+                                    <div
+                                        class="
+                                            d-flex
+                                            align-items-center
+                                        "
+                                    >
 
-                                    {{ $reservation->student->user->first_name }}
+                                        <i
+                                            class="
+                                                fa-solid
+                                                fa-circle-user
+                                                me-2
+                                            "
+                                        ></i>
 
-                                    {{ $reservation->student->user->last_name }}
+                                        <span>
+
+                                            {{
+                                                $reservation
+                                                    ->student
+                                                    ?->user
+                                                    ?->first_name
+                                                ?? ''
+                                            }}
+
+                                            {{
+                                                $reservation
+                                                    ->student
+                                                    ?->user
+                                                    ?->last_name
+                                                ?? ''
+                                            }}
+
+                                        </span>
+
+                                    </div>
 
                                 </td>
 
 
-                                {{-- Material --}}
+                                {{-- ===============================
+                                     Material
+                                ================================ --}}
                                 <td>
 
-                                    {{ $reservation->material->name }}
+                                    {{
+                                        $reservation
+                                            ->material
+                                            ?->name
+                                        ?? '-'
+                                    }}
 
                                 </td>
 
 
-                                {{-- Status --}}
+                                {{-- ===============================
+                                     Status
+                                ================================ --}}
                                 <td>
 
                                     @if (
-                                        $reservation->status->status_code
+                                        $reservation
+                                            ->status
+                                            ?->status_code
                                         === 'confirmed'
                                     )
 
-                                        <span class="badge text-bg-primary">
+                                        <span
+                                            class="
+                                                badge
+                                                text-bg-primary
+                                            "
+                                        >
                                             Confirmed
                                         </span>
 
                                     @elseif (
-                                        $reservation->status->status_code
+                                        $reservation
+                                            ->status
+                                            ?->status_code
                                         === 'pending'
                                     )
 
-                                        <span class="badge text-bg-warning">
+                                        <span
+                                            class="
+                                                badge
+                                                text-bg-warning
+                                            "
+                                        >
                                             Pending
                                         </span>
 
                                     @else
 
-                                        <span class="badge text-bg-secondary">
+                                        <span
+                                            class="
+                                                badge
+                                                text-bg-secondary
+                                            "
+                                        >
 
                                             {{
                                                 ucfirst(
                                                     $reservation
                                                         ->status
-                                                        ->status_code
+                                                        ?->status_code
+                                                    ?? ''
                                                 )
                                             }}
 
@@ -277,13 +290,21 @@
                                 </td>
 
 
-                                {{-- Action --}}
+                                {{-- ===============================
+                                     Action
+                                ================================ --}}
                                 <td class="text-end pe-4">
 
-                                    {{-- 今はダミー --}}
                                     <a
-                                        href="#"
-                                        class="btn btn-outline-primary btn-sm"
+                                        href="{{ route(
+                                            'teachers.reservations.show',
+                                            $reservation
+                                        ) }}"
+                                        class="
+                                            btn
+                                            btn-outline-primary
+                                            btn-sm
+                                        "
                                     >
                                         Details
                                     </a>
@@ -299,7 +320,11 @@
 
                                 <td
                                     colspan="5"
-                                    class="text-center py-5 text-secondary"
+                                    class="
+                                        text-center
+                                        py-5
+                                        text-secondary
+                                    "
                                 >
 
                                     No lessons scheduled for today.
@@ -319,62 +344,6 @@
         </div>
 
     </div>
-
-
-    {{-- ===============================
-         TODO
-    ================================ --}}
-    {{--
-
-        TODO:
-
-        現在は表示確認用のダミーデータ。
-
-
-        最終的には
-
-        ログイン中Teacherの
-
-        今日の
-
-        pending / confirmed
-
-        の予約を取得して表示する。
-
-
-        表示内容:
-
-        ・Time
-        ・Student
-        ・Material
-        ・Status
-        ・Details
-
-
-        Details:
-
-        最終的には
-
-        teachers.reservations.show
-
-        に接続する。
-
-
-        My Lessons:
-
-        今日以降の予約一覧を表示する。
-
-
-        Lesson終了後:
-
-        statusをcompletedに変更し、
-
-        生徒側のLearning Historyや
-
-        先生側のLesson Historyに
-        表示する予定。
-
-    --}}
 
 </div>
 

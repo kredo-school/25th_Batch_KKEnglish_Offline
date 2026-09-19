@@ -30,10 +30,10 @@ use App\Http\Controllers\Admin\ExpectedReservationSettingController;
 use App\Http\Controllers\Admin\SeasonPeriodController;
 use App\Http\Controllers\Student\ReviewController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
+
 // Test route for frontend testing
-// Review create test
-Route::view('/students/reviews/create-test','students.reviews.create')
-->name('students.reviews.create.test');
+
 
 
 // Public routes
@@ -78,8 +78,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     //     ->name('student.lessons.cancel');
 
     // Review routes
-    Route::get('/students/reviews', [ReviewController::class, 'create'])->name('students.reviews.create');
-    Route::post('/students/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
+    // Route::get('/students/reviews', [ReviewController::class, 'create'])->name('students.reviews.create');
+    // Route::post('/students/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
     // Student reservations
      // 予約一覧・検索画面
     Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
@@ -109,7 +109,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/history/point-history', [PointHistoryController::class, 'index'])->name('students.point-history.index');
 
     // Review routes
-    Route::get('/students/reviews', [ReviewController::class, 'create'])->name('students.reviews.create');
+    Route::get('/students/reservations/{reservation}/reviews/create', [ReviewController::class, 'create'])->name('students.reviews.create');
     Route::post('/students/reservations/{reservation}/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
 
 
@@ -117,12 +117,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 // Teacher Dashboard
 Route::middleware(['auth', 'role:teacher'])->group(function () {
-    Route::get('/teachers/dashboard', function () {
-        return view('teachers.dashboard');
-    })->name('teacher.dashboard');
+    Route::get('/teachers/dashboard',[TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
 
     // My Schedule 画面
-    // Route::view('/teachers/schedule', 'teachers.schedule')->name('teachers.schedule');
     Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teachers.schedule');
     Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
     Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');

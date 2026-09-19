@@ -83,10 +83,12 @@ class ReviewController extends Controller
                 $validated['comment'] ?? null,
         ]);
 
-        return back()->with(
-            'success',
-            'レビューを投稿しました。'
-        );
+        return redirect()
+            ->route('students.history.index')
+            ->with(
+                'success',
+                'レビューを投稿しました。'
+            );
     }
 
 

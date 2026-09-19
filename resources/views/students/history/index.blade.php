@@ -267,14 +267,26 @@
                                         === 'completed'
                                     )
 
-                                        <a
-                                            href="{{ route(
-                                               'students.reviews.create.test'
-                                            ) }}"
-                                            class="btn btn-outline-primary btn-sm"
-                                        >
-                                            Write a Review
-                                        </a>
+                                        @if ($reservation->review)
+
+                                           <span class="text-success fw-semibold">
+                                                <i class="fa-solid fa-check me-1"></i>
+                                                Reviewed
+                                            </span>
+
+                                        @else
+
+                                            <a
+                                                href="{{ route(
+                                                    'students.reviews.create',
+                                                    $reservation
+                                                ) }}"
+                                                class="btn btn-outline-primary btn-sm"
+                                            >
+                                                Write a Review
+                                            </a>
+
+                                        @endif
 
                                     @else
 
@@ -294,7 +306,7 @@
                             <tr>
 
                                 <td
-                                    colspan="5"
+                                    colspan="6"
                                     class="text-center py-5"
                                 >
 

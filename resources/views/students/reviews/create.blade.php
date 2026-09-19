@@ -4,7 +4,19 @@
 
 @section('content')
 
+@php
+    $startAt = \Carbon\Carbon::parse(
+        $reservation->start_at
+    );
+
+    $endAt = \Carbon\Carbon::parse(
+        $reservation->end_at
+    );
+@endphp
+
+
 <div class="container py-4">
+
 
     {{-- ===============================
          Title
@@ -20,6 +32,45 @@
         </p>
 
     </div>
+
+
+
+    {{-- ===============================
+         Success Message
+    ================================ --}}
+    @if (session('success'))
+
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+
+    @endif
+
+
+
+    {{-- ===============================
+         Error Message
+    ================================ --}}
+    @if ($errors->any())
+
+        <div class="alert alert-danger">
+
+            <ul class="mb-0">
+
+                @foreach ($errors->all() as $error)
+
+                    <li>
+                        {{ $error }}
+                    </li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
 
 
     {{-- ===============================
@@ -38,28 +89,93 @@
 
         <div class="card-body p-4">
 
-           {{-- Teacher --}}
+
+            {{-- ===============================
+                 Teacher
+            ================================ --}}
             <div class="row border-bottom py-3">
 
                 <div class="col-md-3 fw-bold">
                     Teacher
                 </div>
 
+
                 <div class="col-md-9">
 
                     <div class="d-flex align-items-center">
 
-                        <img
-                            src="https://via.placeholder.com/48"
-                            alt="Teacher"
-                            width="48"
-                            height="48"
-                            class="rounded-circle me-3"
-                            style="object-fit: cover;"
-                        >
 
+                        {{-- Teacher Image --}}
+                        @if (
+                            $reservation
+                                ->teacher
+                                ?->user
+                                ?->profile_image
+                        )
+
+                            <img
+                                src="{{
+                                    $reservation
+                                        ->teacher
+                                        ->user
+                                        ->profile_image
+                                }}"
+                                alt="Teacher"
+                                width="48"
+                                height="48"
+                                class="rounded-circle me-3"
+                                style="object-fit: cover;"
+                            >
+
+                        @else
+
+                            <div
+                                class="
+                                    rounded-circle
+                                    bg-secondary-subtle
+                                    d-flex
+                                    align-items-center
+                                    justify-content-center
+                                    me-3
+                                "
+                                style="
+                                    width: 48px;
+                                    height: 48px;
+                                "
+                            >
+
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-user
+                                        text-secondary
+                                    "
+                                ></i>
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- Teacher Name --}}
                         <div class="fw-semibold">
-                            Maria Santos
+
+                            {{
+                                $reservation
+                                    ->teacher
+                                    ?->user
+                                    ?->first_name
+                                ?? ''
+                            }}
+
+                            {{
+                                $reservation
+                                    ->teacher
+                                    ?->user
+                                    ?->last_name
+                                ?? ''
+                            }}
+
                         </div>
 
                     </div>
@@ -68,7 +184,11 @@
 
             </div>
 
-            {{-- Date --}}
+
+
+            {{-- ===============================
+                 Date
+            ================================ --}}
             <div class="row border-bottom py-3">
 
                 <div class="col-md-3 fw-bold">
@@ -76,13 +196,22 @@
                 </div>
 
                 <div class="col-md-9">
-                    September 18, 2026
+
+                    {{
+                        $startAt->format(
+                            'F j, Y'
+                        )
+                    }}
+
                 </div>
 
             </div>
 
 
-            {{-- Time --}}
+
+            {{-- ===============================
+                 Time
+            ================================ --}}
             <div class="row border-bottom py-3">
 
                 <div class="col-md-3 fw-bold">
@@ -90,13 +219,20 @@
                 </div>
 
                 <div class="col-md-9">
-                    10:00 - 10:30
+
+                    {{ $startAt->format('H:i') }}
+                    -
+                    {{ $endAt->format('H:i') }}
+
                 </div>
 
             </div>
 
 
-            {{-- Material --}}
+
+            {{-- ===============================
+                 Material
+            ================================ --}}
             <div class="row py-3">
 
                 <div class="col-md-3 fw-bold">
@@ -104,14 +240,34 @@
                 </div>
 
                 <div class="col-md-9">
-                    Grammar Beginner
+
+                    <span
+                        class="
+                            badge
+                            bg-secondary-subtle
+                            text-dark
+                            border
+                        "
+                    >
+
+                        {{
+                            $reservation
+                                ->material
+                                ?->name
+                            ?? '-'
+                        }}
+
+                    </span>
+
                 </div>
 
             </div>
 
+
         </div>
 
     </div>
+
 
 
     {{-- ===============================
@@ -130,78 +286,133 @@
 
         <div class="card-body p-4">
 
-            {{-- 今は表示確認用 --}}
-            <form>
 
-           {{-- Rating --}}
-            <div class="mb-4">
+            {{-- ===============================
+                 Review Form
+            ================================ --}}
+            <form
+                action="{{ route(
+                    'students.reviews.store',
+                    $reservation
+                ) }}"
+                method="POST"
+            >
 
-                <label class="form-label fw-bold">
-                    Rating
-                </label>
+                @csrf
 
-                <div class="d-flex align-items-center gap-3">
 
-                    {{-- Stars --}}
+
+                {{-- ===============================
+                     Rating
+                ================================ --}}
+                <div class="mb-4">
+
+                    <label class="form-label fw-bold">
+                        Rating
+                    </label>
+
+
                     <div
-                        id="starRating"
-                        class="d-flex gap-2 align-items-center"
-                        style="
-                            font-size: 1.45rem;
-                            cursor: pointer;
+                        class="
+                            d-flex
+                            align-items-center
+                            gap-3
+                            flex-wrap
                         "
                     >
 
-                        @for ($i = 1; $i <= 5; $i++)
 
-                            <i
+                        {{-- Stars --}}
+                        <div
+                            id="starRating"
+                            class="
+                                d-flex
+                                gap-2
+                                align-items-center
+                            "
+                            style="
+                                font-size: 1.45rem;
+                                cursor: pointer;
+                            "
+                        >
+
+                            @for ($i = 1; $i <= 5; $i++)
+
+                                <i
+                                    class="
+                                        {{ old('rating', 0) >= $i
+                                            ? 'fa-solid'
+                                            : 'fa-regular'
+                                        }}
+                                        fa-star
+                                        rating-star
+                                        text-warning
+                                    "
+                                    data-value="{{ $i }}"
+                                ></i>
+
+                            @endfor
+
+                        </div>
+
+
+
+                        {{-- Face / Text --}}
+                        <div
+                            class="
+                                d-flex
+                                align-items-center
+                                gap-2
+                            "
+                        >
+
+                            <span
+                                id="ratingFace"
+                                style="font-size: 1.4rem;"
+                            >
+                                😐
+                            </span>
+
+                            <span
+                                id="ratingText"
                                 class="
-                                    fa-regular
-                                    fa-star
-                                    rating-star
-                                    text-warning
+                                    text-secondary
+                                    small
                                 "
-                                data-value="{{ $i }}"
-                            ></i>
+                            >
+                                Select a rating
+                            </span>
 
-                        @endfor
-
-                    </div>
-
-
-                    {{-- Face / Text --}}
-                    <div class="d-flex align-items-center gap-2">
-
-                        <span
-                            id="ratingFace"
-                            style="font-size: 1.4rem;"
-                        >
-                            😐
-                        </span>
-
-                        <span
-                            id="ratingText"
-                            class="text-secondary small"
-                        >
-                            Select a rating
-                        </span>
+                        </div>
 
                     </div>
+
+
+
+                    {{-- Hidden Rating --}}
+                    <input
+                        type="hidden"
+                        name="rating"
+                        id="ratingInput"
+                        value="{{ old('rating') }}"
+                    >
+
+
+                    @error('rating')
+
+                        <div class="text-danger small mt-2">
+                            {{ $message }}
+                        </div>
+
+                    @enderror
 
                 </div>
 
 
-                <input
-                    type="hidden"
-                    name="rating"
-                    id="ratingInput"
-                    value=""
-                >
 
-            </div>
-
-
-                {{-- Comment --}}
+                {{-- ===============================
+                     Comment
+                ================================ --}}
                 <div class="mb-4">
 
                     <label
@@ -211,19 +422,48 @@
                         Comment
                     </label>
 
+
                     <textarea
                         id="comment"
                         name="comment"
                         class="form-control"
                         rows="5"
+                        maxlength="1000"
                         placeholder="Write your feedback..."
-                    ></textarea>
+                    >{{ old('comment') }}</textarea>
+
+
+                    <div
+                        class="
+                            form-text
+                            text-end
+                        "
+                    >
+                        Optional
+                    </div>
+
+
+                    @error('comment')
+
+                        <div class="text-danger small mt-2">
+                            {{ $message }}
+                        </div>
+
+                    @enderror
 
                 </div>
 
 
-                {{-- Buttons --}}
-                <div class="d-flex justify-content-between">
+
+                {{-- ===============================
+                     Buttons
+                ================================ --}}
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                    "
+                >
 
                     <a
                         href="{{ route(
@@ -236,7 +476,7 @@
 
 
                     <button
-                        type="button"
+                        type="submit"
                         class="btn btn-primary"
                     >
                         Submit Review
@@ -244,15 +484,17 @@
 
                 </div>
 
+
             </form>
+
 
         </div>
 
     </div>
 
+
 </div>
 
-@endsection
 
 <script>
 
@@ -311,77 +553,128 @@ document.addEventListener(
         };
 
 
-        stars.forEach(function (star) {
+        /*
+        |--------------------------------------------------------------------------
+        | Rating Display
+        |--------------------------------------------------------------------------
+        */
+        function updateRating(
+            rating
+        ) {
 
-            star.addEventListener(
-                'click',
-                function () {
+            stars.forEach(
+                function (item) {
 
-                    const rating =
+                    const value =
                         Number(
-                            this.dataset.value
+                            item.dataset.value
                         );
 
 
-                    ratingInput.value =
-                        rating;
+                    if (value <= rating) {
 
+                        item.classList.remove(
+                            'fa-regular'
+                        );
 
-                    /*
-                     * 星の表示
-                     */
-                    stars.forEach(
-                        function (item) {
+                        item.classList.add(
+                            'fa-solid'
+                        );
 
-                            const value =
-                                Number(
-                                    item.dataset.value
-                                );
+                    } else {
 
+                        item.classList.remove(
+                            'fa-solid'
+                        );
 
-                            if (
-                                value <= rating
-                            ) {
+                        item.classList.add(
+                            'fa-regular'
+                        );
 
-                                item.classList.remove(
-                                    'fa-regular'
-                                );
-
-                                item.classList.add(
-                                    'fa-solid'
-                                );
-
-                            } else {
-
-                                item.classList.remove(
-                                    'fa-solid'
-                                );
-
-                                item.classList.add(
-                                    'fa-regular'
-                                );
-
-                            }
-
-                        }
-                    );
-
-
-                    /*
-                     * 顔文字と文字を変更
-                     */
-                    ratingFace.textContent =
-                        ratingData[rating].face;
-
-                    ratingText.textContent =
-                        ratingData[rating].text;
+                    }
 
                 }
             );
 
-        });
+
+            if (
+                ratingData[rating]
+            ) {
+
+                ratingFace.textContent =
+                    ratingData[rating].face;
+
+                ratingText.textContent =
+                    ratingData[rating].text;
+
+            } else {
+
+                ratingFace.textContent =
+                    '😐';
+
+                ratingText.textContent =
+                    'Select a rating';
+
+            }
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Star Click
+        |--------------------------------------------------------------------------
+        */
+        stars.forEach(
+            function (star) {
+
+                star.addEventListener(
+                    'click',
+                    function () {
+
+                        const rating =
+                            Number(
+                                this.dataset.value
+                            );
+
+
+                        ratingInput.value =
+                            rating;
+
+
+                        updateRating(
+                            rating
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Keep Old Rating
+        |--------------------------------------------------------------------------
+        */
+        const oldRating =
+            Number(
+                ratingInput.value
+            );
+
+
+        if (oldRating) {
+
+            updateRating(
+                oldRating
+            );
+
+        }
 
     }
 );
 
 </script>
+
+@endsection
