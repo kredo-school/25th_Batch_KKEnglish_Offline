@@ -37,12 +37,11 @@ use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardControll
 
 
 // Public routes
-Auth::routes();
-
 Route::get('/', function () {
     return view('welcome');
 });
 
+Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 
