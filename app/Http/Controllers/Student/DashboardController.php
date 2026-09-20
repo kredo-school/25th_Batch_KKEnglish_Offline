@@ -115,6 +115,7 @@ class DashboardController extends Controller
                         [
                             'pending',
                             'confirmed',
+                            'completed'
                         ]
                     );
                 }
@@ -133,6 +134,13 @@ class DashboardController extends Controller
         $calendarEvents = $calendarReservations
             ->map(
                 function ($reservation) {
+
+                    $statusType = match (true) {
+                        $reservation->end_at < now() => 'past',
+                        $reservation->start_at <= now() && $reservation->end_at >= now() => 'ongoing',
+                        default => 'upcoming',
+                    };
+
                     return [
                         'title' =>
                         $reservation
@@ -145,6 +153,8 @@ class DashboardController extends Controller
 
                         'end' =>
                         $reservation->end_at,
+
+                        'statusType' => $statusType,
                     ];
                 }
             );
@@ -160,6 +170,33 @@ class DashboardController extends Controller
                 'calendarReservations',
                 'calendarEvents'
             )
+        );
+    }
+
+    public function updateLevel(Request $request)
+    {
+        $student = $request->user()->student;
+
+        abort_unless(
+            $student,
+            403,
+            '生徒ユーザーではありません。'
+        );
+
+        $validated = $request->validate([
+            'level' => [
+                'required',
+                'in:beginner,elementary,intermediate,advanced',
+            ],
+        ]);
+
+        $student->update([
+            'level' => $validated['level'],
+        ]);
+
+        return redirect()->route('students.dashboard')->with(
+            'success',
+            'Updated Level'
         );
     }
 }

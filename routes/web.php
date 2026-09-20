@@ -58,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
 // Student Routes
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/dashboard',[StudentDashboardController::class, 'index'])->name('student.dashboard');
+        // Update Student Level
+    Route::post('/students/update-level', [StudentDashboardController::class, 'updateLevel'])->name('students.update.Level');
 
     // Student profile
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
@@ -110,6 +112,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     // Review routes
     Route::get('/students/reservations/{reservation}/reviews/create', [ReviewController::class, 'create'])->name('students.reviews.create');
     Route::post('/students/reservations/{reservation}/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
+
 
 
 });
