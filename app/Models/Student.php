@@ -15,11 +15,13 @@ class Student extends Model
         'user_id',
         'point_balance',
         'birthday',
+        'level',
     ];
 
     protected $casts = [
         'point_balance' => 'integer',
         'birthday' => 'date',
+        'level' => 'string',
     ];
 
     /**
