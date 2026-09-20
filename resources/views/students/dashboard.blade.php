@@ -452,6 +452,11 @@
                 {{-- Available Points --}}
                 <div class="col-5">
 
+                     <a
+                        href="{{ route('students.point-history.index') }}"
+                        class="text-decoration-none text-dark"
+                    >
+
                     <div class="card h-100">
 
                         <div class="card-body p-3">
@@ -495,6 +500,8 @@
                         </div>
 
                     </div>
+
+                  </a>
 
                 </div>
 
@@ -574,32 +581,42 @@
                         Announcements
                     </h5>
 
+                    @forelse ($announcements as $announcement)
 
-                    {{-- Dummy --}}
-                    <div class="border-bottom pb-3 mb-3">
+                        <div
+                            class="
+                                border-bottom
+                                pb-3
+                                mb-3
+                            "
+                        >
 
-                        <div class="fw-semibold">
-                            Welcome to KKEnglish
+                            <div class="fw-semibold mb-1">
+
+                                {{ $announcement->title }}
+
+                            </div>
+
+
+                            <div class="text-secondary small">
+
+                                {{ $announcement->content }}
+
+                            </div>
+
                         </div>
 
-                        <div class="text-secondary small">
-                            Check the latest information from the school.
+                    @empty
+
+                        <div class="text-center py-3">
+
+                            <p class="text-secondary mb-0">
+                                No announcements.
+                            </p>
+
                         </div>
 
-                    </div>
-
-
-                    <div class="border-bottom pb-3">
-
-                        <div class="fw-semibold">
-                            Lesson Information
-                        </div>
-
-                        <div class="text-secondary small">
-                            Please check your reservation before the lesson starts.
-                        </div>
-
-                    </div>
+                    @endforelse
 
                 </div>
 
@@ -1009,9 +1026,9 @@ document.addEventListener(
         // ==========================
         // FullCalendar
         // ==========================
-        const calendarEl =
-            document.getElementById('calendar');
 
+        const calendarEl =
+           document.getElementById('calendar');
 
         const calendar =
             new FullCalendar.Calendar(
@@ -1032,27 +1049,20 @@ document.addEventListener(
 
 
                     // ==========================
-                    // Today's Reservations
+                    // Reservations
                     // ==========================
-                    events: [
+                    events:
+                         @json($calendarEvents),
 
-                        @foreach ($todayLessons as $lesson)
 
-                            {
-                                title:
-                                    '{{ \Carbon\Carbon::parse($lesson->start_at)->format("H:i") }} ' +
-                                    '{{ $lesson->teacher?->user?->first_name ?? "" }}',
-
-                                start:
-                                    '{{ \Carbon\Carbon::parse($lesson->start_at)->format("Y-m-d\TH:i:s") }}',
-
-                                end:
-                                    '{{ \Carbon\Carbon::parse($lesson->end_at)->format("Y-m-d\TH:i:s") }}'
-                            },
-
-                        @endforeach
-
-                    ],
+                    // ==========================
+                    // Time
+                    // ==========================
+                    eventTimeFormat: {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    },
 
 
                     // ==========================
@@ -1081,8 +1091,8 @@ document.addEventListener(
                     wrapper.style.fontWeight =
                         '500';
 
-                    wrapper.textContent =
-                        info.event.title;
+                   wrapper.textContent =
+                        `${info.timeText} ${info.event.title}`;
 
                     return {
                         domNodes: [wrapper]
