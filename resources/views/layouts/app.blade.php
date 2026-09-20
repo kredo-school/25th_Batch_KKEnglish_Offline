@@ -35,7 +35,7 @@
         $barClass = 'bg-white';
         $textClass = 'text-dark';
          $accountLabel = 'Account';
-        $homeHref = '#';
+        $homeHref = url('/');
     }
 @endphp
 
