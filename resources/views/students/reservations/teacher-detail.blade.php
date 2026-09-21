@@ -346,6 +346,38 @@
                     </span>
                     </div>
 
+                    {{-- Rating --}}
+                    <div
+                        class="
+                            d-flex
+                            justify-content-center
+                            align-items-center
+                            gap-1
+                            mt-2
+                        "
+                        style="font-size: 14px;"
+                    >
+                        @if (($teacher->reviews_count ?? 0) > 0)
+
+                            <i class="fa-solid fa-star text-warning"></i>
+
+                            <span class="fw-semibold">
+                                {{ number_format($teacher->reviews_avg_rating, 1) }}
+                            </span>
+
+                            <span class="text-secondary">
+                                ({{ $teacher->reviews_count }})
+                            </span>
+
+                        @else
+
+                            <span class="text-secondary">
+                                No reviews
+                            </span>
+
+                        @endif
+                    </div>
+
 
 
                         <p class="text-secondary mb-0">
@@ -365,12 +397,15 @@
                             Nationality
                         </strong>
 
-                        <p class="mb-0">
+                       <p class="mb-0">
 
-                            {{
-                                $teacher->user->nationality
-                                ?? '-'
-                            }}
+                            {{ $teacher->user->nationality ?? '-' }}
+
+                            @if ($teacher->user?->nationality === 'Philippines')
+                                🇵🇭
+                            @elseif ($teacher->user?->nationality === 'Japan')
+                                🇯🇵
+                            @endif
 
                         </p>
 
