@@ -31,67 +31,42 @@ class ReservationController extends Controller
     public function index(): View
     {
         $student = auth()->user()->student;
-        /**
-         * Teacher一覧
-         *
-         * user
-         * materials
-         *
-         * も一緒に取得
-         */
+
         $teachers = Teacher::query()
             ->with(['user', 'materials'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->get();
 
-        /*
-        * ログイン中の生徒が
-        * お気に入り登録しているteacher_idを取得
-        */
         $favoriteTeacherIds = TeacherLike::query()
             ->where('student_id', $student->id)
             ->pluck('teacher_id');
 
-            /*
-            * Favorite Teachers
-            */
-            $favoriteTeachers = Teacher::query()
-                ->with([
-                    'user',
-                    'materials',
-                ])
-                ->whereIn('id', $favoriteTeacherIds)
-                ->get();
-
-        /*
-         * Material一覧
-         */
+        $favoriteTeachers = Teacher::query()
+            ->with([
+                'user',
+                'materials',
+            ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
+            ->whereIn('id', $favoriteTeacherIds)
+            ->get();
 
         $materials = Material::query()
             ->orderBy('material_id')
             ->get();
 
-        /*
-         * Bladeへ
-         * $teachers
-         * $materials
-         * を渡す
-
-         */
         return view(
             'students.reservations.index',
-            compact('teachers',
-                    'materials',
-                    'favoriteTeachers'
+            compact(
+                'teachers',
+                'materials',
+                'favoriteTeachers'
             )
         );
     }
     public function confirm(Request $request): RedirectResponse
     {
-        /*
-         * ========================================
-         * フロントから送られてきた予約情報を確認
-         * ========================================
-         */
         $validated = $request->validate([
             'teacher_id' => [
                 'required',
@@ -124,11 +99,6 @@ class ReservationController extends Controller
         ]);
 
 
-        /*
-         * ========================================
-         * Teacher取得
-         * ========================================
-         */
         $teacher = Teacher::query()
             ->with([
                 'user',
@@ -138,23 +108,12 @@ class ReservationController extends Controller
                 $validated['teacher_id']
             );
 
-
-        /*
-         * ========================================
-         * Material取得
-         * ========================================
-         */
         $material = Material::query()
             ->findOrFail(
                 $validated['material_id']
             );
 
 
-        /*
-         * ========================================
-         * TeacherSchedule取得
-         * ========================================
-         */
         $schedule = TeacherSchedule::query()
             ->findOrFail(
                 $validated['schedule_id']
@@ -191,7 +150,6 @@ class ReservationController extends Controller
             ]);
         }
 
-
         /*
          * ========================================
          * TeacherがMaterialを教えられるか確認
@@ -204,15 +162,12 @@ class ReservationController extends Controller
                 $material->material_id
             );
 
-
         if (!$canTeachMaterial) {
-
             throw ValidationException::withMessages([
                 'material_id' =>
                 'この講師は選択した教材を担当できません。',
             ]);
         }
-
         /*
          * ========================================
          * 予約確認情報をSessionへ保存
@@ -222,7 +177,6 @@ class ReservationController extends Controller
             'reservation_confirmation',
             $validated
         );
-
 
         /*
          * ========================================
@@ -280,23 +234,11 @@ class ReservationController extends Controller
                 $validated['material_id']
             );
 
-
-        /*
-         * ========================================
-         * TeacherSchedule取得
-         * ========================================
-         */
         $schedule = TeacherSchedule::query()
             ->findOrFail(
                 $validated['schedule_id']
             );
 
-
-        /*
-         * ========================================
-         * 予約確認画面を表示
-         * ========================================
-         */
         return view(
             'students.reservations.confirm',
             compact(
@@ -721,9 +663,23 @@ class ReservationController extends Controller
                 'user',
                 'materials',
             ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->findOrFail(
                 $validated['teacher_id']
             );
+
+        $reviews = $teacher
+            ->reviews()
+            ->whereNotNull('comment')
+            ->where(
+                'comment',
+                '!=',
+                ''
+            )
+            ->latest()
+            ->take(3)
+            ->get();
 
         $material = Material::query()
             ->findOrFail(
@@ -757,7 +713,8 @@ class ReservationController extends Controller
                 'material',
                 'validated',
                 'selectedDate',
-                'viewStart'
+                'viewStart',
+                'reviews'
             )
         );
     }

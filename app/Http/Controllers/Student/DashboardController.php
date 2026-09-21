@@ -20,36 +20,46 @@ class DashboardController extends Controller
             '生徒ユーザーではありません。'
         );
 
-        // 今日のレッスン
         $todayLessons = Reservation::query()
 
-            // ログイン中の生徒だけ
             ->where('student_id', $student->id)
 
-            // 今日の予約だけ
             ->whereBetween('start_at', [
                 now()->startOfDay(),
                 now()->endOfDay(),
             ])
 
-            // 有効な予約だけ
             ->whereHas('status', function ($query) {
                 $query->whereIn('status_code', [
                     'pending',
                     'confirmed',
+                    'completed',
+                    'awaiting_result',
                 ]);
             })
 
-            // 関連データも一緒に取得
             ->with([
                 'teacher.user',
                 'material',
                 'status',
             ])
 
-            // 時間順
             ->orderBy('start_at')
-            ->get();
+            ->get()
+            ->map(function ($reservation) {
+
+                $reservation->statusType = match (true) {
+                    $reservation->end_at < now() => 'past',
+
+                    $reservation->start_at <= now()
+                        && $reservation->end_at >= now()
+                    => 'ongoing',
+
+                    default => 'upcoming',
+                };
+
+                return $reservation;
+            });
 
         $nextLessons = Reservation::query()
 
@@ -82,8 +92,8 @@ class DashboardController extends Controller
         $nextLesson = $nextLessons->first();
 
         /*
-         * Student向けお知らせ
-         */
+            * Student向けお知らせ
+            */
         $announcements = Announcement::query()
             ->whereIn(
                 'target',
@@ -98,8 +108,8 @@ class DashboardController extends Controller
 
         // 可能であれば
         /*
-        * カレンダー表示用予約
-        */
+            * カレンダー表示用予約
+            */
         $calendarReservations = Reservation::query()
 
             ->where(
@@ -129,8 +139,8 @@ class DashboardController extends Controller
 
 
         /*
-         * FullCalendar用データ
-        */
+            * FullCalendar用データ
+            */
         $calendarEvents = $calendarReservations
             ->map(
                 function ($reservation) {
@@ -186,7 +196,7 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'level' => [
                 'required',
-                'in:beginner,elementary,intermediate,advanced',
+                'in:A1,A2,B1,B2,C1,C2',
             ],
         ]);
 

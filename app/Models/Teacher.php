@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\TeacherLike;
 use App\Models\Material;
+use App\Models\Review;
+use App\Models\ShiftPattern;
 
 use App\Models\User;
 use App\Models\TeacherSchedule;
@@ -67,12 +69,13 @@ class Teacher extends Model
     }
     public function materials()
     {
-        return $this->belongsToMany(Material::class,
-        'teacher_materials', // pivot table
-        'teacher_id',        // pivot の Teacher FK
-        'material_id',       // pivot の Material FK
-        'id',                // teachers 側PK
-        'material_id'        // materials 側PK)
+        return $this->belongsToMany(
+            Material::class,
+            'teacher_materials', // pivot table
+            'teacher_id',        // pivot の Teacher FK
+            'material_id',       // pivot の Material FK
+            'id',                // teachers 側PK
+            'material_id'        // materials 側PK)
         )->withTimestamps();
     }
 
@@ -89,9 +92,8 @@ class Teacher extends Model
         return $this->hasMany(TeacherLike::class);
     }
 
-    public function reviews(): HasMany
+    public function reviews()
     {
         return $this->hasMany(Review::class);
     }
-
 }
