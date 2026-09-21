@@ -124,7 +124,7 @@
                                         {{
                                             $transaction
                                                 ->created_at
-                                                ?->format('h:i A')
+                                                ?->format('H:i')
                                             ?? ''
                                         }}
 

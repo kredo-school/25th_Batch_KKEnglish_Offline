@@ -19,7 +19,7 @@
         $barClass = 'teacher-navbar';
         $textClass = 'text-dark';
         $accountLabel = 'Teacher';
-        $homeHref = route('teacher.dashboard');
+        $homeHref = route('teachers.dashboard');
 
     } elseif ($roleCode == 'admin') {
 

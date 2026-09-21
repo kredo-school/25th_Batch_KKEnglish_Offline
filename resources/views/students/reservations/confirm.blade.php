@@ -76,13 +76,13 @@
 
                             {{ \Carbon\Carbon::parse(
                                 $validated['start_at']
-                            )->format('h:i A') }}
+                            )->format('H:i') }}
 
                             -
 
                             {{ \Carbon\Carbon::parse(
                                 $validated['end_at']
-                            )->format('h:i A') }}
+                            )->format('H:i') }}
 
                         </div>
 
@@ -241,7 +241,7 @@
 
                             {{-- Back --}}
                             <a
-                                href="{{ route('students.reservations.index') }}"
+                                href="{{ url()->previous() }}"
                                 class="btn btn-outline-secondary"
                             >
                                 Back

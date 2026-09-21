@@ -22,7 +22,7 @@ class HomeController extends Controller
         }
 
         if ($roleCode === 'teacher') {
-            return redirect()->route('teacher.dashboard');
+            return redirect()->route('teachers.dashboard');
         }
 
         if ($roleCode === 'admin') {

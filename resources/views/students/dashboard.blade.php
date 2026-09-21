@@ -245,7 +245,6 @@
                                 <span>
 
                                     {{ $lesson->teacher?->user?->first_name ?? '' }}
-                                    {{ $lesson->teacher?->user?->last_name ?? '' }}
 
                                 </span>
 
@@ -997,17 +996,12 @@ document.addEventListener(
                     const wrapper =
                         document.createElement('div');
 
+                    const statusType =
+                        info.event.extendedProps.statusType;
+
+
                     wrapper.className =
                         'w-100 rounded px-2 py-1';
-
-                    wrapper.style.backgroundColor =
-                        '#ffffff';
-
-                    wrapper.style.color =
-                        '#3b82f6';
-
-                    wrapper.style.border =
-                        '1px solid #3b82f6';
 
                     wrapper.style.fontSize =
                         '0.8rem';
@@ -1015,8 +1009,68 @@ document.addEventListener(
                     wrapper.style.fontWeight =
                         '500';
 
-                   wrapper.textContent =
+                    wrapper.style.whiteSpace =
+                        'nowrap';
+
+                    wrapper.style.overflow =
+                        'hidden';
+
+                    wrapper.style.textOverflow =
+                        'ellipsis';
+
+
+                    // ==========================
+                    // Past
+                    // ==========================
+                    if (statusType === 'past') {
+
+                        wrapper.style.backgroundColor =
+                            '#f1f3f5';
+
+                        wrapper.style.color =
+                            '#868e96';
+
+                        wrapper.style.border =
+                            '1px solid #dee2e6';
+
+                    }
+
+                    // ==========================
+                    // Ongoing
+                    // ==========================
+                    else if (statusType === 'ongoing') {
+
+                        wrapper.style.backgroundColor =
+                            '#fff3cd';
+
+                        wrapper.style.color =
+                            '#856404';
+
+                        wrapper.style.border =
+                            '1px solid #ffe69c';
+
+                    }
+
+                    // ==========================
+                    // Upcoming
+                    // ==========================
+                    else {
+
+                        wrapper.style.backgroundColor =
+                            '#eef5ff';
+
+                        wrapper.style.color =
+                            '#2563eb';
+
+                        wrapper.style.border =
+                            '1px solid #bfdbfe';
+
+                    }
+
+
+                    wrapper.textContent =
                         `${info.timeText} ${info.event.title}`;
+
 
                     return {
                         domNodes: [wrapper]

@@ -62,9 +62,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::patch('/students/update-level', [StudentDashboardController::class, 'updateLevel'])->name('students.update.Level');
 
     // Student profile
-    Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');
-    Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
-    Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
+    Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('students.profile');
+    Route::get('/students/profile/edit', [StudentProfileController::class, 'edit'])->name('students.profile.edit');
+    Route::patch('/students/profile', [StudentProfileController::class, 'update'])->name('students.profile.update');
 
     // Lessons history
     Route::get('/students/history', [LessonHistoryController::class, 'index'])->name('students.history.index');
@@ -119,13 +119,13 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 // Teacher Dashboard
 Route::middleware(['auth', 'role:teacher'])->group(function () {
-    Route::get('/teachers/dashboard',[TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
+    Route::get('/teachers/dashboard',[TeacherDashboardController::class, 'index'])->name('teachers.dashboard');
 
     // My Schedule 画面
     Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teachers.schedule');
     Route::get('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'index'])->name('teachers.schedule-exceptions.index');
-    Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teacher.schedule-exceptions.store');
-    Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teacher.schedule-exceptions.destroy');
+    Route::post('/teachers/schedule-exceptions', [ScheduleExceptionController::class, 'store'])->name('teachers.schedule-exceptions.store');
+    Route::delete('/teachers/schedule-exceptions/{scheduleException}', [ScheduleExceptionController::class, 'destroy'])->name('teachers.schedule-exceptions.destroy');
 
     // My upcoming　画面
     Route::get('/teachers/lessons', [TeacherReservationController::class, 'index'])->name('teachers.reservations.index');
