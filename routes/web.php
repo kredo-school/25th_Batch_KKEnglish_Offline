@@ -57,9 +57,9 @@ Route::middleware(['auth'])->group(function () {
 
 // Student Routes
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/students/dashboard',[StudentDashboardController::class, 'index'])->name('student.dashboard');
+    Route::get('/students/dashboard',[StudentDashboardController::class, 'index'])->name('students.dashboard');
         // Update Student Level
-    Route::post('/students/update-level', [StudentDashboardController::class, 'updateLevel'])->name('students.update.Level');
+    Route::patch('/students/update-level', [StudentDashboardController::class, 'updateLevel'])->name('students.update.Level');
 
     // Student profile
     Route::get('/students/profile', [StudentProfileController::class, 'show'])->name('student.profile');

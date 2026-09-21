@@ -33,7 +33,7 @@ class RegisterController extends Controller
 
     protected function registered($request, $user)
     {
-    return redirect()->route('student.dashboard');
+    return redirect()->route('students.dashboard');
     }
     /**
      * Create a new controller instance.

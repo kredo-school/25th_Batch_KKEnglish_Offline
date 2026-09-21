@@ -506,8 +506,7 @@
                 </div>
 
 
-
-                {{-- My Level --}}
+               {{-- My Level --}}
                 <div class="col-7">
 
                     <div class="card h-100">
@@ -517,7 +516,6 @@
                             <div class="dashboard-card-label mb-2">
                                 My Level
                             </div>
-
 
                             <div
                                 class="
@@ -529,19 +527,8 @@
                             >
 
                                 <h5 class="fw-bold mb-0">
-                                    B1
+                                    {{ ucfirst($student->level ?? 'Not Set') }}
                                 </h5>
-
-                                <span
-                                    class="
-                                        badge
-                                        bg-secondary-subtle
-                                        text-dark
-                                        border
-                                    "
-                                >
-                                    Intermediate
-                                </span>
 
                                 <button
                                     type="button"
@@ -703,6 +690,13 @@
 
         <div class="modal-content">
 
+            <form
+                action="{{ route('students.update.Level') }}"
+                method="POST"
+            >
+                @csrf
+                @method('PATCH')
+
 
             {{-- Header --}}
             <div class="modal-header">
@@ -732,7 +726,7 @@
                 <div class="list-group">
 
 
-                    {{-- A1 --}}
+                    {{-- A1 Beginner --}}
                     <label class="list-group-item py-3">
 
                         <div
@@ -746,8 +740,9 @@
                             <input
                                 class="form-check-input mt-1"
                                 type="radio"
-                                name="english_level"
-                                value="a1"
+                                name="level"
+                                value="beginner"
+                                {{ $student->level === 'beginner' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -757,7 +752,7 @@
                                 </div>
 
                                 <div class="text-secondary small">
-                                    Can understand and use very basic English.
+                                    Just starting to learn English.
                                 </div>
 
                             </div>
@@ -768,7 +763,7 @@
 
 
 
-                    {{-- A2 --}}
+                     {{-- A2 Elementary --}}
                     <label class="list-group-item py-3">
 
                         <div
@@ -782,8 +777,9 @@
                             <input
                                 class="form-check-input mt-1"
                                 type="radio"
-                                name="english_level"
-                                value="a2"
+                                name="level"
+                                value="elementary"
+                                {{ $student->level === 'elementary' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -793,7 +789,7 @@
                                 </div>
 
                                 <div class="text-secondary small">
-                                    Can communicate in simple everyday situations.
+                                    Can manage simple everyday English.
                                 </div>
 
                             </div>
@@ -804,7 +800,7 @@
 
 
 
-                    {{-- B1 --}}
+                     {{-- B1 Intermediate --}}
                     <label class="list-group-item py-3">
 
                         <div
@@ -818,9 +814,9 @@
                             <input
                                 class="form-check-input mt-1"
                                 type="radio"
-                                name="english_level"
-                                value="b1"
-                                checked
+                                name="level"
+                                value="intermediate"
+                                {{ $student->level === 'intermediate' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -830,7 +826,7 @@
                                 </div>
 
                                 <div class="text-secondary small">
-                                    Can handle most everyday conversations.
+                                   Can handle everyday conversations.
                                 </div>
 
                             </div>
@@ -841,7 +837,7 @@
 
 
 
-                    {{-- B2 --}}
+                     {{-- C1 Advanced --}}
                     <label class="list-group-item py-3">
 
                         <div
@@ -855,44 +851,9 @@
                             <input
                                 class="form-check-input mt-1"
                                 type="radio"
-                                name="english_level"
-                                value="b2"
-                            >
-
-                            <div>
-
-                                <div class="fw-bold">
-                                    B2 - Upper Intermediate
-                                </div>
-
-                                <div class="text-secondary small">
-                                    Can communicate clearly on a wide range of topics.
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </label>
-
-
-
-                    {{-- C1 --}}
-                    <label class="list-group-item py-3">
-
-                        <div
-                            class="
-                                d-flex
-                                align-items-start
-                                gap-3
-                            "
-                        >
-
-                            <input
-                                class="form-check-input mt-1"
-                                type="radio"
-                                name="english_level"
-                                value="c1"
+                                name="level"
+                                value="advanced"
+                                {{ $student->level === 'advanced' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -902,43 +863,7 @@
                                 </div>
 
                                 <div class="text-secondary small">
-                                    Can express ideas fluently and in detail.
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </label>
-
-
-
-                    {{-- C2 --}}
-                    <label class="list-group-item py-3">
-
-                        <div
-                            class="
-                                d-flex
-                                align-items-start
-                                gap-3
-                            "
-                        >
-
-                            <input
-                                class="form-check-input mt-1"
-                                type="radio"
-                                name="english_level"
-                                value="c2"
-                            >
-
-                            <div>
-
-                                <div class="fw-bold">
-                                    C2 - Proficient
-                                </div>
-
-                                <div class="text-secondary small">
-                                    Can understand and communicate almost like a fluent speaker.
+                                    Can communicate fluently and in detail.
                                 </div>
 
                             </div>
@@ -967,10 +892,8 @@
                     Cancel
                 </button>
 
-
-                {{-- Dummy --}}
                 <button
-                    type="button"
+                    type="submit"
                     class="btn btn-primary"
                 >
                     Save
@@ -980,6 +903,7 @@
             </div>
 
 
+          </form>
         </div>
 
     </div>
