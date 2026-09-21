@@ -151,19 +151,6 @@
 
                 @forelse ($todayLessons as $lesson)
 
-                    @php
-                        $startAt =
-                            \Carbon\Carbon::parse(
-                                $lesson->start_at
-                            );
-
-                        $endAt =
-                            \Carbon\Carbon::parse(
-                                $lesson->end_at
-                            );
-                    @endphp
-
-
                     <div
                         class="
                             today-lesson-item
@@ -189,9 +176,24 @@
                                 {{-- Time --}}
                                 <div class="fw-bold mb-2">
 
-                                    {{ $startAt->format('H:i') }}
+                                     {{ $lesson->start_at->format('H:i') }}
                                     -
-                                    {{ $endAt->format('H:i') }}
+                                    {{ $lesson->end_at->format('H:i') }}
+
+                                    {{-- Status --}}
+                                   @if ($lesson->statusType === 'ongoing')
+
+                                        <span class="badge bg-danger ms-2">
+                                            Ongoing
+                                        </span>
+
+                                    @elseif ($lesson->statusType === 'upcoming')
+
+                                        <span class="badge bg-primary ms-2">
+                                            Upcoming
+                                        </span>
+
+                                    @endif
 
                                 </div>
 
@@ -265,22 +267,27 @@
 
                             </div>
 
+                            {{-- Cancel --}}
+                            @if ($lesson->statusType === 'upcoming')
 
-                            <button
-                                type="button"
-                                class="btn btn-outline-danger btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#cancelModal{{ $lesson->id }}"
-                            >
-                                Cancel
-                            </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#cancelModal{{ $lesson->id }}"
+                                >
+                                    Cancel
+                                </button>
+
+                            @endif
 
                         </div>
 
                     </div>
 
 
-                    {{-- Cancel Modal は今のまま --}}
+                    {{-- Cancel Modal --}}
+                 @if ($lesson->statusType === 'upcoming')
                     <div
                         class="modal fade"
                         id="cancelModal{{ $lesson->id }}"
@@ -328,18 +335,17 @@
                                         <div class="bg-light rounded p-3 mb-4">
 
                                             <div class="fw-bold mb-1">
-                                                {{ $startAt->format('F j') }}
+                                                {{ \Carbon\Carbon::parse($lesson->start_at)->format('F j') }}
                                             </div>
 
                                             <div class="mb-1">
-                                                {{ $startAt->format('H:i') }}
+                                                {{ \Carbon\Carbon::parse($lesson->start_at)->format('H:i') }}
                                                 -
-                                                {{ $endAt->format('H:i') }}
+                                                {{ \Carbon\Carbon::parse($lesson->end_at)->format('H:i') }}
                                             </div>
 
                                             <div class="mb-2">
                                                 {{ $lesson->teacher?->user?->first_name ?? '' }}
-                                                {{ $lesson->teacher?->user?->last_name ?? '' }}
                                             </div>
 
                                             <span
@@ -401,6 +407,8 @@
                         </div>
 
                     </div>
+
+                  @endif
 
 
                 @empty
@@ -526,7 +534,7 @@
                             >
 
                                 <h5 class="fw-bold mb-0">
-                                    {{ ucfirst($student->level ?? 'Not Set') }}
+                                   {{ $student->level ?? 'Not Set' }}
                                 </h5>
 
                                 <button
@@ -740,8 +748,8 @@
                                 class="form-check-input mt-1"
                                 type="radio"
                                 name="level"
-                                value="beginner"
-                                {{ $student->level === 'beginner' ? 'checked' : '' }}
+                                value="A1"
+                                {{ $student->level === 'A1' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -777,8 +785,8 @@
                                 class="form-check-input mt-1"
                                 type="radio"
                                 name="level"
-                                value="elementary"
-                                {{ $student->level === 'elementary' ? 'checked' : '' }}
+                                value="A2"
+                                {{ $student->level === 'A2' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -814,8 +822,8 @@
                                 class="form-check-input mt-1"
                                 type="radio"
                                 name="level"
-                                value="intermediate"
-                                {{ $student->level === 'intermediate' ? 'checked' : '' }}
+                                value="B1"
+                                {{ $student->level === 'B1' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -828,6 +836,33 @@
                                    Can handle everyday conversations.
                                 </div>
 
+                            </div>
+
+                        </div>
+
+                    </label>
+
+                    {{-- B2 Upper Intermediate --}}
+                    <label class="list-group-item py-3">
+
+                        <div class="d-flex align-items-start gap-3">
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="level"
+                                value="B2"
+                                {{ $student->level === 'B2' ? 'checked' : '' }}
+                            >
+
+                            <div>
+                                <div class="fw-bold">
+                                    B2 - Upper Intermediate
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can communicate clearly in many situations.
+                                </div>
                             </div>
 
                         </div>
@@ -851,8 +886,8 @@
                                 class="form-check-input mt-1"
                                 type="radio"
                                 name="level"
-                                value="advanced"
-                                {{ $student->level === 'advanced' ? 'checked' : '' }}
+                                value="C1"
+                                {{ $student->level === 'C1' ? 'checked' : '' }}
                             >
 
                             <div>
@@ -865,6 +900,33 @@
                                     Can communicate fluently and in detail.
                                 </div>
 
+                            </div>
+
+                        </div>
+
+                    </label>
+
+                    {{-- C2 Proficient --}}
+                    <label class="list-group-item py-3">
+
+                        <div class="d-flex align-items-start gap-3">
+
+                            <input
+                                class="form-check-input mt-1"
+                                type="radio"
+                                name="level"
+                                value="C2"
+                                {{ $student->level === 'C2' ? 'checked' : '' }}
+                            >
+
+                            <div>
+                                <div class="fw-bold">
+                                    C2 - Proficient
+                                </div>
+
+                                <div class="text-secondary small">
+                                    Can understand and communicate English at a highly proficient level.
+                                </div>
                             </div>
 
                         </div>
@@ -1041,13 +1103,13 @@ document.addEventListener(
                     else if (statusType === 'ongoing') {
 
                         wrapper.style.backgroundColor =
-                            '#fff3cd';
+                            '#fde2e2';
 
                         wrapper.style.color =
-                            '#856404';
+                            '#b42318';
 
                         wrapper.style.border =
-                            '1px solid #ffe69c';
+                            '1px solid #f5b7b1';
 
                     }
 

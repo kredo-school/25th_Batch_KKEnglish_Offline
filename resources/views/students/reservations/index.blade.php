@@ -170,54 +170,118 @@
                         "
                     >
 
-                    {{-- Name + Lesson Point --}}
-                <div class="d-flex justify-content-between align-items-start mb-2">
+                        {{-- Name + Lesson Point --}}
+                        <div
+                            class="
+                                d-flex
+                                justify-content-between
+                                align-items-start
+                                mb-2
+                            "
+                            style="min-height: 40px;"
+                        >
 
-                    {{-- Name --}}
-                    <h5 class="fw-bold mb-0">
+                            <h5
+                                class="
+                                    fw-bold
+                                    mb-0
+                                    pe-2
+                                "
+                                style="
+                                    line-height: 1.3;
+                                "
+                            >
+                                {{
+                                    $teacher->user?->first_name
+                                    ?? 'Teacher'
+                                }}
 
-                        {{
-                            $teacher->user?->first_name
-                            ?? 'Teacher'
-                        }}
-
-                        {{
-                            $teacher->user?->last_name
-                            ?? ''
-                        }}
-
-                    </h5>
+                                {{
+                                    $teacher->user?->last_name
+                                    ?? ''
+                                }}
+                            </h5>
 
 
-                    {{-- Lesson Point --}}
-                    <span
-                        class="badge text-dark px-2 py-2"
-                        style="
-                            background-color: #f0c94d;
-                            font-family: Arial, sans-serif;
-                        "
-                    >
-                        {{ number_format($teacher->point_consumed ?? 0) }} pt
-                    </span>
-
-                </div>
-                        {{-- Nationality --}}
-                        <p class="mb-1 small">
-
-                            <span class="text-secondary">
-                                Nationality:
+                            <span
+                                class="
+                                    badge
+                                    text-dark
+                                    px-2
+                                    py-2
+                                    flex-shrink-0
+                                "
+                                style="
+                                    background-color: #f0c94d;
+                                    font-family: Arial, sans-serif;
+                                "
+                            >
+                                {{ number_format($teacher->point_consumed ?? 0) }} pt
                             </span>
 
-                            {{
-                                $teacher->user?->nationality
-                                ?? '-'
-                            }}
+                        </div>
 
-                        </p>
+
+                        {{-- Nationality --}}
+                        <div
+                            class="mb-2 small"
+                            style="min-height: 24px;"
+                        >
+                            {{ $teacher->user?->nationality ?? '-' }}
+
+                            @if ($teacher->user?->nationality === 'Philippines')
+                                🇵🇭
+                            @elseif ($teacher->user?->nationality === 'Japan')
+                                🇯🇵
+                            @endif
+                        </div>
+
+
+                        {{-- Rating --}}
+                        <div
+                            class="
+                                d-flex
+                                align-items-center
+                                gap-1
+                                border
+                                rounded
+                                px-2
+                                py-1
+                                mb-2
+                                align-self-start
+                            "
+                            style="
+                                font-size: 13px;
+                                min-height: 30px;
+                            "
+                        >
+                            @if (($teacher->reviews_count ?? 0) > 0)
+
+                                <i class="fa-solid fa-star text-warning"></i>
+
+                                <span class="fw-semibold">
+                                    {{ number_format($teacher->reviews_avg_rating, 1) }}
+                                </span>
+
+                                <span class="text-secondary">
+                                    ({{ $teacher->reviews_count }})
+                                </span>
+
+                            @else
+
+                                <span class="text-secondary">
+                                    No reviews
+                                </span>
+
+                            @endif
+                        </div>
 
 
                         {{-- Specialty --}}
-                        <p class="mb-3 small">
+                        <div
+                            class="small mb-3"
+                            style="min-height: 48px;"
+                        >
 
                             <span class="text-secondary">
                                 Specialty:
@@ -228,15 +292,12 @@
                                 ?? '-'
                             }}
 
-                        </p>
+                        </div>
 
 
+                        {{-- Buttons --}}
                         <div class="mt-auto">
 
-                            {{-- ===============================
-                                 Method 1:
-                                 View Schedule
-                            ================================ --}}
                             <a
                                 href="#"
                                 class="
@@ -253,11 +314,6 @@
                                 View Schedule
                             </a>
 
-
-                            {{-- ===============================
-                                 Method 2:
-                                 Direct Book
-                            ================================ --}}
                             <button
                                 type="button"
                                 class="

@@ -161,16 +161,18 @@
                         {{-- ===============================
                              Nationality
                         ================================ --}}
-                        <p
+                      <p
                             class="text-secondary mb-2"
                             style="font-size: 12px;"
                         >
-                            {{
-                                $teacher->user?->nationality
-                                ?? '-'
-                            }}
-                        </p>
+                            {{ $teacher->user?->nationality ?? '-' }}
 
+                            @if ($teacher->user?->nationality === 'Philippines')
+                                🇵🇭
+                            @elseif ($teacher->user?->nationality === 'Japan')
+                                🇯🇵
+                            @endif
+                        </p>
 
                         {{-- ===============================
                              View Profile
@@ -413,18 +415,44 @@
                             pt
                         </span>
 
+                        {{-- ===============================
+                            Rating
+                        =============================== --}}
+                        <div
+                            class="
+                                d-flex
+                                align-items-center
+                                gap-1
+                                mb-1
+                            "
+                            style="font-size: 12px;"
+                        >
+                            <i class="fa-solid fa-star text-warning"></i>
+
+                            <span class="fw-semibold">
+                                {{ number_format($teacher->reviews_avg_rating ?? 0, 1) }}
+                            </span>
+
+                            <span class="text-secondary">
+                                ({{ $teacher->reviews_count ?? 0 }})
+                            </span>
+                        </div>
+
 
                         {{-- ===============================
                              Nationality
                         ================================ --}}
-                        <p
+                       <p
                             class="text-secondary mb-2"
                             style="font-size: 12px;"
                         >
-                            {{
-                                $teacher->user?->nationality
-                                ?? '-'
-                            }}
+                            {{ $teacher->user?->nationality ?? '-' }}
+
+                            @if ($teacher->user?->nationality === 'Philippines')
+                                🇵🇭
+                            @elseif ($teacher->user?->nationality === 'Japan')
+                                🇯🇵
+                            @endif
                         </p>
 
 
