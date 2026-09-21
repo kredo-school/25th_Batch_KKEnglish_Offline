@@ -1,8 +1,8 @@
     <nav class="px-2 py-3 fw-bold fs-5">
 
-        <a href="{{ route('student.dashboard') }}"
+        <a href="{{ route('students.dashboard') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('student.dashboard') ? 'student-active fw-semibold' : '' }}">
+           {{ request()->routeIs('students.dashboard') ? 'student-active fw-semibold' : '' }}">
             Dashboard
         </a>
 

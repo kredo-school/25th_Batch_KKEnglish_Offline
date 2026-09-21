@@ -44,7 +44,7 @@ class LoginController extends Controller
 
         $roleCode = $user->role->role_code;
         if ($roleCode === 'student') {
-            return redirect()->route('student.dashboard');
+            return redirect()->route('students.dashboard');
         }
 
         if ($roleCode === 'teacher') {

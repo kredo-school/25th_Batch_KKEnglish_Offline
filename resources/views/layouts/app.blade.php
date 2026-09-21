@@ -12,7 +12,7 @@
         $barClass = 'bg-info-subtle';
         $textClass = 'text-dark';
         $accountLabel = 'Student';
-        $homeHref = route('student.dashboard');
+        $homeHref = route('students.dashboard');
 
     } elseif ($roleCode == 'teacher') {
 
