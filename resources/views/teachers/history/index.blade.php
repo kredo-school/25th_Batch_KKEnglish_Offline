@@ -137,11 +137,11 @@
                                     {{-- Time --}}
                                     <td>
 
-                                        {{ $startAt->format('h:i A') }}
+                                        {{ $startAt->format('H:i') }}
 
                                         -
 
-                                        {{ $endAt->format('h:i A') }}
+                                        {{ $endAt->format('H:i') }}
 
                                     </td>
 
@@ -404,11 +404,11 @@
                                     {{-- Time --}}
                                     <td>
 
-                                        {{ $startAt->format('h:i A') }}
+                                        {{ $startAt->format('H:i') }}
 
                                         -
 
-                                        {{ $endAt->format('h:i A') }}
+                                        {{ $endAt->format('H:i') }}
 
                                     </td>
 

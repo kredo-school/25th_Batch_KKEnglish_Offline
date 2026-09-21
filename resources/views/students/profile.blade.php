@@ -6,7 +6,7 @@
  <div class="container my-4">
     {{-- タブ --}}
     <div class="d-flex mb-0">
-        <a href="{{ route('student.profile') }}"
+        <a href="{{ route('students.profile') }}"
            class="px-4 py-3 border border-bottom-0 bg-white text-dark text-decoration-none">
             <i class="fa-regular fa-id-badge me-2"></i>
             My Account
@@ -37,7 +37,7 @@
         </div>
 
 
-        <form action="{{ route('student.profile.update') }}"
+        <form action="{{ route('students.profile.update') }}"
               method="POST"
               enctype="multipart/form-data">
 
@@ -284,7 +284,7 @@
             {{-- Button --}}
             <div class="p-4 text-center">
 
-                <a href="{{ route('student.profile') }}"
+                <a href="{{ route('students.profile') }}"
                    class="btn btn-secondary me-2">
                     Cancel
                 </a>

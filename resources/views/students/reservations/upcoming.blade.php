@@ -157,7 +157,7 @@
 
                                         {{
                                             $startAt->format(
-                                                'h:i A'
+                                                'H:i'
                                             )
                                         }}
 
@@ -165,7 +165,7 @@
 
                                         {{
                                             $endAt->format(
-                                                'h:i A'
+                                                'H:i'
                                             )
                                         }}
 
@@ -472,7 +472,7 @@
 
                                                     {{
                                                         $startAt->format(
-                                                            'h:i A'
+                                                            'H:i'
                                                         )
                                                     }}
 
@@ -480,7 +480,7 @@
 
                                                     {{
                                                         $endAt->format(
-                                                            'h:i A'
+                                                            'H:i'
                                                         )
                                                     }}
 

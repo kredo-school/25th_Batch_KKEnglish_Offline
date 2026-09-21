@@ -73,6 +73,6 @@ class ProfileController extends Controller
             ['birthday' => $request->input('birthday')]
         );
 
-        return redirect()->route('student.profile')->with('success', 'Profile updated successfully.');
+        return redirect()->route('students.profile')->with('success', 'Profile updated successfully.');
     }
 }

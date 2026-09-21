@@ -28,7 +28,9 @@
 
             <i class="fa-regular fa-clock me-1"></i>
 
-            {{ now()->format('H:i') }}
+            <span id="currentTime">
+                {{ now()->format('H:i') }}
+            </span>
 
         </p>
 
@@ -151,7 +153,7 @@
 
                                         {{
                                             $startAt->format(
-                                                'h:i A'
+                                                'H:i'
                                             )
                                         }}
 
@@ -159,7 +161,7 @@
 
                                         {{
                                             $endAt->format(
-                                                'h:i A'
+                                                'H:i'
                                             )
                                         }}
 
@@ -346,5 +348,45 @@
     </div>
 
 </div>
+
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        function updateCurrentTime() {
+
+            const now = new Date();
+
+            const hours =
+                String(
+                    now.getHours()
+                ).padStart(2, '0');
+
+            const minutes =
+                String(
+                    now.getMinutes()
+                ).padStart(2, '0');
+
+            document
+                .getElementById('currentTime')
+                .textContent =
+                    `${hours}:${minutes}`;
+        }
+
+
+        updateCurrentTime();
+
+        setInterval(
+            updateCurrentTime,
+            60000
+        );
+
+    }
+);
+
+</script>
 
 @endsection

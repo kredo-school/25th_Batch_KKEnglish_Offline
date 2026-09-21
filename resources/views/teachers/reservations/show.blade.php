@@ -146,11 +146,11 @@
 
                 <div class="col-md-8">
 
-                    {{ $startAt->format('h:i A') }}
+                    {{ $startAt->format('H:i') }}
 
                     -
 
-                    {{ $endAt->format('h:i A') }}
+                    {{ $endAt->format('H:i') }}
 
                 </div>
 

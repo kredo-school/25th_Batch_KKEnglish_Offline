@@ -118,7 +118,7 @@
                         <li>
                             <a
                                 class="dropdown-item"
-                                href="{{ route('student.profile') }}"
+                                href="{{ route('students.profile') }}"
                             >
                                 Profile
                             </a>
