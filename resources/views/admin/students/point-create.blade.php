@@ -18,7 +18,7 @@
             <div class="text-muted small">Student</div>
             <div class="fs-5 fw-bold">
                 #{{ $student->id }}
-                {{ trim(($student->first_name ?? '').' '.($student->last_name ?? '')) ?: 'Name Not Registered' }}
+                {{ trim(($student->user->first_name ?? '').' '.($student->user->last_name ?? '')) ?: 'Name Not Registered' }}
             </div>
             <div class="mt-2">Current Remaining Points: <strong>{{ number_format($pointBalance) }} pt</strong></div>
         </div>
@@ -32,7 +32,7 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">Transaction Type</label>
                     <select name="transaction_type" class="form-select" required>
-                        <option value="">Please select</option>
+                        <option value=""> -- Please select -- </option>
                         @foreach($types as $type)
                             <option value="{{ $type->type_id }}" @selected(old('transaction_type') == $type->type_id)>
                                 {{ $type->type_name }}

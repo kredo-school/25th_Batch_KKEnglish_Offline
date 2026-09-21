@@ -42,10 +42,10 @@ class StudentController extends Controller
 
         $query = Student::query()
             ->with('user')
-            ->withSum(
-                'pointTransactions as calculated_point_balance',
-                'point'
-            )
+            // ->withSum(
+            //     'pointTransactions as calculated_point_balance',
+            //     'point'
+            // )
             ->where('students.user_id', '!=', null)
             ->whereHas('user', function ($userQuery) use ($studentRoleId) {
                 $userQuery->where('role_id', $studentRoleId);
@@ -166,9 +166,7 @@ class StudentController extends Controller
         |
         */
 
-        $pointBalance = (int) $student
-            ->pointTransactions
-            ->sum('point');
+        $pointBalance = (int) $student->point_balance;
 
         return view(
             'admin.students.show',
@@ -189,9 +187,7 @@ class StudentController extends Controller
             'pointTransactions',
         ]);
 
-        $pointBalance = (int) $student
-            ->pointTransactions
-            ->sum('point');
+        $pointBalance = (int) $student->point_balance;
 
         return view(
             'admin.students.profile',
@@ -215,8 +211,7 @@ class StudentController extends Controller
             ->get();
 
         $pointBalance = (int) $student
-            ->pointTransactions()
-            ->sum('point');
+            ->point_balance;
 
         return view(
             'admin.students.point-create',
@@ -284,7 +279,7 @@ class StudentController extends Controller
                 ->withInput()
                 ->withErrors([
                     'transaction_type' =>
-                        'ポイント付与用の取引種類を選択してください。',
+                        'Choose a transaction type for granting points.',
                 ]);
         }
 
@@ -307,6 +302,12 @@ class StudentController extends Controller
             $data,
             $student
         ) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | point_transactionsに履歴を登録
+        |--------------------------------------------------------------------------
+        */
             PointTransaction::create([
                 'student_id' => $student->id,
 
@@ -327,8 +328,24 @@ class StudentController extends Controller
                 'created_at' =>
                     now(),
             ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | students.point_balanceを更新
+            |--------------------------------------------------------------------------
+            */
+
+            $student->increment(
+                'point_balance',
+                (int) $data['point']
+            );
         });
 
+    /*
+    |--------------------------------------------------------------------------
+    | ④ Student詳細へ戻る
+    |--------------------------------------------------------------------------
+    */
         return redirect()
             ->route(
                 'admin.students.show',
@@ -336,7 +353,7 @@ class StudentController extends Controller
             )
             ->with(
                 'status',
-                $data['point'] . 'ポイントを付与しました。'
+                $data['point'] . 'Points added.'
             );
     }
 }

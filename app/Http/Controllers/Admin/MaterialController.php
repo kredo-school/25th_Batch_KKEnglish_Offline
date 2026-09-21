@@ -19,6 +19,7 @@ class MaterialController extends Controller
         $status = $request->input('status', 'all');
 
         $materials = Material::query()
+            ->withCount('teachers')
             ->when($keyword, fn ($q) => $q->where('name', 'like', "%{$keyword}%"))
             ->when($status !== 'all', fn ($q) => $q->where('status', $status))
             ->orderByDesc('updated_at')

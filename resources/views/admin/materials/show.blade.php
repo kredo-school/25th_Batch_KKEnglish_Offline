@@ -41,6 +41,11 @@
 
             <div class="mt-4 d-flex flex-wrap gap-2">
                 <a href="{{ route('admin.materials.edit', $material) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                <a href="{{ route('admin.materials.teachers.edit', $material) }}"
+   class="btn btn-outline-success btn-sm">
+    <i class="fa-solid fa-user-plus"></i>
+    Assign Teachers
+</a>
 
                 @if($material->status === 'active')
                     <form method="POST" action="{{ route('admin.materials.suspend', $material) }}" onsubmit="return confirm('Would you like to suspend this material?');">
@@ -62,7 +67,7 @@
                     <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
                 </form>
 
-                <a href="{{ route('admin.materials.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+                <a href="{{ route('admin.materials.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to List</a>
             </div>
         </div>
     </div>

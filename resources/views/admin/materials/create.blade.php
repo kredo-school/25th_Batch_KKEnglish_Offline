@@ -7,6 +7,6 @@
     @csrf
     @include('admin.materials._form')
     <button class="btn btn-primary">Register</button>
-    <a href="{{ route('admin.materials.index') }}" class="btn btn-outline-secondary">Back</a>
+    <a href="{{ route('admin.materials.index') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-angles-left"></i> Back</a>
 </form>
 @endsection

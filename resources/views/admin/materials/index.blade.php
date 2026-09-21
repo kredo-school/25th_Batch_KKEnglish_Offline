@@ -48,7 +48,7 @@
                             {{-- 教師数 --}}
                             <div class="mb-2">
                                 <span class="badge bg-info">
-                                    {{ $material->teachers_count ?? 0 }} Teachers {{-- 未解決 --}}
+                                    {{ $material->teachers_count ?? 0 }} Teachers
                                 </span>
                             </div>
 

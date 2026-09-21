@@ -13,7 +13,7 @@
             {{-- Schedule専用サイドバー --}}
             <a href="{{ route('admin.dashboard', ['menu' => 'main']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-                <i class="fa-solid fa-angles-left"></i> Back
+                <i class="fa-solid fa-angles-left"></i> Back to Dashboard
             </a>
 
             <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6">Schedule management</div>

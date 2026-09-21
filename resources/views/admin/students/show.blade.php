@@ -21,8 +21,8 @@
                     <p><strong>Enrollment Date:</strong>{{ $student->created_at?->format('Y-m-d') ?? '-' }}</p>
                     <p><strong>Graduation Date:</strong>{{ $student->graduation_date?->format('Y-m-d') ?? '-' }}</p>
                     <p class="mb-0"><strong>Active:</strong>
-                        @if(($student->user->status ?? null) === 'active')<span class="badge bg-success">ON</span>
-                        @else<span class="badge bg-secondary">OFF</span>@endif
+                        @if(($student->user->status ?? null) === 'active')<span class="badge bg-success">Active</span>
+                        @else<span class="badge bg-secondary">Inactive</span>@endif
                     </p>
                 </div>
             </div>

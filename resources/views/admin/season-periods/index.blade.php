@@ -2,7 +2,11 @@
 
 @section('content')
 <div class="container py-3">
-    <h1 class="h4 mb-4">Season Period Settings</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">Season Period Settings</h1>
+        <a href="{{ route('admin.schedules.matrix_details', ['date' => request('date', now()->toDateString())]) }}"
+   class="btn btn-outline-secondary btn-sm"> <i class="fa-solid fa-angles-left"></i> Back </a>
+    </div>
 
     @if (session('status'))
         <div class="alert alert-success">{{ session('status') }}</div>

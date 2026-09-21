@@ -19,6 +19,7 @@
             <p><strong>Email:</strong> {{ $teacher->user->email }}</p>
             <p><strong>Status:</strong> {{ $teacher->user->status }}</p>
             <hr>
+            <p><strong>Nationality:</strong> {{ $teacher->user->nationality ?: '-' }}</p>
             <p><strong>Specialty:</strong> {{ $teacher->specialty ?: '-' }}</p>
             <p><strong>Career:</strong> {{ $teacher->career ?: '-' }}</p>
             <p><strong>Graduation School:</strong> {{ $teacher->graduation_school ?: '-' }}</p>
