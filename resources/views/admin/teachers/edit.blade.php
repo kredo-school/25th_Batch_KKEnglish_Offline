@@ -64,6 +64,12 @@
             <div class="card-header">Teacher Profile</div>
             <div class="card-body">
                 <div class="mt-2">
+                    <label class="form-label">Nationality</label>
+                    <input type="text" name="nationality" class="form-control"
+                           value="{{ old('nationality', $teacher->user->nationality) }}">
+                </div>
+
+                <div class="mt-2">
                     <label class="form-label">Specialty</label>
                     <input type="text" name="specialty" class="form-control"
                            value="{{ old('specialty', $teacher->specialty) }}">
@@ -94,8 +100,9 @@
 
                 <div class="mt-3">
                     <label class="form-label">About Me</label>
-                    <textarea name="about_me" rows="4" class="form-control">{{ old('about_me', $teacher->about_me) }}</textarea>
+                    <textarea rows="4" class="form-control" readonly>{{ $teacher->about_me }}</textarea>
                 </div>
+
             </div>
         </div>
 

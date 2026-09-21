@@ -30,4 +30,45 @@ class TeacherMaterialController extends Controller
             ->route('admin.teachers.show', $teacher)
             ->with('status', '科目割り当てを更新しました。');
     }
+
+    /**
+ * Materialに割り当てる先生を選択
+ */
+public function editTeachers(Material $material)
+    {
+        $teachers = Teacher::query()
+            ->with('user')
+            ->orderBy('id')
+            ->get();
+
+        $selectedTeacherIds = $material->teachers()
+            ->pluck('teachers.id')
+            ->all();
+
+        return view(
+            'admin.materials.teachers',
+            compact(
+                'material',
+                'teachers',
+                'selectedTeacherIds'
+            )
+        );
+    }
+
+    /**
+     * Materialの先生割り当てを保存
+     */
+    public function updateTeachers(Request $request, Material $material)
+    {
+        $data = $request->validate([
+            'teacher_ids'   => ['nullable', 'array'],
+            'teacher_ids.*' => ['integer', 'exists:teachers,id'],
+        ]);
+
+        $material->teachers()->sync($data['teacher_ids'] ?? []);
+
+        return redirect()
+            ->route('admin.materials.show', $material)
+            ->with('success', '先生の割り当てを更新しました。');
+    }
 }

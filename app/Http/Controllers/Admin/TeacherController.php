@@ -212,6 +212,7 @@ class TeacherController extends Controller
             'first_name' => ['required','string','max:100'],
             'email' => ['required','email','max:255','unique:users,email'],
             'password' => ['required','string','min:8'],
+            'nationality' => ['nullable','string','max:255'],
             'specialty' => ['nullable','string','max:255'],
             'career' => ['nullable','string','max:255'],
             'biography' => ['nullable','string'],
@@ -232,6 +233,7 @@ class TeacherController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'role_id' => $teacherRoleId,
+                'nationality' => $data['nationality'] ?? null,
                 'status' => 'active',
             ]);
 
@@ -249,41 +251,63 @@ class TeacherController extends Controller
         return redirect()->route('admin.teachers.index')->with('success', '講師を登録しました。');
     }
 
-    public function edit(Teacher $teacher): View { $teacher->load('user'); return view('admin.teachers.edit', compact('teacher')); }
-
-    public function update(Request $request, Teacher $teacher): RedirectResponse
+    public function show(Teacher $teacher): View
     {
         $teacher->load('user');
+
+        return view('admin.teachers.show', compact('teacher'));
+    }
+    
+    public function edit(Teacher $teacher): View { $teacher->load('user'); return view('admin.teachers.edit', compact('teacher')); }
+
+ public function update(Request $request, Teacher $teacher): RedirectResponse
+    {
+        $teacher->load('user');
+
         $data = $request->validate([
-            'last_name' => ['required','string','max:100'], 'first_name' => ['required','string','max:100'],
-            'email' => ['required','email','max:255', \Illuminate\Validation\Rule::unique('users','email')->ignore($teacher->user->id)],
-            'specialty' => ['nullable','string','max:255'], 'career' => ['nullable','string','max:255'],
-            'biography' => ['nullable','string'], 'graduation_school' => ['nullable','string','max:255'],
-            'certification' => ['nullable','string','max:255'], 'about_me' => ['nullable','string'],
-            'status' => ['required','in:active,inactive'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('users', 'email')
+                    ->ignore($teacher->user->id),
+            ],
+            'nationality' => ['nullable', 'string', 'max:255'],
+            'specialty' => ['nullable', 'string', 'max:255'],
+            'career' => ['nullable', 'string', 'max:255'],
+            'biography' => ['nullable', 'string'],
+            'graduation_school' => ['nullable', 'string', 'max:255'],
+            'certification' => ['nullable', 'string', 'max:255'],
+            'about_me' => ['nullable', 'string'],
+            'status' => ['required', 'in:active,inactive'],
         ]);
 
         DB::transaction(function () use ($teacher, $data) {
-            $teacher->user->update(['last_name' => $data['last_name'], 'first_name' => $data['first_name'], 'email' => $data['email'], 'status' => $data['status']]);
-            $teacher->update(['specialty' => $data['specialty'] ?? null, 'career' => $data['career'] ?? null, 'biography' => $data['biography'] ?? null, 'graduation_school' => $data['graduation_school'] ?? null, 'certification' => $data['certification'] ?? null, 'about_me' => $data['about_me'] ?? null]);
+
+            // User側の情報
+            $teacher->user->update([
+                'last_name' => $data['last_name'],
+                'first_name' => $data['first_name'],
+                'email' => $data['email'],
+                'nationality' => $data['nationality'] ?? null,
+                'status' => $data['status'],
+            ]);
+
+            // Teacher側の情報
+            $teacher->update([
+                'specialty' => $data['specialty'] ?? null,
+                'career' => $data['career'] ?? null,
+                'biography' => $data['biography'] ?? null,
+                'graduation_school' => $data['graduation_school'] ?? null,
+                'certification' => $data['certification'] ?? null,
+                'about_me' => $data['about_me'] ?? null,
+            ]);
         });
 
-        return redirect()->route('admin.teachers.index')->with('success', '講師情報を更新しました。');
-    }
-
-    public function destroy(Teacher $teacher): RedirectResponse
-    {
-        $teacher->load('user');
-        $teacher->user->update(['status' => 'inactive']);
-        return redirect()->route('admin.teachers.index')->with('success', '講師アカウントを停止しました。');
-    }
-
-    public function show(Teacher $teacher): View
-    {
-        $teacher->load('user', 'materials');
-        if (!$teacher->user) {
-            return redirect()->route('admin.teachers.index')->with('error', '紐づくユーザーが見つかりません。');
-        }
-        return view('admin.teachers.show', compact('teacher'));
+        return redirect()
+            ->route('admin.teachers.index')
+            ->with('success', '講師情報を更新しました。');
     }
 }

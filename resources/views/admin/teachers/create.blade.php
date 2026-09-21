@@ -40,6 +40,11 @@
         </div>
 
         <div class="mt-3">
+            <label class="form-label">Nationality</label>
+            <input type="text" name="nationality" class="form-control" value="{{ old('nationality') }}">
+        </div>
+
+        <div class="mt-3">
             <label class="form-label">Specialty</label>
             <input type="text" name="specialty" class="form-control" value="{{ old('specialty') }}">
         </div>

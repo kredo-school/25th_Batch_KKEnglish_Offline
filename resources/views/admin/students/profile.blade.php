@@ -66,11 +66,11 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">国籍</label>
+                                <label class="form-label">Nationality</label>
                                 <input type="text" class="form-control" name="nationality" value="{{ $student->user->nationality }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">名前 (英語)</label>
+                                <label class="form-label">Name (English)</label>
                                 {{-- ※DBにカラムがないため空値にしています --}}
                                 <input type="text" class="form-control" name="name_en" value="">
                             </div>
@@ -78,52 +78,52 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">名前 (姓)</label>
+                                <label class="form-label">Name (Last)</label>
                                 <input type="text" class="form-control" name="last_name" value="{{ $student->user->last_name }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">名前 (名)</label>
+                                <label class="form-label">Name (First)</label>
                                 <input type="text" class="form-control" name="first_name" value="{{ $student->user->first_name }}">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">メールアドレス</label>
+                                <label class="form-label">Email Address</label>
                                 <input type="email" class="form-control" name="email" value="{{ $student->user->email }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">パスワード</label>
+                                <label class="form-label">Password</label>
                                 <input type="password" class="form-control" name="password" placeholder="変更する場合のみ入力">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">電話番号</label>
+                                <label class="form-label">Phone Number</label>
                                 <input type="text" class="form-control" name="phone_number" value="{{ $student->user->{'phone-number'} }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">誕生日</label>
+                                <label class="form-label">Birthday</label>
                                 <input type="date" class="form-control" name="birthday" value="{{ $student->birthday?->format('Y-m-d') }}">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">住所</label>
+                                <label class="form-label">Address</label>
                                 {{-- ※DBにカラムがないため空値にしています --}}
                                 <input type="text" class="form-control" name="address" value="">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">市区町村</label>
+                                <label class="form-label">City</label>
                                 {{-- ※DBにカラムがないため空値にしています --}}
                                 <input type="text" class="form-control" name="city" value="">
                             </div>
                         </div>
 
                         <div class="text-end">
-                            <button type="submit" class="btn btn-primary">保存する</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </form>
                 </div>
@@ -138,32 +138,32 @@
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>入会日</span>
+                            <span>Enrollment Date</span>
                             <strong>{{ $student->created_at?->format('Y-m-d') ?? '-' }}</strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>卒業日</span>
+                            <span>Graduation Date</span>
                             {{-- ※DBにカラムがないためプレースホルダーにしています --}}
                             <strong>-</strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>残ポイント数</span>
+                            <span>Remaining Points</span>
                             <div>
                                 <strong class="fs-5">{{ number_format($pointBalance) }}</strong> pt
                             </div>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>ステータス</span>
+                            <span>Status</span>
                             @if($student->user->status === 'active')
-                                <span class="badge bg-success">有効</span>
+                                <span class="badge bg-success">Active</span>
                             @else
-                                <span class="badge bg-secondary">無効</span>
+                                <span class="badge bg-secondary">Inactive</span>
                             @endif
                         </li>
                     </ul>
 
                     <div class="mt-3 d-grid">
-                        <a href="{{ route('admin.students.points.create', $student) }}" class="btn btn-outline-primary btn-sm">ポイントを付与する</a>
+                        <a href="{{ route('admin.students.points.create', $student) }}" class="btn btn-outline-primary btn-sm">Grant Points</a>
                     </div>
                 </div>
             </div>

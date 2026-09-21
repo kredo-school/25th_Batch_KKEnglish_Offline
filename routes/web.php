@@ -158,6 +158,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::delete('/materials/{material}', [AdminMaterialController::class, 'destroy'])->name('materials.destroy');
     Route::patch('/materials/{material}/suspend',[AdminMaterialController::class, 'suspend'])->name('materials.suspend');
     Route::patch('/materials/{material}/activate',[AdminMaterialController::class, 'activate'])->name('materials.activate');
+    // Assign Teachers to Materials
+    Route::get(
+    '/materials/{material}/teachers', [TeacherMaterialController::class, 'editTeachers'])->name('materials.teachers.edit');
+
+    Route::put('/materials/{material}/teachers', [TeacherMaterialController::class, 'updateTeachers'])->name('materials.teachers.update');
 
     // User 編集
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');

@@ -92,7 +92,7 @@
                     <td>{{ $teacher->today ?? '-' }}</td>
                     <td class="text-nowrap">
                         <a href="{{ route('admin.teachers.show', $teacher) }}" class="btn btn-sm btn-outline-secondary">Details</a>
-                        <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        {{-- <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-sm btn-outline-primary">Edit</a> --}}
                         <a href="{{ route('admin.teachers.materials.edit', $teacher) }}" class="btn btn-sm btn-outline-info">Materials</a>
                     </td>
                 </tr>

@@ -6,7 +6,7 @@
 <div class="container py-4">
     <h4 class="mb-3">Details: {{ $date }} / {{ $type }}</h4>
     <a href="{{ route('admin.dashboard', ['week_start' => \Carbon\Carbon::parse($date)->startOfWeek(\Carbon\Carbon::MONDAY)->toDateString()]) }}"
-       class="btn btn-outline-secondary btn-sm mb-3">Back</a>
+       class="btn btn-outline-secondary btn-sm mb-3"><i class="fa-solid fa-angles-left"></i> Back</a>
 
     @if($items->isEmpty())
         <p class="text-secondary">No data.</p>
