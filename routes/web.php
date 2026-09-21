@@ -35,7 +35,6 @@ use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardControll
 // Test route for frontend testing
 
 
-
 // Public routes
 Route::get('/', function () {
     return view('welcome');

@@ -26,6 +26,8 @@ public function index(): View
             'user',
             'materials',
         ])
+        ->withCount('reviews')
+        ->withAvg('reviews', 'rating')
         ->latest('id')
         ->paginate(20);
 
@@ -54,10 +56,38 @@ public function index(): View
     /**
      * 講師プロフィール
      */
-    public function show(int $id): View
-    {
-        $teacher = Teacher::findOrFail($id);
+public function show(int $id): View
+{
+    $teacher = Teacher::query()
+        ->with([
+            'user',
+            'materials',
+        ])
+        ->withCount('reviews')
+        ->withAvg(
+            'reviews',
+            'rating'
+        )
+        ->findOrFail($id);
 
-        return view('teachers.show', compact('teacher'));
-    }
+    $reviews = $teacher
+        ->reviews()
+        ->whereNotNull('comment')
+        ->where(
+            'comment',
+            '!=',
+            ''
+        )
+        ->latest()
+        ->take(3)
+        ->get();
+
+    return view(
+        'teachers.show',
+        compact(
+            'teacher',
+            'reviews'
+        )
+    );
+ }
 }
