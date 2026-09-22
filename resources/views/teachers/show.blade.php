@@ -109,51 +109,61 @@
                 </div>
 
                 <div class="col-md-9">
-                    {{ $teacher->user->nationality ?? '-' }}
 
                     @if ($teacher->user?->nationality === 'Philippines')
-                        🇵🇭
-                    @elseif ($teacher->user?->nationality === 'Japan')
-                        🇯🇵
+
+                        Philippines
+                        <span class="fi fi-ph ms-1"></span>
+
+                    @elseif ($teacher->user?->nationality === 'Japanese')
+
+                        Japan
+                        <span class="fi fi-jp ms-1"></span>
+
+                    @else
+
+                        {{ $teacher->user?->nationality ?? '-' }}
+
                     @endif
+
                 </div>
 
             </div>
 
             {{-- ===============================
-     Rating
-=============================== --}}
-<div class="row border-bottom py-3">
+                Rating
+            =============================== --}}
+            <div class="row border-bottom py-3">
 
-    <div class="col-md-3 fw-bold text-secondary">
-        Rating
-    </div>
+                <div class="col-md-3 fw-bold text-secondary">
+                    Rating
+                </div>
 
-    <div class="col-md-9">
+                <div class="col-md-9">
 
-        @if (($teacher->reviews_count ?? 0) > 0)
+                    @if (($teacher->reviews_count ?? 0) > 0)
 
-            <i class="fa-solid fa-star text-warning me-1"></i>
+                        <i class="fa-solid fa-star text-warning me-1"></i>
 
-            <span class="fw-semibold">
-                {{ number_format($teacher->reviews_avg_rating, 1) }}
-            </span>
+                        <span class="fw-semibold">
+                            {{ number_format($teacher->reviews_avg_rating, 1) }}
+                        </span>
 
-            <span class="text-secondary">
-                ({{ $teacher->reviews_count }} reviews)
-            </span>
+                        <span class="text-secondary">
+                            ({{ $teacher->reviews_count }} reviews)
+                        </span>
 
-        @else
+                    @else
 
-            <span class="text-secondary">
-                No reviews
-            </span>
+                        <span class="text-secondary">
+                            No reviews
+                        </span>
 
-        @endif
+                    @endif
 
-    </div>
+                </div>
 
-</div>
+            </div>
 
             {{-- ===============================
                     Teaching Materials

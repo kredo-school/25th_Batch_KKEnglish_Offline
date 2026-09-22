@@ -227,13 +227,22 @@
                             class="mb-2 small"
                             style="min-height: 24px;"
                         >
-                            {{ $teacher->user?->nationality ?? '-' }}
-
                             @if ($teacher->user?->nationality === 'Philippines')
-                                🇵🇭
-                            @elseif ($teacher->user?->nationality === 'Japan')
-                                🇯🇵
+
+                                Philippines
+                                <span class="fi fi-ph ms-1"></span>
+
+                            @elseif ($teacher->user?->nationality === 'Japanese')
+
+                                Japan
+                                <span class="fi fi-jp ms-1"></span>
+
+                            @else
+
+                                {{ $teacher->user?->nationality ?? '-' }}
+
                             @endif
+
                         </div>
 
 

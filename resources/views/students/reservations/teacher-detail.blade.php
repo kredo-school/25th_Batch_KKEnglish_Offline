@@ -399,13 +399,22 @@
 
                        <p class="mb-0">
 
-                            {{ $teacher->user->nationality ?? '-' }}
+                             @if ($teacher->user?->nationality === 'Philippines')
 
-                            @if ($teacher->user?->nationality === 'Philippines')
-                                🇵🇭
-                            @elseif ($teacher->user?->nationality === 'Japan')
-                                🇯🇵
+                                Philippines
+                                <span class="fi fi-ph ms-1"></span>
+
+                            @elseif ($teacher->user?->nationality === 'Japanese')
+
+                                Japan
+                                <span class="fi fi-jp ms-1"></span>
+
+                            @else
+
+                                {{ $teacher->user?->nationality ?? '-' }}
+
                             @endif
+
 
                         </p>
 
