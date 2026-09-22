@@ -19,24 +19,62 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Services\PointService;
+use App\Services\TeacherSearchService;
 
 
 class ReservationController extends Controller
 {
     public function __construct(
         private ReservationService $reservationService,
-        private PointService $pointService
+        private PointService $pointService,
+        private TeacherSearchService $teacherSearchService,
     ) {}
 
-    public function index(): View
-    {
-        $student = auth()->user()->student;
+    public function index(
+        Request $request
+    ): View {
+        $student =
+            $request->user()->student;
 
-        $teachers = Teacher::query()
-            ->with(['user', 'materials'])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
-            ->get();
+
+        $validated =
+            $request->validate([
+
+                'keyword' => [
+                    'nullable',
+                    'string',
+                    'max:100',
+                ],
+
+                'material_id' => [
+                    'nullable',
+                    'integer',
+                    'exists:materials,material_id',
+                ],
+
+                'nationality' => [
+                    'nullable',
+                    'string',
+                    'max:100',
+                ],
+
+                'max_points' => [
+                    'nullable',
+                    'integer',
+                    'min:0',
+                ],
+
+                'min_rating' => [
+                    'nullable',
+                    'numeric',
+                    'between:1,5',
+                ],
+            ]);
+
+
+        $teachers =
+            $this->teacherSearchService->search();
+
 
         $favoriteTeacherIds = TeacherLike::query()
             ->where('student_id', $student->id)
@@ -79,7 +117,6 @@ class ReservationController extends Controller
                 'integer',
                 'exists:materials,material_id',
             ],
-
             'schedule_id' => [
                 'required',
                 'integer',
