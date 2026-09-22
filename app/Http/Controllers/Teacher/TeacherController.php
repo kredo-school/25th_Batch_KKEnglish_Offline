@@ -40,6 +40,8 @@ public function index(): View
             'user',
             'materials',
         ])
+        ->withCount('reviews')
+        ->withAvg('reviews', 'rating')
         ->whereIn('id', $favoriteTeacherIds)
         ->get();
 

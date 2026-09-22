@@ -23,6 +23,7 @@ class LessonHistoryController extends Controller
         ->where('student_id', $student->id)
         ->whereHas('status', function ($query) {
             $query->whereIn('status_code', [
+                'awaiting_result',
                 'completed',
                 'absent',
             ]);

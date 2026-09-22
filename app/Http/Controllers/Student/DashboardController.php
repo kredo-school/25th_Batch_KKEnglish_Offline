@@ -29,6 +29,7 @@ class DashboardController extends Controller
                 now()->endOfDay(),
             ])
 
+            ->where('end_at', '>', now())
             ->whereHas('status', function ($query) {
                 $query->whereIn('status_code', [
                     'pending',
@@ -125,7 +126,8 @@ class DashboardController extends Controller
                         [
                             'pending',
                             'confirmed',
-                            'completed'
+                            'awaiting_result',
+                            'completed',
                         ]
                     );
                 }

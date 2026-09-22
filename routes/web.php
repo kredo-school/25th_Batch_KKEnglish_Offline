@@ -99,7 +99,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/my-reservations',
     [ReservationController::class, 'myReservations'])->name('students.reservations.upcoming');
 
-    // Teacher dtail
+    // Teacher detail
     Route::get('/students/reservations/teacher-detail', [ReservationController::class, 'teacherDetail'])->name('students.reservations.teacher-detail');
 
     // Teacher reservations
