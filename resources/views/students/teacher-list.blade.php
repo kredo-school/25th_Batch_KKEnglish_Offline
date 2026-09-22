@@ -157,6 +157,24 @@
                             pt
                         </span>
 
+                        {{-- ===============================
+                            Rating
+                        ================================ --}}
+                        <div
+                            class="d-flex align-items-center gap-1 mb-1"
+                            style="font-size: 12px;"
+                        >
+                            <i class="fa-solid fa-star text-warning"></i>
+
+                            <span class="fw-semibold">
+                                {{ number_format($teacher->reviews_avg_rating ?? 0, 1) }}
+                            </span>
+
+                            <span class="text-secondary">
+                                ({{ $teacher->reviews_count ?? 0 }})
+                            </span>
+                        </div>
+
 
                         {{-- ===============================
                              Nationality

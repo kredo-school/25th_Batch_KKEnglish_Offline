@@ -230,10 +230,10 @@
                                 <td class="text-center">
 
                                     @if (
-                                        $reservation
-                                            ->status
-                                            ?->status_code
-                                        === 'completed'
+                                        in_array(
+                                            $reservation->status?->status_code,
+                                            ['completed', 'awaiting_result']
+                                        )
                                     )
 
                                         <span class="badge text-bg-success">
@@ -261,10 +261,10 @@
                                 <td class="text-center">
 
                                     @if (
-                                        $reservation
-                                            ->status
-                                            ?->status_code
-                                        === 'completed'
+                                        in_array(
+                                            $reservation->status?->status_code,
+                                            ['completed', 'awaiting_result']
+                                        )
                                     )
 
                                         @if ($reservation->review)
