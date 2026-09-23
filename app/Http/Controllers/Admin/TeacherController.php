@@ -38,6 +38,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Services\TeacherScheduleStatusService;
 
 class TeacherController extends Controller
 {
@@ -90,7 +91,7 @@ class TeacherController extends Controller
             ->leftJoin('shift_patterns as sp', 'sp.id', '=', 'ts.shift_pattern_id')
             ->whereIn('ts.teacher_id', $teacherIds)
             ->where('ts.available_date', $today)
-            ->where('ts.status', '!=', 'cancelled')
+            ->where('ts.status', 'confirmed')
             ->select(
                 'ts.teacher_id',
                 'ts.start_time',
@@ -105,7 +106,6 @@ class TeacherController extends Controller
 
         // Booked は teacher_schedules ではなく reservations から取得します。
         // 「今日、その先生に何件予約が入っているか」を表示するためです。
-        // 今日の予約数。
         $bookedByTeacher = DB::table('reservations')
             ->whereIn('teacher_id', $teacherIds)
             ->whereDate('start_at', $today)
@@ -121,64 +121,66 @@ class TeacherController extends Controller
 
             $teacher->booked = (int) $bookedByTeacher->get($teacher->id, 0);
 
-            // ------------------------------------------------------------
-            // Number of Slots の計算
-            // ------------------------------------------------------------
-            // teacher_schedules は「勤務時間帯」を持っています。
-            // 例：09:00～13:00 → 4時間 → 30分単位なら8スロット。
-            // ただし重複行があると二重計算になるため、先にmergeします。
-            // 重複時間を除外してからSlot数を計算する。
-            $periods = $schedules->map(function ($schedule) {
-                return [
-                    'start' => Carbon::parse($schedule->start_time),
-                    'end' => Carbon::parse($schedule->end_time),
-                    'slot_minutes' => max((int) ($schedule->slot_minutes ?? 30), 1),
-                ];
-            })->sortBy('start')->values()->all();
+            // inactive の先生は list 上ではオフ扱いにする
+            $isInactive = $teacher->user?->status === 'inactive';
 
-            $merged = [];
-            foreach ($periods as $period) {
-                if (empty($merged)) {
-                    $merged[] = $period;
-                    continue;
-                }
+            if ($isInactive) {
+                $teacher->slots_number = 0;
+            } else {
+                // Number of Slots の計算
+                // teacher_schedules は「勤務時間帯」を持っています。
+                // 例：09:00～13:00 → 4時間 → 30分単位なら8スロット。
+                // ただし重複行があると二重計算になるため、先にmergeします。
+                // 重複時間を除外してからSlot数を計算する。
+                $periods = $schedules->map(function ($schedule) {
+                    return [
+                        'start' => Carbon::parse($schedule->start_time),
+                        'end' => Carbon::parse($schedule->end_time),
+                        'slot_minutes' => max((int) ($schedule->slot_minutes ?? 30), 1),
+                    ];
+                })->sortBy('start')->values()->all();
 
-                $i = count($merged) - 1;
-                if ($period['start']->lte($merged[$i]['end'])) {
-                    if ($period['end']->gt($merged[$i]['end'])) {
-                        $merged[$i]['end'] = $period['end']->copy();
+                $merged = [];
+                foreach ($periods as $period) {
+                    if (empty($merged)) {
+                        $merged[] = $period;
+                        continue;
                     }
-                } else {
-                    $merged[] = $period;
-                }
-            }
 
-            $teacher->slots_number = collect($merged)->sum(function ($period) {
-                return intdiv(
-                    $period['start']->diffInMinutes($period['end']),
-                    $period['slot_minutes']
-                );
-            });
+                    $i = count($merged) - 1;
+                    if ($period['start']->lte($merged[$i]['end'])) {
+                        if ($period['end']->gt($merged[$i]['end'])) {
+                            $merged[$i]['end'] = $period['end']->copy();
+                        }
+                    } else {
+                        $merged[] = $period;
+                    }
+                }
+
+                $teacher->slots_number = collect($merged)->sum(function ($period) {
+                    return intdiv(
+                        $period['start']->diffInMinutes($period['end']),
+                        $period['slot_minutes']
+                    );
+                });
+            }
 
             // Shift Pattern は assignment → shift_patterns から取得します。
             // 今日の teacher_schedules がなくても、Teacherに設定されている
             // Shift Patternを表示します。
-
             $teacherAssignments = $assignments->get($teacher->id, collect());
             if ($teacherAssignments->isNotEmpty()) {
-            $patterns = $teacherAssignments
-                ->map(function ($assignment) {
-                    return $assignment->shiftPattern?->pattern_name;
-                })
-                ->filter()
-                ->unique()
-                ->values();
+                $patterns = $teacherAssignments
+                    ->map(function ($assignment) {
+                        return $assignment->shiftPattern?->pattern_name;
+                    })
+                    ->filter()
+                    ->unique()
+                    ->values();
 
-            $teacher->shift_pattern_name = $patterns->isNotEmpty()
-                ? $patterns->implode(', ')
-                : null;
-            // Shift Pattern は今日の teacher_schedules → shift_patterns から取得します。
-            // 同じパターンが複数行あっても、unique() で1回だけ表示します。
+                $teacher->shift_pattern_name = $patterns->isNotEmpty()
+                    ? $patterns->implode(', ')
+                    : null;
             } else {
                 $patterns = $schedules->pluck('pattern_name')->filter()->unique()->values();
                 $teacher->shift_pattern_name = $patterns->isNotEmpty()
@@ -186,8 +188,8 @@ class TeacherController extends Controller
                     : null;
             }
 
-            // 今日の teacher_schedules がなければ Off と表示します。
-            if ($schedules->isEmpty()) {
+            // inactive または 今日の勤務予定がなければ Off と表示します。
+            if ($isInactive || $schedules->isEmpty()) {
                 $teacher->today = 'Off';
             } else {
                 $ranges = $schedules->map(function ($schedule) {
@@ -220,8 +222,13 @@ class TeacherController extends Controller
             'certification' => ['nullable','string','max:255'],
             'about_me' => ['nullable','string'],
         ]);
-
-        DB::transaction(function () use ($data) {
+$previousStatus = (string) $teacher->user->status;
+        DB::transaction(function () use (
+    $teacher,
+    $data,
+    $previousStatus,
+    $teacherScheduleStatusService
+) {
             $teacherRoleId = Role::query()->where('role_code', 'teacher')->value('id');
             if (!$teacherRoleId) {
                 throw ValidationException::withMessages(['role' => 'teacherロールが見つかりません。rolesテーブルを確認してください。']);
@@ -257,10 +264,15 @@ class TeacherController extends Controller
 
         return view('admin.teachers.show', compact('teacher'));
     }
-    
-    public function edit(Teacher $teacher): View { $teacher->load('user'); return view('admin.teachers.edit', compact('teacher')); }
 
- public function update(Request $request, Teacher $teacher): RedirectResponse
+    public function edit(Teacher $teacher): View
+    {
+        $teacher->load('user');
+
+        return view('admin.teachers.edit', compact('teacher'));
+    }
+
+    public function update(Request $request, Teacher $teacher, TeacherScheduleStatusService $teacherScheduleStatusService): RedirectResponse
     {
         $teacher->load('user');
 
@@ -282,10 +294,17 @@ class TeacherController extends Controller
             'certification' => ['nullable', 'string', 'max:255'],
             'about_me' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
+            'profile_image' => 'nullable|image|mimes:jpeg,png,gif|max:2048',
         ]);
 
-        DB::transaction(function () use ($teacher, $data) {
-
+        // ファイルアップロード処理
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+            $path = $file->store('profile-images', 'public');
+            $data['profile_image'] = asset('storage/' . $path);
+        }
+$previousStatus = (string) $teacher->user->status;
+        DB::transaction(function () use ($teacher, $data, $previousStatus, $teacherScheduleStatusService) {
             // User側の情報
             $teacher->user->update([
                 'last_name' => $data['last_name'],
@@ -293,7 +312,32 @@ class TeacherController extends Controller
                 'email' => $data['email'],
                 'nationality' => $data['nationality'] ?? null,
                 'status' => $data['status'],
+                'profile_image' => $data['profile_image'] ?? $teacher->user->profile_image,
             ]);
+            $teacherScheduleStatusService->syncForUserStatus(
+    $teacher->user,
+    $previousStatus,
+    $data['status']
+);
+
+            // Teacher の有効・無効に合わせて勤務予定の状態を更新する
+            // if ($data['status'] === 'inactive') {
+            //     DB::table('teacher_schedules')
+            //         ->where('teacher_id', $teacher->getKey())
+            //         ->where('status', 'confirmed')
+            //         ->update([
+            //             'status' => 'draft',
+            //             'updated_at' => now(),
+            //         ]);
+            // } else {
+            //     DB::table('teacher_schedules')
+            //         ->where('teacher_id', $teacher->getKey())
+            //         ->where('status', 'draft')
+            //         ->update([
+            //             'status' => 'confirmed',
+            //             'updated_at' => now(),
+            //         ]);
+            // }
 
             // Teacher側の情報
             $teacher->update([
@@ -307,7 +351,7 @@ class TeacherController extends Controller
         });
 
         return redirect()
-            ->route('admin.teachers.index')
-            ->with('success', '講師情報を更新しました。');
+            ->route('admin.teachers.show', $teacher)
+            ->with('success', 'Teacher updated successfully!');
     }
 }
