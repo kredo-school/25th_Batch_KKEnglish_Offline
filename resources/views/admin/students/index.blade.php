@@ -122,7 +122,7 @@
                         );
 
                         $pointBalance =
-                            (int) ($student->calculated_point_balance ?? 0);
+                            (int) ($student->point_balance ?? 0);
                     @endphp
 
                     <tr>

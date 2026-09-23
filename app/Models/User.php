@@ -29,7 +29,7 @@ class User extends Authenticatable
         'nationality',
         'gender',
         'status',
-        'phone-number',
+        'phone_number',
         'profile_image',
     ];
 

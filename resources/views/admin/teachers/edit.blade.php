@@ -24,7 +24,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.teachers.update', $teacher) }}">
+    <form method="POST" action="{{ route('admin.teachers.update', $teacher) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -59,6 +59,25 @@
                 </div>
             </div>
         </div>
+
+        <div class="card mb-3">
+    <div class="card-header">Profile Picture</div>
+    <div class="card-body">
+        <div class="mt-3">
+            @if($teacher->user->profile_image)
+                <div class="mb-3">
+                    <p><strong>Current Profile Picture:</strong></p>
+                    <img src="{{ $teacher->user->profile_image }}" alt="Profile" class="img-thumbnail" style="max-width: 150px;">
+                </div>
+            @endif
+
+            <label class="form-label">Upload Profile Picture</label>
+            <input type="file" name="profile_image" class="form-control" accept="image/*">
+            <small class="text-muted">Supported formats: JPG, PNG, GIF (Max 2MB)</small>
+        </div>
+    </div>
+</div>
+
 
         <div class="card mb-3">
             <div class="card-header">Teacher Profile</div>

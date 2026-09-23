@@ -14,6 +14,7 @@
 
     <div class="card">
         <div class="card-body">
+            <p><strong>Profile Picture:</strong> <img src="{{ $teacher->user->profile_image }}" alt="{{ $teacher->user->first_name }} {{ $teacher->user->last_name }}" class="img-thumbnail" style="max-width: 150px;"></p>
             <p><strong>Teacher ID:</strong> {{ $teacher->id }}</p>
             <p><strong>Name:</strong> {{ $teacher->user->last_name }} {{ $teacher->user->first_name }}</p>
             <p><strong>Email:</strong> {{ $teacher->user->email }}</p>
