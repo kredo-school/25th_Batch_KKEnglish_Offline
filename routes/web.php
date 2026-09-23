@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Student\TeacherSearchController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Student\PointHistoryController;
 use App\Http\Controllers\MaterialController;
@@ -112,6 +113,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/students/reservations/{reservation}/reviews/create', [ReviewController::class, 'create'])->name('students.reviews.create');
     Route::post('/students/reservations/{reservation}/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
 
+    Route::get('/students/teachers/search', [TeacherSearchController::class, 'search'])->name('students.teachers.search');
 
 
 });

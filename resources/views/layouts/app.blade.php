@@ -60,8 +60,12 @@
         .teacher-navbar {
             background-color: #FFD166 !important;
         }
-
     </style>
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/nouislider@15.8.1/dist/nouislider.min.css">
+
 </head>
 
 <body>

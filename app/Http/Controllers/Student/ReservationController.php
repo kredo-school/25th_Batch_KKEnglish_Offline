@@ -66,9 +66,9 @@ class ReservationController extends Controller
 
                 'min_rating' => [
                     'nullable',
-                    'numeric',
-                    'between:1,5',
                 ],
+                'numeric',
+                'between:1,5',
             ]);
 
 
@@ -673,7 +673,7 @@ class ReservationController extends Controller
             ],
 
             'material_id' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:materials,material_id',
             ],
@@ -690,8 +690,8 @@ class ReservationController extends Controller
             ],
 
             'mode' => [
-                'required',
-                'in:material,date',
+                'nullable',
+                'in:teacher,material,date',
             ],
         ]);
 
@@ -718,10 +718,59 @@ class ReservationController extends Controller
             ->take(3)
             ->get();
 
-        $material = Material::query()
-            ->findOrFail(
-                $validated['material_id']
-            );
+        /*
+     * ========================================
+     * Teacherが担当できるMaterials
+     * ========================================
+     */
+        $materials =
+            $teacher
+            ->materials
+            ->sortBy(
+                'material_id'
+            )
+            ->values();
+
+
+        /*
+     * ========================================
+     * 選択中Material
+     * ========================================
+     *
+     * 未選択なら null
+     */
+        $selectedMaterial =
+            null;
+
+
+        if (
+            !empty($validated['material_id'])
+        ) {
+
+            /*
+         * このTeacherが実際に
+         * 教えられるMaterialなのか確認
+         */
+            $selectedMaterial =
+                $materials
+                ->firstWhere(
+                    'material_id',
+                    (int) $validated['material_id']
+                );
+
+
+            /*
+         * URLを直接書き換えて
+         * 担当外Materialを指定された場合
+         */
+            if (!$selectedMaterial) {
+
+                abort(
+                    404,
+                    'この講師は選択された教材を担当していません。'
+                );
+            }
+        }
 
         /*
          * 生徒が選択した日
@@ -747,11 +796,12 @@ class ReservationController extends Controller
             'students.reservations.teacher-detail',
             compact(
                 'teacher',
-                'material',
+                'materials',
                 'validated',
                 'selectedDate',
                 'viewStart',
-                'reviews'
+                'reviews',
+                'selectedMaterial',
             )
         );
     }

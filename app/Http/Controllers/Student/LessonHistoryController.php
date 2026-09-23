@@ -35,6 +35,7 @@ class LessonHistoryController extends Controller
             'lessonRecord',
             'review',
         ])
+        
         ->orderByDesc('start_at')
         ->get();
 
