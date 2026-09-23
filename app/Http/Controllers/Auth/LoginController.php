@@ -44,6 +44,8 @@ class LoginController extends Controller
 
         $roleCode = $user->role->role_code;
         if ($roleCode === 'student') {
+            session()->flash('show_welcome_monkey', true);
+
             return redirect()->route('students.dashboard');
         }
 

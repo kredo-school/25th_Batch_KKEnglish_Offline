@@ -578,24 +578,6 @@
 
     </div>
 
-
-
-    {{-- ===============================
-         Back
-    ================================ --}}
-    <div class="mt-4">
-
-        <a
-            href="{{ route(
-                'teachers.reservations.index'
-            ) }}"
-            class="btn btn-outline-secondary"
-        >
-            Back
-        </a>
-
-    </div>
-
 </div>
 
 @endsection

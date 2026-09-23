@@ -9,16 +9,104 @@
     rel="stylesheet">
 
 <script
-    src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"
-></script>
+    src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js">
+</script>
 
 
 <style>
 
-    #calendar a {
-        color: #000;
-        text-decoration: none;
+    /* =========================================
+       Header Monkey
+    ========================================= */
+
+    .header-monkey {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+
+    margin-left: 2px;
+
+    flex-shrink: 0;
+}
+
+
+    /* =========================================
+       Welcome Monkey Jump
+    ========================================= */
+
+   .header-monkey {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+
+/* 名前にぶら下がる感じ */
+.hanging-monkey {
+    margin-left: -4px;
+    margin-top: 8px;
+
+    transform: rotate(4deg);
+}
+
+
+/* ログイン時のジャンプ */
+.welcome-monkey-jump {
+    animation: monkeyJumpToName 1.8s ease-out forwards;
+}
+
+
+@keyframes monkeyJumpToName {
+
+    0% {
+        opacity: 0;
+
+        transform:
+            translateX(120px)
+            translateY(30px)
+            scale(1.35);
     }
+
+    25% {
+        opacity: 1;
+
+        transform:
+            translateX(80px)
+            translateY(-20px)
+            scale(1.2);
+    }
+
+    45% {
+        transform:
+            translateX(55px)
+            translateY(4px)
+            scale(1.1);
+    }
+
+    65% {
+        transform:
+            translateX(28px)
+            translateY(-12px)
+            scale(1.05);
+    }
+
+    82% {
+        transform:
+            translateX(8px)
+            translateY(2px)
+            scale(1);
+    }
+
+    100% {
+        opacity: 1;
+
+        transform:
+            translateX(0)
+            translateY(0)
+            scale(1);
+    }
+}
 
 
     /* =========================================
@@ -55,6 +143,11 @@
        FullCalendar
     ========================================= */
 
+    #calendar a {
+        color: #000;
+        text-decoration: none;
+    }
+
     #calendar .fc-toolbar-title {
         font-size: 1.1rem;
         font-weight: 700;
@@ -85,9 +178,37 @@
         {{-- Name / Date --}}
         <div>
 
-            <h2 class="fw-bold mb-1">
-                Hello, {{ auth()->user()->first_name }}
-            </h2>
+          <h2 class="fw-bold mb-1 d-flex align-items-center">
+
+            @if(session('show_welcome_monkey'))
+
+                <span id="welcomeName">
+                    Welcome back, {{ auth()->user()->first_name }}!
+                </span>
+
+                <img
+                    id="headerMonkey"
+                    src="{{ asset('images/kk-monkey-jump.png') }}"
+                    data-still-src="{{ asset('images/kk-monkey.png') }}"
+                    alt="KK English Monkey"
+                    class="header-monkey welcome-monkey-jump"
+                >
+
+            @else
+
+                <span>
+                    Hello, {{ auth()->user()->first_name }}
+                </span>
+
+                <img
+                    src="{{ asset('images/kk-monkey.png') }}"
+                    alt="KK English Monkey"
+                    class="header-monkey hanging-monkey"
+                >
+
+            @endif
+
+        </h2>
 
             <p class="text-secondary mb-0">
                 {{ now()->format('l, F j') }}
@@ -674,8 +795,6 @@
 
 </div>
 
-
-
 {{-- =============================================================
      English Level Modal
 ============================================================= --}}
@@ -1145,13 +1264,43 @@ document.addEventListener(
                 }
             );
 
-
         calendar.render();
+
+
+// ==========================
+// Welcome Monkey
+// ==========================
+
+const headerMonkey =
+    document.getElementById('headerMonkey');
+
+if (headerMonkey) {
+
+    headerMonkey.addEventListener(
+        'animationend',
+        function () {
+
+            // ジャンプ画像 → ぶら下がり画像
+            headerMonkey.src =
+                headerMonkey.dataset.stillSrc;
+
+            // ジャンプアニメーションを外す
+            headerMonkey.classList.remove(
+                'welcome-monkey-jump'
+            );
+
+            // 名前にぶら下がるスタイルを追加
+            headerMonkey.classList.add(
+                'hanging-monkey'
+            );
+
+        }
+    );
+}
 
     }
 );
 
 </script>
-
 
 @endsection
