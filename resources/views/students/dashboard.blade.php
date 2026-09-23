@@ -5,8 +5,7 @@
 @section('content')
 
 <link
-    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
-    rel="stylesheet">
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
 <script
     src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js">
@@ -15,53 +14,28 @@
 
 <style>
 
-    /* =========================================
-       Header Monkey
-    ========================================= */
+/* =========================================
+   Dashboard Monkey
+========================================= */
 
-    .header-monkey {
-    width: 34px;
-    height: 34px;
+.header-monkey {
+    width: 57px;
+    height: 57px;
     object-fit: contain;
-
-    margin-left: 2px;
-
+    margin-left: -8px;
+    margin-top: -4px;
     flex-shrink: 0;
 }
-
-
-    /* =========================================
-       Welcome Monkey Jump
-    ========================================= */
-
-   .header-monkey {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-
-/* 名前にぶら下がる感じ */
-.hanging-monkey {
-    margin-left: -4px;
-    margin-top: 8px;
-
-    transform: rotate(4deg);
-}
-
 
 /* ログイン時のジャンプ */
 .welcome-monkey-jump {
     animation: monkeyJumpToName 1.8s ease-out forwards;
 }
 
-
 @keyframes monkeyJumpToName {
 
     0% {
         opacity: 0;
-
         transform:
             translateX(120px)
             translateY(30px)
@@ -70,7 +44,6 @@
 
     25% {
         opacity: 1;
-
         transform:
             translateX(80px)
             translateY(-20px)
@@ -100,7 +73,6 @@
 
     100% {
         opacity: 1;
-
         transform:
             translateX(0)
             translateY(0)
@@ -109,49 +81,86 @@
 }
 
 
-    /* =========================================
-       Dashboard Titles
-    ========================================= */
+/* =========================================
+   Dashboard Monkey Bubble
+========================================= */
 
-    .dashboard-section-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        margin-bottom: 0;
-    }
+.dashboard-monkey-bubble {
+    margin-left: 4px;
 
-    .dashboard-card-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #6c757d;
-    }
+    background-color: #fff;
+    border: 1px solid #d6d6d6;
+    border-radius: 14px;
+
+    padding: 7px 12px;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    opacity: 0;
+
+    transform:
+        translateX(-6px)
+        translateY(-4px);
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+
+.dashboard-monkey-bubble.show {
+    opacity: 1;
+
+    transform:
+        translateX(0)
+        translateY(-4px);
+}
 
 
-    /* =========================================
-       Today's Lessons
-    ========================================= */
+/* =========================================
+   Dashboard Titles
+========================================= */
 
-    .today-lesson-item {
-        transition: background-color 0.2s;
-    }
+.dashboard-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
 
-    .today-lesson-item:hover {
-        background-color: #f8f9fa;
-    }
+.dashboard-card-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+}
 
 
-    /* =========================================
-       FullCalendar
-    ========================================= */
+/* =========================================
+   Today's Lessons
+========================================= */
 
-    #calendar a {
-        color: #000;
-        text-decoration: none;
-    }
+.today-lesson-item {
+    transition: background-color 0.2s;
+}
 
-    #calendar .fc-toolbar-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-    }
+.today-lesson-item:hover {
+    background-color: #f8f9fa;
+}
+
+
+/* =========================================
+   FullCalendar
+========================================= */
+
+#calendar a {
+    color: #000;
+    text-decoration: none;
+}
+
+#calendar .fc-toolbar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
 
 </style>
 
@@ -180,35 +189,44 @@
 
           <h2 class="fw-bold mb-1 d-flex align-items-center">
 
-            @if(session('show_welcome_monkey'))
+                @if(session('show_welcome_monkey'))
 
-                <span id="welcomeName">
-                    Welcome back, {{ auth()->user()->first_name }}!
-                </span>
+                    <span id="welcomeName">
+                        Welcome back, {{ auth()->user()->first_name }}!
+                    </span>
 
-                <img
-                    id="headerMonkey"
-                    src="{{ asset('images/kk-monkey-jump.png') }}"
-                    data-still-src="{{ asset('images/kk-monkey.png') }}"
-                    alt="KK English Monkey"
-                    class="header-monkey welcome-monkey-jump"
+                    <img
+                        id="headerMonkey"
+                        src="{{ asset('images/kk-monkey-jump.png') }}"
+                        data-still-src="{{ asset('images/kk-monkey.png') }}"
+                        alt="KK English Monkey"
+                        class="header-monkey welcome-monkey-jump"
+                    >
+
+                @else
+
+                    <span>
+                        Hello, {{ auth()->user()->first_name }}
+                    </span>
+
+                    <img
+                        src="{{ asset('images/kk-monkey.png') }}"
+                        alt="KK English Monkey"
+                        class="header-monkey"
+                    >
+
+                @endif
+
+
+                {{-- Monkey Message --}}
+                <div
+                    id="dashboardMonkeyBubble"
+                    class="dashboard-monkey-bubble"
                 >
+                    Let's do our best today!
+                </div>
 
-            @else
-
-                <span>
-                    Hello, {{ auth()->user()->first_name }}
-                </span>
-
-                <img
-                    src="{{ asset('images/kk-monkey.png') }}"
-                    alt="KK English Monkey"
-                    class="header-monkey hanging-monkey"
-                >
-
-            @endif
-
-        </h2>
+            </h2>
 
             <p class="text-secondary mb-0">
                 {{ now()->format('l, F j') }}
@@ -1266,37 +1284,82 @@ document.addEventListener(
 
         calendar.render();
 
-
 // ==========================
-// Welcome Monkey
+// Dashboard Monkey
 // ==========================
 
 const headerMonkey =
     document.getElementById('headerMonkey');
 
+const dashboardBubble =
+    document.getElementById('dashboardMonkeyBubble');
+
+
+/*
+ * ログイン時
+ * ジャンプ画像 → 通常画像
+ */
 if (headerMonkey) {
 
     headerMonkey.addEventListener(
         'animationend',
         function () {
 
-            // ジャンプ画像 → ぶら下がり画像
             headerMonkey.src =
                 headerMonkey.dataset.stillSrc;
 
-            // ジャンプアニメーションを外す
             headerMonkey.classList.remove(
                 'welcome-monkey-jump'
-            );
-
-            // 名前にぶら下がるスタイルを追加
-            headerMonkey.classList.add(
-                'hanging-monkey'
             );
 
         }
     );
 }
+
+
+/*
+ * 吹き出し
+ */
+if (dashboardBubble) {
+
+    /*
+     * ログイン直後なら
+     * ジャンプ終了後に表示
+     *
+     * 通常のDashboardなら
+     * すぐ表示
+     */
+    const bubbleDelay =
+        headerMonkey ? 2000 : 500;
+
+
+    setTimeout(
+        function () {
+
+            dashboardBubble.classList.add(
+                'show'
+            );
+
+        },
+        bubbleDelay
+    );
+
+
+    /*
+     * 約4秒後に消す
+     */
+    setTimeout(
+        function () {
+
+            dashboardBubble.classList.remove(
+                'show'
+            );
+
+        },
+        bubbleDelay + 3500
+    );
+}
+
 
     }
 );

@@ -46,16 +46,6 @@
             (Notifications)
         </a>
 
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            (User Guide)
-        </a>
-
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            (AI customized Lesson)
-        </a>
-
     </nav>
 
 <style>
