@@ -14,6 +14,8 @@
         <h2 class="fw-bold mb-1">
             Teacher Profile
         </h2>
+        <a href="{{ route('students.reservations.teacher-detail', ['teacher_id' => $teacher->id,
+            'mode' => 'teacher']) }}">Back to Teachers List</a>
 
         <p class="text-secondary mb-0">
             Teacher information and introduction
