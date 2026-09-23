@@ -6,6 +6,19 @@
 
 <div class="container-fluid">
 
+    {{-- Back --}}
+    <div class="mb-3">
+
+        <a
+            href="{{ route('students.history.index') }}"
+            class="btn btn-outline-secondary btn-sm"
+        >
+            <i class="fa-solid fa-angles-left me-1"></i>
+            Back
+        </a>
+
+    </div>
+
     {{-- ===============================
          Title
     ================================ --}}
@@ -337,21 +350,6 @@
             </div>
 
         </div>
-
-    </div>
-
-
-    {{-- ===============================
-         Back
-    ================================ --}}
-    <div class="mt-4">
-
-        <a
-            href="{{ route('students.history.index') }}"
-            class="btn btn-outline-secondary"
-        >
-            Back
-        </a>
 
     </div>
 

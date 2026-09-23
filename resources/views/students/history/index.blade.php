@@ -4,6 +4,53 @@
 
 @section('content')
 
+<style>
+.lesson-history-monkey {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-left: -10px;
+    margin-top: -8px;
+    flex-shrink: 0;
+}
+
+.lesson-monkey-area {
+    display: flex;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.lesson-history-monkey {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.lesson-monkey-bubble {
+    margin-left: 8px;
+
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+
+    padding: 8px 12px;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.4s ease;
+}
+
+.lesson-monkey-bubble.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+</style>
+
 <div class="container-fluid">
 
     {{-- ===============================
@@ -11,15 +58,30 @@
     ================================ --}}
     <div class="d-flex justify-content-between align-items-start mb-4">
 
-        <div>
-            <h2 class="fw-bold mb-1">
-                Lesson History
-            </h2>
+       <div class="d-flex align-items-center mb-1">
 
-            <p class="text-secondary mb-0">
-                View your completed lessons.
-            </p>
+    <h2 class="fw-bold mb-0">
+        Lesson History
+    </h2>
+
+    <div class="lesson-monkey-area">
+
+        <img
+            src="{{ asset('images/kk-monkey-cap.png') }}"
+            alt="KK English Monkey"
+            class="lesson-history-monkey"
+        >
+
+        <div
+            id="lessonMonkeyBubble"
+            class="lesson-monkey-bubble"
+        >
+            Great job!
         </div>
+
+    </div>
+
+</div>
 
 
         {{-- Point History --}}
@@ -345,5 +407,29 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const bubble =
+            document.getElementById('lessonMonkeyBubble');
+
+        if (bubble) {
+
+            setTimeout(() => {
+                bubble.classList.add('show');
+            }, 300);
+
+            setTimeout(() => {
+                bubble.classList.remove('show');
+            }, 3500);
+
+        }
+    }
+);
+</script>
+
 
 @endsection
