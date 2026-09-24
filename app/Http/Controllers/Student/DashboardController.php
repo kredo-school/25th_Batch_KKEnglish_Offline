@@ -46,7 +46,7 @@ class DashboardController extends Controller
             ])
 
             ->orderBy('start_at')
-            ->get()
+            ->paginate(3)
             ->map(function ($reservation) {
 
                 $reservation->statusType = match (true) {
@@ -58,7 +58,7 @@ class DashboardController extends Controller
 
                     default => 'upcoming',
                 };
-
+                
                 return $reservation;
             });
 

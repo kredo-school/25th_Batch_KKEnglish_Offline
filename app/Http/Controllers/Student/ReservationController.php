@@ -618,7 +618,7 @@ class ReservationController extends Controller
                 'status',
             ])
             ->orderBy('start_at')
-            ->get();
+            ->paginate(10);
 
         /*
          * 予約履歴
