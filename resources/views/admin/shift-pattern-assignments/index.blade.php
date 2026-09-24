@@ -110,7 +110,7 @@
                                     <td class="text-center">
                                         <div class="d-flex flex-column gap-1">
 
-                                            @foreach($assignments as $assignment)
+                                            {{-- @foreach($assignments as $assignment)
 
                                                 <div class="d-inline-flex align-items-center gap-1">
 
@@ -135,13 +135,13 @@
                                                         </button>
                                                     </form>
                                                 </div>
-                                            @endforeach
+                                            @endforeach --}}
 
                                             {{-- Teacher単位の一括変更 --}}
                                             <div class="mt-1">
                                                 <a href="{{ route('admin.shift-pattern-assignments.bulk-edit', $teacher) }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    Bulk Edit
+                                                    class="btn btn-outline-primary btn-sm">
+                                                     Edit
                                                 </a>
                                             </div>
 

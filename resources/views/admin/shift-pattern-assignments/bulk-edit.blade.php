@@ -39,6 +39,9 @@
         @csrf
         @method('PUT')
 
+        {{-- この画面は曜日単位の一括変更なので weekly 固定 --}}
+    <input type="hidden" name="assignment_type" value="weekly">
+
         <div class="card">
             <div class="card-body">
 
@@ -49,7 +52,7 @@
                         @foreach($weekdayNames as $num => $name)
                             <div class="col-6 col-md-3 mb-2">
                                 <div class="form-check">
-                                    <input class="form-check-input"
+                                    <input class="form-check-input weekday-checkbox"
                                            type="checkbox"
                                            name="weekdays[]"
                                            value="{{ $num }}"
@@ -153,8 +156,39 @@
             </div>
         </div>
     </form>
+
     <hr class="my-4">
-<div class="card border-danger mb-4">
+
+    <div class="card border-warning mb-4">
+        <div class="card-body">
+            <h5 class="text-warning">Delete Selected Weekdays</h5>
+
+            <p class="text-muted small">
+                Deletes future unreserved shifts only for the weekdays selected above.
+                Reserved lessons and past shifts will not be deleted.
+            </p>
+
+            <form
+                id="bulk-delete-form"
+                action="{{ route('admin.shift-pattern-assignments.bulk-destroy', $teacher) }}"
+                method="POST"
+                onsubmit="return prepareBulkDelete();"
+            >
+                @csrf
+                @method('DELETE')
+
+                <div id="bulk-delete-weekdays"></div>
+
+                <button
+                    type="submit"
+                    class="btn btn-warning"
+                >
+                    Delete Selected Weekday Shifts
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div class="card-body">
         <h5 class="text-danger">All Shifts Deletion</h5>
         <p class="text-muted small">
@@ -167,5 +201,35 @@
         </form>
     </div>
 </div>
-</div>
+
+<script>
+    function prepareBulkDelete() {
+        const checkedWeekdays = document.querySelectorAll(
+            '.weekday-checkbox:checked'
+        );
+
+        if (checkedWeekdays.length === 0) {
+            alert('Please select at least one weekday.');
+            return false;
+        }
+
+        const container = document.getElementById('bulk-delete-weekdays');
+
+        container.innerHTML = '';
+
+        checkedWeekdays.forEach(function (checkbox) {
+            const input = document.createElement('input');
+
+            input.type = 'hidden';
+            input.name = 'weekdays[]';
+            input.value = checkbox.value;
+
+            container.appendChild(input);
+        });
+
+        return confirm(
+            'Are you sure you want to delete the future unreserved shifts for the selected weekdays?'
+        );
+    }
+</script>
 @endsection

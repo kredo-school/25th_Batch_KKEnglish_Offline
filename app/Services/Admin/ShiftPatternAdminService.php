@@ -3,7 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Models\ShiftPattern;
-use App\Models\TeacherShiftAssignment;
+use App\Models\TeacherShiftPatternAssignment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use DomainException;

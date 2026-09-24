@@ -7,6 +7,7 @@ use App\Models\ShiftPattern;
 use App\Models\Teacher;
 use App\Models\TeacherSchedule;
 use App\Models\TeacherShiftPatternAssignment;
+use App\Models\ScheduleException; // スケジュール例外モデル
 use App\Services\Admin\TeacherScheduleGenerationService; // スケジュール生成サービス
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -89,7 +90,7 @@ class ShiftPatternAssignmentController extends Controller
             } else {
             $weekdays   = collect($data['weekdays'])->map(fn($v) => (int)$v)->unique()->values();
             if ($weekdays->isEmpty()) {
-                return back()->withInput()->withErrors(['weekdays' => '曜日を選択してください。']);
+                return back()->withInput()->withErrors(['weekdays' => 'Select the weekdays you want to modify.']);
             }
             // $endDate    = !empty($data['end_date']) ? $data['end_date'] : null;
             // $now        = now();
@@ -288,6 +289,172 @@ class ShiftPatternAssignmentController extends Controller
             ->with('status', "Teacher #{$teacher->id} の割り当てと、未来の未予約シフトを一括削除しました。（休講記録は保持されます）");
     }
 
+/**
+ * Bulk Editで選択した曜日の未来の未予約Shiftを削除
+ *
+ * - 選択した曜日だけ対象
+ * - 今日以降だけ対象
+ * - confirmed / draft の両方を対象
+ * - 予約があるScheduleは削除しない
+ * - 過去のAssignmentは履歴として残す
+ * - 未来のAssignmentは終了させる
+ */
+public function bulkDestroy(
+    Teacher $teacher,
+    Request $request
+): RedirectResponse {
+    $data = $request->validate([
+        'weekdays' => ['required', 'array', 'min:1'],
+        'weekdays.*' => ['integer', 'between:0,6'],
+    ]);
+
+    $weekdays = collect($data['weekdays'])
+        ->map(fn ($value) => (int) $value)
+        ->unique()
+        ->values();
+
+    $today = now()->toDateString();
+    $yesterday = now()->subDay()->toDateString();
+
+    $deletedScheduleCount = 0;
+    $deletedAssignmentCount = 0;
+    $updatedAssignmentCount = 0;
+
+    try {
+        DB::transaction(function () use (
+            $teacher,
+            $weekdays,
+            $today,
+            $yesterday,
+            &$deletedScheduleCount,
+            &$deletedAssignmentCount,
+            &$updatedAssignmentCount
+        ) {
+
+            /*
+             * ----------------------------------------------------------
+             * 1. 今日以降の未予約Scheduleを取得
+             * ----------------------------------------------------------
+             *
+             * confirmed と draft の両方を対象にする。
+             */
+            $schedules = TeacherSchedule::query()
+                ->where('teacher_id', $teacher->id)
+                ->whereDate('available_date', '>=', $today)
+                ->whereIn('status', ['confirmed', 'draft'])
+                ->whereIn(
+                    DB::raw('DAYOFWEEK(available_date) - 1'),
+                    $weekdays->all()
+                )
+                ->whereDoesntHave('reservations')
+                ->get();
+
+            /*
+             * ----------------------------------------------------------
+             * 2. Scheduleを削除
+             * ----------------------------------------------------------
+             */
+            if ($schedules->isNotEmpty()) {
+
+                $scheduleIds = $schedules->pluck('schedule_id');
+
+                /*
+                 * ScheduleExceptionは履歴として残す。
+                 * ただし削除するScheduleとの紐付けだけ外す。
+                 */
+                ScheduleException::whereIn('schedule_id', $scheduleIds)
+                    ->update([
+                        'schedule_id' => null,
+                    ]);
+
+                $deletedScheduleCount = TeacherSchedule::query()
+                    ->whereIn('schedule_id', $scheduleIds)
+                    ->delete();
+            }
+
+            /*
+             * ----------------------------------------------------------
+             * 3. 選択された曜日のAssignmentを停止
+             * ----------------------------------------------------------
+             *
+             * 未来から始まるAssignment
+             * → Assignment自体を削除
+             *
+             * 過去から継続しているAssignment
+             * → 昨日までに終了させる
+             *
+             * こうすることで過去の履歴は残しつつ、
+             * 今後の自動Schedule生成を止める。
+             */
+            $assignments = TeacherShiftPatternAssignment::query()
+                ->where('teacher_id', $teacher->id)
+                ->whereIn('weekday', $weekdays->all())
+                ->where(function ($query) use ($today) {
+                    $query
+                        ->whereNull('end_date')
+                        ->orWhereDate('end_date', '>=', $today);
+                })
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($assignments as $assignment) {
+
+                /*
+                 * Assignmentが今日より前から始まっている場合
+                 * → 昨日で終了させる
+                 */
+                if ($assignment->start_date < $today) {
+
+                    $assignment->end_date = $yesterday;
+                    $assignment->save();
+
+                    $updatedAssignmentCount++;
+
+                } else {
+
+                    /*
+                     * 今日以降から始まるAssignmentなら
+                     * 完全に未来側なので削除する。
+                     */
+                    $assignment->delete();
+
+                    $deletedAssignmentCount++;
+                }
+            }
+        });
+
+        return redirect()
+            ->route(
+                'admin.shift-pattern-assignments.index',
+                $teacher
+            )
+            ->with(
+                'status',
+                "Successfully deleted the day shifts selected."
+                . " Schedule {$deletedScheduleCount} deleted, "
+                . " Assignment {$deletedAssignmentCount} deleted, "
+                . " {$updatedAssignmentCount} Assignments ended."
+            );
+
+    } catch (\Throwable $e) {
+
+        Log::error(
+            'ShiftPatternAssignment Bulk Destroy Error.',
+            [
+                'teacher_id' => $teacher->id,
+                'weekdays' => $weekdays->all(),
+                'error' => $e->getMessage(),
+            ]
+        );
+
+        return back()
+            ->withInput()
+            ->withErrors([
+                'error' => 'An error occurred while deleting the shifts: '
+                    . $e->getMessage(),
+            ]);
+    }
+}
     public function edit(TeacherShiftPatternAssignment $assignment): View
     {
         $assignment->load(['teacher.user', 'shiftPattern',
@@ -544,14 +711,18 @@ class ShiftPatternAssignmentController extends Controller
 public function bulkUpdate(Teacher $teacher, Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'assignment_type'     => ['required', 'string', 'in:weekly,specific_date'],
+            'assignment_type' => [
+                'required',
+                'string',
+                'in:weekly,specific_date'
+            ],
             'shift_pattern_id' => [
                 'required',
                 'integer',
                 'exists:shift_patterns,id',
             ],
             'weekdays' => [
-                'nullable',
+                'required',
                 'array',
                 'min:1',
             ],

@@ -224,6 +224,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
 
     Route::get('/shift-pattern-assignments/teacher/{teacher}/bulk-edit',[ShiftPatternAssignmentController::class, 'bulkEdit'])->name('shift-pattern-assignments.bulk-edit');
     Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
+    Route::delete('/shift-pattern-assignments/teachers/{teacher}/bulk-destroy',[ShiftPatternAssignmentController::class, 'bulkDestroy'])->name('shift-pattern-assignments.bulk-destroy');
 
     Route::delete('/shift-pattern-assignments/teacher/{teacher}', [ShiftPatternAssignmentController::class, 'destroyByTeacher'])->name('shift-pattern-assignments.destroy-by-teacher');
 
