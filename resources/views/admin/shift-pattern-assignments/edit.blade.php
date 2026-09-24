@@ -7,9 +7,9 @@
         <h1 class="h3 mb-0">
             Edit Shift Assignment
         </h1>
-        <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}" class="btn btn-secondary">
-            Back
-        </a>
+        {{-- <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-angles-left"></i> Back
+        </a> --}}
     </div>
 
     @if ($errors->any())
@@ -111,7 +111,7 @@
                     <button type="submit" class="btn btn-primary">
                         Update Assignment
                     </button>
-                    <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}" class="btn btn-secondary">
+                    <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}" class="btn btn-outline-secondary">
                         Cancel
                     </a>
                 </div>

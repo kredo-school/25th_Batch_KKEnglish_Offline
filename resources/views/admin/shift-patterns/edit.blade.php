@@ -154,6 +154,7 @@
 
         <div>
             <button type="submit" class="btn btn-primary">Update</button>
+            <a href="{{ route('admin.shift-patterns.index') }}" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </form>
 </div>

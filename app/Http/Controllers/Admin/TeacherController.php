@@ -222,13 +222,7 @@ class TeacherController extends Controller
             'certification' => ['nullable','string','max:255'],
             'about_me' => ['nullable','string'],
         ]);
-$previousStatus = (string) $teacher->user->status;
-        DB::transaction(function () use (
-    $teacher,
-    $data,
-    $previousStatus,
-    $teacherScheduleStatusService
-) {
+DB::transaction(function () use ($data) {
             $teacherRoleId = Role::query()->where('role_code', 'teacher')->value('id');
             if (!$teacherRoleId) {
                 throw ValidationException::withMessages(['role' => 'teacherロールが見つかりません。rolesテーブルを確認してください。']);

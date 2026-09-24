@@ -6,10 +6,10 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">Bulk Edit Teacher Assignments</h1>
 
-        <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}"
+        {{-- <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}"
            class="btn btn-outline-secondary btn-sm">
-            Back
-        </a>
+            <i class="fa-solid fa-angles-left"></i> Back
+        </a> --}}
     </div>
 
     @if ($errors->any())
@@ -66,7 +66,7 @@
                     </div>
 
                     <div class="form-text">
-                        変更したい曜日を選択してください。
+                        Select the weekdays you want to modify.
                     </div>
                 </div>
 
@@ -116,7 +116,7 @@
                                value="{{ old('end_date', $defaultEndDate) }}">
 
                         <div class="form-text">
-                            空欄の場合は終了日なしです。
+                            If left blank, there will be no end date.
                         </div>
                     </div>
                 </div>
@@ -136,20 +136,18 @@
                 </div>
 
                 <div class="alert alert-warning">
-                    <strong>注意：</strong>
-                    指定した開始日以降の同じ先生・同じ曜日の既存Assignmentは、
-                    新しいAssignmentに置き換えられます。
+                    <strong>Caution:</strong>
+                    Existing assignments for the same teacher and the same weekday after the specified start date will be replaced with the new assignment.
                 </div>
 
                 <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Save Changes
+                    </button>
                     <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}"
                        class="btn btn-outline-secondary">
                         Cancel
                     </a>
-
-                    <button type="submit" class="btn btn-primary">
-                        Save Changes
-                    </button>
                 </div>
 
             </div>
@@ -158,14 +156,14 @@
     <hr class="my-4">
 <div class="card border-danger mb-4">
     <div class="card-body">
-        <h5 class="text-danger">全シフトの一括削除</h5>
+        <h5 class="text-danger">All Shifts Deletion</h5>
         <p class="text-muted small">
-            この先生に設定されているすべてのシフト割り当てと、未来の未予約スケジュールを全て削除します。（予約済みのレッスンは削除されません）
+            Deletes all shift assignments for this teacher and all future unreserved schedules. (Reserved lessons will not be deleted.)
         </p>
-        <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}" method="POST" onsubmit="return confirm('本当にこの先生のすべてのシフトを一括削除しますか？');">
+        <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete all shifts for this teacher?');">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-danger">一括削除を実行する</button>
+            <button type="submit" class="btn btn-danger">Execute Bulk Deletion</button>
         </form>
     </div>
 </div>

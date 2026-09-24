@@ -110,6 +110,7 @@
         </div> --}}
 
         <button type="submit" class="btn btn-primary">Assign Shift</button>
+        <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}" class="btn btn-outline-secondary">Cancel</a>
     </form>
 </div>
 
