@@ -141,7 +141,10 @@ class ReviewController extends Controller
         if (
             $reservation->status->status_code
             !==
-            'completed'
+            'completed' &&
+            $reservation->status->status_code
+            !==
+            'awaiting_result'
         ) {
             throw ValidationException::withMessages([
                 'review' =>

@@ -35,9 +35,9 @@ class LessonHistoryController extends Controller
             'lessonRecord',
             'review',
         ])
-        
+
         ->orderByDesc('start_at')
-        ->get();
+        ->paginate(10);
 
     return view(
         'students.history.index',

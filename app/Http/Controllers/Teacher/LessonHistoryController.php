@@ -64,7 +64,7 @@ class LessonHistoryController extends Controller
              * 新しい授業から表示
              */
             ->orderByDesc('start_at')
-            ->get();
+            ->paginate(10);
 
         /*
          * ========================================
@@ -105,7 +105,7 @@ class LessonHistoryController extends Controller
              * 新しい授業から表示
              */
             ->orderByDesc('start_at')
-            ->get();
+            ->paginate(10);
 
         return view(
             'teachers.history.index',

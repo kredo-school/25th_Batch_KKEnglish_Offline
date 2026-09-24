@@ -128,12 +128,31 @@
 
                                 {{-- Student --}}
                                 <td>
+                                    <div class="d-flex align-items-center">
+                                        @if (
+                                            $reservation->student
+                                                ?->user
+                                                ?->profile_image
+                                        )
+                                            <img
+                                                src="{{ asset('storage/' . $reservation->student->user->profile_image) }}"
+                                                alt="{{ $reservation->student->user->first_name }}"
+                                                width="40"
+                                                height="40"
+                                                class="rounded-circle me-2"
+                                                style="object-fit: cover;"
+                                            >
+                                        @else
+                                            <i class="fa-solid fa-circle-user fa-3x me-2"></i>
+                                        @endif
 
-                                    <i class="fa-solid fa-circle-user me-2"></i>
+                                        <div>
+                                            {{ $reservation->student->user->first_name }}
 
-                                    {{ $reservation->student->user->first_name }}
+                                            {{ $reservation->student->user->last_name }}
+                                        </div>
 
-                                    {{ $reservation->student->user->last_name }}
+                                    </div>
 
                                 </td>
 

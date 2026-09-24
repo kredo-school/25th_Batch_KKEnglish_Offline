@@ -58,7 +58,7 @@ class ReservationController extends Controller
          */
         $upcomingReservations = Reservation::query()
             ->where('teacher_id', $teacher->id)
-            ->where('start_at', '>', today()->endOfDay())
+            ->where('start_at', '>', now())
             ->whereHas('status', function ($query) {
                 $query->whereIn('status_code', [
                     'pending',

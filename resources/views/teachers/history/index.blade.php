@@ -159,7 +159,7 @@
                                             )
 
                                                 <img
-                                                    src="{{ $reservation->student->user->profile_image }}"
+                                                    src="{{ asset('storage/' . $reservation->student->user->profile_image) }}"
                                                     alt="{{ $reservation->student->user->first_name }}"
                                                     width="40"
                                                     height="40"
@@ -173,7 +173,7 @@
                                                     class="
                                                         fa-solid
                                                         fa-circle-user
-                                                        fa-2x
+                                                        fa-3x
                                                         text-secondary
                                                         me-2
                                                     "
@@ -426,7 +426,7 @@
                                             )
 
                                                 <img
-                                                    src="{{ $reservation->student->user->profile_image }}"
+                                                    src="{{ asset('storage/' . $reservation->student->user->profile_image) }}"
                                                     alt="{{ $reservation->student->user->first_name }}"
                                                     width="40"
                                                     height="40"
@@ -440,7 +440,7 @@
                                                     class="
                                                         fa-solid
                                                         fa-circle-user
-                                                        fa-2x
+                                                        fa-3x
                                                         text-secondary
                                                         me-2
                                                     "
