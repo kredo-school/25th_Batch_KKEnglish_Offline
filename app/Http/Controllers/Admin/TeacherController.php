@@ -222,7 +222,8 @@ class TeacherController extends Controller
             'certification' => ['nullable','string','max:255'],
             'about_me' => ['nullable','string'],
         ]);
-DB::transaction(function () use ($data) {
+
+            DB::transaction(function () use ($data) {
             $teacherRoleId = Role::query()->where('role_code', 'teacher')->value('id');
             if (!$teacherRoleId) {
                 throw ValidationException::withMessages(['role' => 'teacherロールが見つかりません。rolesテーブルを確認してください。']);
@@ -249,7 +250,7 @@ DB::transaction(function () use ($data) {
             ]);
         });
 
-        return redirect()->route('admin.teachers.index')->with('success', '講師を登録しました。');
+        return redirect()->route('admin.teachers.index')->with('success', 'Registered successfully.');
     }
 
     public function show(Teacher $teacher): View
