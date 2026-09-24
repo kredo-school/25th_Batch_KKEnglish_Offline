@@ -167,7 +167,7 @@
                             <i class="fa-solid fa-star text-warning"></i>
 
                             <span class="fw-semibold">
-                                {{ number_format($teacher->reviews_avg_rating ?? 0, 1) }}
+                                {{ number_format($teacher->reviews_avg_rating ?? 3, 1) }}
                             </span>
 
                             <span class="text-secondary">
@@ -457,14 +457,13 @@
                             <i class="fa-solid fa-star text-warning"></i>
 
                             <span class="fw-semibold">
-                                {{ number_format($teacher->reviews_avg_rating ?? 0, 1) }}
+                                {{ number_format($teacher->reviews_avg_rating ?? 3, 1) }}
                             </span>
 
                             <span class="text-secondary">
                                 ({{ $teacher->reviews_count ?? 0 }})
                             </span>
                         </div>
-
 
                         {{-- ===============================
                              Nationality

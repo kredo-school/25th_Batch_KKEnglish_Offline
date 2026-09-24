@@ -159,7 +159,18 @@
                                             )
 
                                                 <img
-                                                    src="{{ asset('storage/' . $reservation->student->user->profile_image) }}"
+
+                                                    src="{{ str_starts_with(
+                                                        $reservation->student->user->profile_image,
+                                                        'http'
+                                                    )
+                                                        ? $reservation->student->user->profile_image
+                                                        : asset(
+                                                            'storage/' .
+                                                            $reservation->student->user->profile_image
+                                                        )
+                                                    }}"
+
                                                     alt="{{ $reservation->student->user->first_name }}"
                                                     width="40"
                                                     height="40"
@@ -169,14 +180,14 @@
 
                                             @else
 
-                                                <i
+                                               <i
                                                     class="
                                                         fa-solid
                                                         fa-circle-user
-                                                        fa-3x
                                                         text-secondary
                                                         me-2
                                                     "
+                                                    style="font-size: 40px;"
                                                 ></i>
 
                                             @endif
@@ -414,7 +425,7 @@
 
 
                                     {{-- Student --}}
-                                    <td>
+                                   <td>
 
                                         <div class="d-flex align-items-center">
 
@@ -426,7 +437,18 @@
                                             )
 
                                                 <img
-                                                    src="{{ asset('storage/' . $reservation->student->user->profile_image) }}"
+
+                                                    src="{{ str_starts_with(
+                                                        $reservation->student->user->profile_image,
+                                                        'http'
+                                                    )
+                                                        ? $reservation->student->user->profile_image
+                                                        : asset(
+                                                            'storage/' .
+                                                            $reservation->student->user->profile_image
+                                                        )
+                                                    }}"
+
                                                     alt="{{ $reservation->student->user->first_name }}"
                                                     width="40"
                                                     height="40"
@@ -440,10 +462,10 @@
                                                     class="
                                                         fa-solid
                                                         fa-circle-user
-                                                        fa-3x
                                                         text-secondary
                                                         me-2
                                                     "
+                                                    style="font-size: 40px;"
                                                 ></i>
 
                                             @endif

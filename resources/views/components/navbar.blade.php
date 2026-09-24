@@ -90,7 +90,15 @@
 
                     @else
 
-                        <i class="fa-solid fa-circle-user me-2 fa-2x"></i>
+                       <i
+                                                class="
+                                                    fa-solid
+                                                    fa-circle-user
+                                                    text-secondary
+                                                    me-2
+                                                "
+                                                style="font-size: 40px;"
+                                            ></i>
 
                     @endif
 

@@ -217,14 +217,14 @@
 
                         @else
 
-                            <i
+                           <i
                                 class="
                                     fa-solid
                                     fa-circle-user
                                     me-2
-                                    fa-2x
                                     text-secondary
                                 "
+                                style="font-size: 45px;"
                             ></i>
 
                         @endif
