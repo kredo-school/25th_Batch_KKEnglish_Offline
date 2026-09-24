@@ -8,12 +8,8 @@ use Illuminate\Support\Facades\Hash;
 
 class TeacherProfileSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Sample teacher profile data (10 teachers)
         $teachers = [
             [
                 'first_name' => 'Mary Jane',
@@ -175,39 +171,173 @@ class TeacherProfileSeeder extends Seeder
                 'specialty' => 'TOEIC Preparation, Presentation Skills, Executive Business',
                 'rating_average' => 4.98,
             ],
+            [
+                'first_name' => 'Neil',
+                'last_name' => 'Kredo',
+                'email' => 'neil.kredo@example.com',
+                'gender' => 'Male',
+                'nationality' => 'Philippines',
+                'profile_image' => 'https://assets.st-note.com/img/1764099014-SCQmaFc4LeKBgb7lxX2U9huH.png?width=1200',
+                'biography' => 'An IT instructor from Naga, Cebu who enjoys programming personal projects and sharing practical skills and experience with students.',
+                'point_consumed' => 120,
+                'career' => 'IT Instructor at Kredo',
+                'graduation_school' => 'Not publicly specified',
+                'certification' => 'Not publicly specified',
+                'about_me' => 'I enjoy programming personal projects and continuously learning new technologies. Keep learning for a brighter future!',
+                'specialty' => 'Programming Fundamentals, Web Development, Project-Based Learning',
+                'rating_average' => 4.90,
+            ],
+            [
+                'first_name' => 'John',
+                'last_name' => 'Kredo',
+                'email' => 'john.kredo@example.com',
+                'gender' => 'Male',
+                'nationality' => 'Philippines',
+                'profile_image' => 'https://assets.st-note.com/img/1764099045-Y3I5RK9eMWtEkiyBpGbPlrJd.png?width=1200',
+                'biography' => 'An IT instructor from Bilar, Bohol who enjoys building websites, learning new web technologies, mobile games, and basketball.',
+                'point_consumed' => 120,
+                'career' => 'IT Instructor at Kredo',
+                'graduation_school' => 'Not publicly specified',
+                'certification' => 'Not publicly specified',
+                'about_me' => 'I enjoy creating websites and learning new languages for web development. I am happy to share my web development experience with students.',
+                'specialty' => 'Web Development, Programming Fundamentals, Front-End Development',
+                'rating_average' => 4.88,
+            ],
+            [
+                'first_name' => 'Quisie',
+                'last_name' => 'Kredo',
+                'email' => 'quisie.kredo@example.com',
+                'gender' => 'Female',
+                'nationality' => 'Philippines',
+                'profile_image' => 'https://assets.st-note.com/img/1764099092-SaZv1Vfbsuwydirx5KonCB4O.png?width=1200',
+                'biography' => 'An IT instructor from Mactan, Cebu who enjoys movies, reading, spending time with family, and helping students overcome difficult programming challenges.',
+                'point_consumed' => 100,
+                'career' => 'IT Instructor at Kredo',
+                'graduation_school' => 'Not publicly specified',
+                'certification' => 'Not publicly specified',
+                'about_me' => 'I enjoy reading, watching movies, and spending time with my family and cat. My advice to learners is simple: love your errors and keep learning from them.',
+                'specialty' => 'Programming Fundamentals, Debugging, Beginner Web Development',
+                'rating_average' => 4.91,
+            ],
+            [
+                'first_name' => 'Shem',
+                'last_name' => 'Kredo',
+                'email' => 'shem.kredo@example.com',
+                'gender' => 'Female',
+                'nationality' => 'Philippines',
+                'profile_image' => 'https://assets.st-note.com/img/1764099128-nWjl7M8R2PBZ4ixqNgATauUf.png?width=1200',
+                'biography' => 'An IT instructor from Compostela, Cebu who enjoys badminton, fashion, movies, and helping students understand IT and programming in English.',
+                'point_consumed' => 110,
+                'career' => 'IT Instructor at Kredo',
+                'graduation_school' => 'Not publicly specified',
+                'certification' => 'Not publicly specified',
+                'about_me' => 'I enjoy meeting new students every month and helping them build the skills they need for global companies, remote work, and better career opportunities.',
+                'specialty' => 'Programming Fundamentals, Career-Oriented IT Skills, Web Development',
+                'rating_average' => 4.93,
+            ],
+            [
+                'first_name' => 'Garry',
+                'last_name' => 'Kredo',
+                'email' => 'garry.kredo@example.com',
+                'gender' => 'Male',
+                'nationality' => 'Philippines',
+                'profile_image' => 'https://assets.st-note.com/img/1764099178-2XZyhHiYosMfOBD5Gt7Wzjvk.png?width=1200',
+                'biography' => 'An IT instructor from Bayawan City, Negros Oriental who is passionate about software development, computers, chess, and teaching practical programming skills.',
+                'point_consumed' => 150,
+                'career' => 'IT Instructor at Kredo',
+                'graduation_school' => 'Not publicly specified',
+                'certification' => 'Not publicly specified',
+                'about_me' => 'I enjoy software development, computer-related activities, and online chess. I like helping motivated students turn ideas into working applications.',
+                'specialty' => 'Software Development, Application Development, Advanced Programming',
+                'rating_average' => 4.97,
+            ],
+            [
+                'first_name' => 'Edo',
+                'last_name' => 'Kredo',
+                'email' => 'edo.kredo@example.com',
+                'gender' => 'Male',
+                'nationality' => 'Philippines',
+                'profile_image' => 'https://assets.st-note.com/img/1764099208-O3DBvHQwIP4UogCNaej2tEGf.png?width=1200',
+                'biography' => 'An IT instructor from Apas, Cebu who enjoys mobile and computer games and likes helping students learn programming step by step.',
+                'point_consumed' => 100,
+                'career' => 'IT Instructor at Kredo',
+                'graduation_school' => 'Not publicly specified',
+                'certification' => 'Not publicly specified',
+                'about_me' => 'I enjoy gaming and spending time with my family. I am happy when students learn programming and become able to build things by themselves.',
+                'specialty' => 'Programming Fundamentals, Beginner Coding, Web Development',
+                'rating_average' => 4.89,
+            ],
+            [
+                'first_name' => 'Kurt',
+                'last_name' => 'Kredo',
+                'email' => 'kurt.kredo@example.com',
+                'gender' => 'Male',
+                'nationality' => 'Philippines',
+                'profile_image' => 'https://assets.st-note.com/img/1764099266-WFImA2P9c3tbKfHuXerOaNQd.png?width=1200',
+                'biography' => 'An IT instructor from Lahug, Cebu who enjoys gaming and communicating with students while supporting them through the challenges of learning IT and English.',
+                'point_consumed' => 100,
+                'career' => 'IT Instructor at Kredo',
+                'graduation_school' => 'Not publicly specified',
+                'certification' => 'Not publicly specified',
+                'about_me' => 'I enjoy games and talking with students. Learning IT and English can be difficult at first, but consistent effort will lead to improvement.',
+                'specialty' => 'Programming Fundamentals, IT English, Beginner Web Development',
+                'rating_average' => 4.87,
+            ],
         ];
 
         foreach ($teachers as $teacher) {
-            // 1. Insert into users table
+
+            /*
+            |--------------------------------------------------------------------------
+            | Skip already registered teachers
+            |--------------------------------------------------------------------------
+            */
+            $existingUser = DB::table('users')
+                ->where('email', $teacher['email'])
+                ->first();
+
+            if ($existingUser) {
+                continue;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | 1. Insert into users table
+            |--------------------------------------------------------------------------
+            */
             $userId = DB::table('users')->insertGetId([
-                'first_name'        => $teacher['first_name'],
-                'last_name'         => $teacher['last_name'],
-                'role_id'           => 2,
-                'email'             => $teacher['email'],
-                'phone_number'      => '09' . rand(100000000, 999999999),
-                'profile_image'     => $teacher['profile_image'],
-                'nationality'       => $teacher['nationality'],
-                'gender'            => $teacher['gender'],
-                'status'            => 'active',
+                'first_name' => $teacher['first_name'],
+                'last_name' => $teacher['last_name'],
+                'role_id' => 2,
+                'email' => $teacher['email'],
+                'phone_number' => '09' . rand(100000000, 999999999),
+                'profile_image' => $teacher['profile_image'],
+                'nationality' => $teacher['nationality'],
+                'gender' => $teacher['gender'],
+                'status' => 'active',
                 'email_verified_at' => now(),
-                'password'          => Hash::make('password123'),
-                'created_at'        => now(),
-                'updated_at'        => now(),
+                'password' => Hash::make('password123'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
-            // 2. Insert into teachers table
+            /*
+            |--------------------------------------------------------------------------
+            | 2. Insert into teachers table
+            |--------------------------------------------------------------------------
+            */
             DB::table('teachers')->insert([
-                'user_id'           => (string)$userId,
-                'biography'         => $teacher['biography'],
-                'point_consumed'    => $teacher['point_consumed'],
-                'career'            => $teacher['career'],
+                'user_id' => (string) $userId,
+                'biography' => $teacher['biography'],
+                'point_consumed' => $teacher['point_consumed'],
+                'career' => $teacher['career'],
                 'graduation_school' => $teacher['graduation_school'],
-                'certification'     => $teacher['certification'],
-                'about_me'          => $teacher['about_me'],
-                'specialty'         => $teacher['specialty'],
-                'rating_average'    => $teacher['rating_average'],
-                'created_at'        => now(),
-                'updated_at'        => now(),
+                'certification' => $teacher['certification'],
+                'about_me' => $teacher['about_me'],
+                'specialty' => $teacher['specialty'],
+                'rating_average' => $teacher['rating_average'],
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }
