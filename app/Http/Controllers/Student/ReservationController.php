@@ -73,7 +73,8 @@ class ReservationController extends Controller
 
 
         $teachers =
-            $this->teacherSearchService->search();
+            $this->teacherSearchService
+                 ->search();
 
 
         $favoriteTeacherIds = TeacherLike::query()
