@@ -147,6 +147,12 @@
     background-color: #f8f9fa;
 }
 
+.today-lessons-scroll {
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
 
 /* =========================================
    FullCalendar
@@ -285,6 +291,8 @@
                     </div>
 
                 </div>
+
+              <div class="today-lessons-scroll">
 
 
                 @forelse ($todayLessons as $lesson)
@@ -571,6 +579,8 @@
 
                 @endforelse
 
+              </div>
+
 
             </div>
 
@@ -707,52 +717,73 @@
             ========================================== --}}
             <div class="card flex-grow-1">
 
-                <div class="card-body p-4">
+    <div class="card-body p-4">
 
-                    <h5 class="dashboard-section-title mb-3">
-                        Announcements
-                    </h5>
+        {{-- Title --}}
+        <div class="d-flex justify-content-between align-items-center mb-3">
 
-                    @forelse ($announcements as $announcement)
+            <h5 class="dashboard-section-title mb-0">
+                Announcements
+            </h5>
 
-                        <div
-                            class="
-                                border-bottom
-                                pb-3
-                                mb-3
-                            "
-                        >
-
-                            <div class="fw-semibold mb-1">
-
-                                {{ $announcement->title }}
-
-                            </div>
+        </div>
 
 
-                            <div class="text-secondary small">
+        {{-- Announcements --}}
+        @forelse ($announcements as $announcement)
 
-                                {{ $announcement->content }}
+            <div class="border-bottom pb-2 mb-2">
 
-                            </div>
+                {{-- Title / Date --}}
+                <div class="d-flex justify-content-between gap-3 mb-1">
 
-                        </div>
+                    <div class="fw-semibold">
+                        {{ $announcement->title }}
+                    </div>
 
-                    @empty
-
-                        <div class="text-center py-3">
-
-                            <p class="text-secondary mb-0">
-                                No announcements.
-                            </p>
-
-                        </div>
-
-                    @endforelse
+                    <small class="text-secondary text-nowrap">
+                        {{ $announcement->created_at?->format('M d') }}
+                    </small>
 
                 </div>
 
+
+                {{-- Content --}}
+                <div class="text-secondary small">
+                    {{ $announcement->content }}
+                </div>
+
             </div>
+
+        @empty
+
+            <div class="text-center py-3">
+
+                <p class="text-secondary mb-0">
+                    No announcements.
+                </p>
+
+            </div>
+
+        @endforelse
+
+
+        {{-- View All --}}
+        <div class="text-end">
+
+            <a
+                href="#"
+                class="small text-decoration-none"
+            >
+                View All
+                <i class="fa-solid fa-chevron-right ms-1"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
 
 
         </div>
@@ -767,7 +798,7 @@
     {{-- =====================================================
          Reservation Calendar
     ====================================================== --}}
-    <div class="row mt-5">
+    <div class="row mt-4">
 
         <div class="col-12">
 

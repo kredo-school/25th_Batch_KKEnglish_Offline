@@ -216,11 +216,11 @@
                                                 <div
                                                     class="
                                                         rounded-circle
-                                                        bg-light
                                                         d-flex
+                                                        bg-secondary
                                                         justify-content-center
                                                         align-items-center
-                                                        text-secondary
+                                                        text-white
                                                         me-2
                                                     "
                                                     style="
@@ -346,6 +346,23 @@
                     </tbody>
 
                 </table>
+
+            </div>
+
+            {{-- Pagination --}}
+            <div class="d-flex justify-content-between align-items-center px-3 py-3">
+
+                <small class="text-secondary">
+                    {{ $pointTransactions->firstItem() }}
+                    -
+                    {{ $pointTransactions->lastItem() }}
+                    /
+                    {{ $pointTransactions->total() }}
+                </small>
+
+                <div>
+                    {{ $pointTransactions->onEachSide(1)->links('pagination::bootstrap-5') }}
+                </div>
 
             </div>
 

@@ -100,7 +100,10 @@
                         |--------------------------------------------------------------------------
                         */
 
-        .teacher-profile-card,
+        .teacher-profile-card {
+            height: auto;
+        }
+
         .schedule-card {
             height: 750px;
         }

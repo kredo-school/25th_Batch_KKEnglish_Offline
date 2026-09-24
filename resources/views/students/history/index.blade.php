@@ -227,11 +227,11 @@
                                             <div
                                                 class="
                                                     rounded-circle
-                                                    bg-light
+                                                    bg-secondary
                                                     d-flex
                                                     justify-content-center
                                                     align-items-center
-                                                    text-secondary
+                                                    text-white
                                                     me-2
                                                 "
                                                 style="
@@ -402,7 +402,22 @@
 
             </div>
 
-        </div>
+            {{-- Pagination --}}
+           <div class="d-flex justify-content-between align-items-center px-3 py-3">
+
+                <small class="text-secondary">
+                    {{ $reservations->firstItem() }}
+                    -
+                    {{ $reservations->lastItem() }}
+                    /
+                    {{ $reservations->total() }}
+                </small>
+
+                <div>
+                    {{ $reservations->onEachSide(1)->links('pagination::bootstrap-5') }}
+                </div>
+
+            </div>
 
     </div>
 
