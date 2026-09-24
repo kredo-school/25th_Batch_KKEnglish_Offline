@@ -27,9 +27,7 @@ return new class extends Migration
     {
         Schema::table('reservations', function (Blueprint $table) {
             if (Schema::hasColumn('reservations', 'is_auto_assigned')) {
-                Schema::table('reservations', function (Blueprint $table) {
-                    $table->dropColumn('is_auto_assigned');
-                });
+                $table->dropColumn('is_auto_assigned');
             }
         });
     }
