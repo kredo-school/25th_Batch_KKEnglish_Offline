@@ -45,7 +45,7 @@ class PointHistoryController extends Controller
             ->orderByDesc(
                 'transaction_id'
             )
-            ->get();
+            ->paginate(10);
 
         /*
          * ========================================

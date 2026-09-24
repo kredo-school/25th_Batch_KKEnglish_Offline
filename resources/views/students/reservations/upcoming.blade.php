@@ -4,16 +4,71 @@
 
 @section('content')
 
+<style>
+.upcoming-monkey-area {
+    display: flex;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.upcoming-monkey {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.upcoming-monkey-bubble {
+    margin-left: 8px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.4s ease;
+}
+
+.upcoming-monkey-bubble.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+</style>
+
 <div class="container-fluid">
 
     {{-- ===============================
-         Title
-    ================================ --}}
+        Title
+    =============================== --}}
     <div class="mb-4">
 
-        <h2 class="fw-bold mb-1">
-            Upcoming Lessons
-        </h2>
+        <div class="d-flex align-items-center mb-1">
+
+            <h2 class="fw-bold mb-0">
+                Upcoming Lessons
+            </h2>
+
+            <div class="upcoming-monkey-area">
+
+                <img
+                    src="{{ asset('images/kk-monkey.png') }}"
+                    alt="KK English Monkey"
+                    class="upcoming-monkey"
+                >
+
+                <div
+                    id="upcomingMonkeyBubble"
+                    class="upcoming-monkey-bubble"
+                >
+                    Enjoy your lesson!
+                </div>
+
+            </div>
+
+        </div>
 
         <p class="text-secondary mb-0">
             View and manage your upcoming reservations.
@@ -203,11 +258,11 @@
                                                 <div
                                                     class="
                                                         rounded-circle
-                                                        bg-light
+                                                        bg-secondary
                                                         d-flex
                                                         justify-content-center
                                                         align-items-center
-                                                        text-secondary
+                                                        text-white
                                                         me-2
                                                     "
                                                     style="
@@ -608,5 +663,28 @@
     @endif
 
 </div>
+
+<script>
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const bubble =
+            document.getElementById('upcomingMonkeyBubble');
+
+        if (bubble) {
+
+            setTimeout(() => {
+                bubble.classList.add('show');
+            }, 300);
+
+            setTimeout(() => {
+                bubble.classList.remove('show');
+            }, 3500);
+
+        }
+    }
+);
+</script>
 
 @endsection
