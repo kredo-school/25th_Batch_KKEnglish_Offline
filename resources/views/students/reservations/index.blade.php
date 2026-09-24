@@ -186,36 +186,32 @@
 
 
                             {{-- Rating --}}
-                            <div class="
-                                                                d-flex
-                                                                align-items-center
-                                                                gap-1
-                                                                border
-                                                                rounded
-                                                                px-2
-                                                                py-1
-                                                                mb-2
-                                                                align-self-start
-                                                            "
+                            <div
+                                class="
+                                    d-flex
+                                    align-items-center
+                                    gap-1
+                                    border
+                                    rounded
+                                    px-2
+                                    py-1
+                                    mb-2
+                                    align-self-start
+                                "
                                 style="
-                                                                font-size: 13px;
-                                                                min-height: 30px;
-                                                            ">
-                                @if (($teacher->reviews_count ?? 0) > 0)
-                                    <i class="fa-solid fa-star text-warning"></i>
+                                    font-size: 13px;
+                                    min-height: 30px;
+                                "
+                            >
+                                <i class="fa-solid fa-star text-warning"></i>
 
-                                    <span class="fw-semibold">
-                                        {{ number_format($teacher->reviews_avg_rating, 1) }}
-                                    </span>
+                                <span class="fw-semibold">
+                                    {{ number_format($teacher->reviews_avg_rating ?? 3, 1) }}
+                                </span>
 
-                                    <span class="text-secondary">
-                                        ({{ $teacher->reviews_count }})
-                                    </span>
-                                @else
-                                    <span class="text-secondary">
-                                        No reviews
-                                    </span>
-                                @endif
+                                <span class="text-secondary">
+                                    ({{ $teacher->reviews_count ?? 0 }})
+                                </span>
                             </div>
 
 
