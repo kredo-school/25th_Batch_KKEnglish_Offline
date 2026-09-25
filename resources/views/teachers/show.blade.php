@@ -15,7 +15,7 @@
             Teacher Profile
         </h2>
         <a href="{{ route('students.reservations.teacher-detail', ['teacher_id' => $teacher->id,
-            'mode' => 'teacher']) }}">Back to Teachers List</a>
+            'mode' => 'teacher']) }}">Book a Lesson</a>
 
         <p class="text-secondary mb-0">
             Teacher information and introduction
@@ -50,10 +50,11 @@
             <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
 
                 {{-- Profile Image --}}
-                @if($teacher->user->profile_image)
+
+                @if($teacher->user?->profile_image_url)
 
                     <img
-                        src="{{ $teacher->user->profile_image }}"
+                        src="{{ $teacher->user->profile_image_url }}"
                         alt="{{ $teacher->user->first_name }}"
                         width="100"
                         height="100"
