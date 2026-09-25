@@ -60,6 +60,38 @@
         .teacher-navbar {
             background-color: #FFD166 !important;
         }
+
+        /* 画面全体のスクロールを止め、Flexboxで高さを100%に固定 */
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+        #app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #app > .container-fluid {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        /* html側の min-vh-100 を強制リセットして高さを親に合わせる */
+        .row.align-items-stretch {
+            height: 100%;
+            min-height: 0 !important;
+        }
+        /* サイドバーを個別スクロール可能に（下部に余白を追加） */
+        aside {
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 3rem; /* 下が見やすくなるように余白を追加 */
+        }
+        /* メインコンテンツを個別スクロール可能に（下部に余白を追加） */
+        main {
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 3rem; /* 下が見やすくなるように余白を追加 */
+        }
     </style>
 
     <link

@@ -25,15 +25,34 @@ class ShiftPatternAssignmentController extends Controller
 
     public function index(Request $request): View
     {
-        // 割り当てが存在する先生を1人1行で取得（全先生を表示対象とする場合は whereHas を外してください）
+        $today = now()->toDateString();
+
+        // 今日以降も有効なAssignmentがある先生だけ取得
         $teachers = Teacher::query()
-            ->whereHas('shiftPatternAssignments')
+            ->whereHas('shiftPatternAssignments', function ($query) use ($today) {
+                $query->where(function ($query) use ($today) {
+                    $query
+                        ->whereNull('end_date')
+                        ->orWhereDate('end_date', '>=', $today);
+                });
+            })
             ->with([
                 'user:id,first_name,last_name',
-                'shiftPatternAssignments.shiftPattern'
+
+                // 現在有効なAssignmentだけ読み込む
+                'shiftPatternAssignments' => function ($query) use ($today) {
+                    $query
+                        ->where(function ($query) use ($today) {
+                            $query
+                                ->whereNull('end_date')
+                                ->orWhereDate('end_date', '>=', $today);
+                        })
+                        ->with('shiftPattern');
+                },
             ])
             ->orderBy('id', 'desc')
             ->paginate(15);
+
         return view('admin.shift-pattern-assignments.index', [
             'teachers' => $teachers,
         ]);
@@ -667,7 +686,13 @@ public function bulkDestroy(
             ->orderBy('id', 'desc')
             ->get(['id', 'pattern_name', 'pattern_code']);
 
-        $assignments = $teacher->shiftPatternAssignments;
+        $today = now()->toDateString();
+
+        $assignments = $teacher->shiftPatternAssignments
+            ->filter(function ($assignment) use ($today) {
+                return is_null($assignment->end_date)
+                    || $assignment->end_date >= $today;
+            });
 
         $selectedWeekdays = $assignments
             ->pluck('weekday')

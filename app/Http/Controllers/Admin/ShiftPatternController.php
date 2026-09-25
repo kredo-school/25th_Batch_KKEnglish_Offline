@@ -11,6 +11,7 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Teacher;
+use DomainException;
 
 class ShiftPatternController extends Controller
 {
@@ -85,10 +86,17 @@ class ShiftPatternController extends Controller
 
     public function destroy(ShiftPattern $shiftPattern, ShiftPatternAdminService $service): RedirectResponse
     {
-        $service->delete($shiftPattern);
+        try {
+            $service->delete($shiftPattern);
 
-        return redirect()
-            ->route('admin.shift-patterns.index')
-            ->with('status', 'Successfully deleted the shift pattern.');
+            return redirect()
+                ->route('admin.shift-patterns.index')
+                ->with('status', 'Successfully deleted the shift pattern.');
+
+        } catch (DomainException $e) {
+            return redirect()
+                ->route('admin.shift-patterns.index')
+                ->with('error', $e->getMessage());
+        }
     }
 }
