@@ -4,6 +4,9 @@ namespace App\Services\Admin;
 
 use App\Models\ShiftPattern;
 use App\Models\TeacherShiftPatternAssignment;
+use App\Models\Schedule;
+use App\Models\ScheduleException;
+use App\Models\TeacherSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use DomainException;
@@ -104,11 +107,89 @@ class ShiftPatternAdminService
     // }
 
     /**
-     * シフトパターンを削除
+     * シフトパターンを物理削除
+     *
+     * 先生が割り当てられているShift Patternは削除不可。
+     *
+     * 削除できる条件
+     * - 先生の割り当てが0人
+     *
+     * 削除時の処理
+     * 1. 未来の未予約Scheduleを削除
+     * 2. ScheduleExceptionの参照を解除
+     * 3. Shift Pattern Assignmentを削除
+     * 4. Shift Patternを物理削除
      */
     public function delete(ShiftPattern $shiftPattern): bool
     {
-        // 関連データ（割り当て等）の整合性チェックや外部キーのケアが必要な場合はここに記述
-        return $shiftPattern->delete();
+        return DB::transaction(function () use ($shiftPattern) {
+
+            /*
+            * 1. このShift Patternを使用している先生の人数を確認
+            */
+            $teacherCount = TeacherShiftPatternAssignment::query()
+                ->where('shift_pattern_id', $shiftPattern->id)
+                ->distinct('teacher_id')
+                ->count('teacher_id');
+
+            /*
+            * 先生が1人でも割り当てられている場合は削除不可
+            */
+            if ($teacherCount > 0) {
+                throw new DomainException(
+                    "This Shift Pattern currently has {$teacherCount} teachers assigned."
+                    . " If you want to delete this Shift Pattern, please reassign the teachers to other Shift Patterns first."
+                );
+            }
+
+            /*
+            * 2. 未来の未予約Scheduleを取得
+            */
+            $schedules = TeacherSchedule::query()
+                ->where('shift_pattern_id', $shiftPattern->id)
+                ->whereDate('available_date', '>=', Carbon::today())
+                ->whereDoesntHave('reservations')
+                ->get();
+
+            /*
+            * 3. ScheduleExceptionの参照を解除してから
+            *    Scheduleを削除
+            */
+            if ($schedules->isNotEmpty()) {
+                $scheduleIds = $schedules->pluck('schedule_id');
+
+                ScheduleException::query()
+                    ->whereIn('schedule_id', $scheduleIds)
+                    ->update([
+                        'schedule_id' => null,
+                    ]);
+
+                TeacherSchedule::query()
+                    ->whereIn('schedule_id', $scheduleIds)
+                    ->delete();
+            }
+
+            /*
+            * 4. 未来の未予約Scheduleを削除した後、
+            *    まだScheduleが残っているか確認
+            *
+            * 過去のScheduleや予約済みScheduleが残っている場合、
+            * Shift Patternは物理削除できない。
+            */
+            $remainingSchedules = TeacherSchedule::query()
+                ->where('shift_pattern_id', $shiftPattern->id)
+                ->exists();
+
+            if ($remainingSchedules) {
+                throw new DomainException(
+                    'This Shift Pattern cannot be deleted because there are past or reserved Schedules remaining.'
+                );
+            }
+
+            /*
+            * 5. Shift Patternを物理削除
+            */
+            return $shiftPattern->delete();
+        });
     }
 }

@@ -7,6 +7,46 @@
         <a href="{{ route('admin.shift-patterns.create') }}" class="btn btn-primary btn-sm">＋ New Pattern</a>
     </div>
 
+    {{-- 成功メッセージ --}}
+    @if (session('status'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('status') }}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+        </div>
+    @endif
+
+    {{-- 削除できない場合の警告 --}}
+    @if (session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Warning</strong><br>
+            {{ session('warning') }}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+        </div>
+    @endif
+
+    {{-- その他のエラー --}}
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-body p-0">
             <table class="table mb-0">
