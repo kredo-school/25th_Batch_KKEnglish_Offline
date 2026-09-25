@@ -97,27 +97,15 @@
 
                     <div class="card h-100 shadow-sm">
 
-
                         {{-- Teacher Image --}}
-                        @if ($teacher->user && $teacher->user->profile_image)
-                            <img src="{{ $teacher->user->profile_image }}" alt="{{ $teacher->user->first_name }}"
+                        @if ($teacher->user?->profile_image_url)
+                            <img src="{{ $teacher->user->profile_image_url }}" alt="{{ $teacher->user->first_name }}"
                                 class="card-img-top"
-                                style="
-                                                                                height: 180px;
-                                                                                object-fit: cover;
-                                                                            ">
+                                style="height: 180px;object-fit: cover;">
                         @else
-                            <div class="
-                                                                                bg-light
-                                                                                d-flex
-                                                                                justify-content-center
-                                                                                align-items-center
-                                                                                text-secondary
-                                                                            "
+                            <div class="bg-light d-flex justify-content-center align-items-center text-secondary"
                                 style="height: 180px;">
-
                                 No Image
-
                             </div>
                         @endif
 
@@ -186,8 +174,7 @@
 
 
                             {{-- Rating --}}
-                            <div
-                                class="
+                            <div class="
                                     d-flex
                                     align-items-center
                                     gap-1
@@ -201,8 +188,7 @@
                                 style="
                                     font-size: 13px;
                                     min-height: 30px;
-                                "
-                            >
+                                ">
                                 <i class="fa-solid fa-star text-warning"></i>
 
                                 <span class="fw-semibold">
@@ -1579,10 +1565,10 @@
                     }
                 }
                 /*
-        |--------------------------------------------------------------------------
-        | Favorite Toggle
-        |--------------------------------------------------------------------------
-        */
+            |--------------------------------------------------------------------------
+            | Favorite Toggle
+            |--------------------------------------------------------------------------
+            */
 
                 document
                     .querySelectorAll(

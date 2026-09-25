@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -74,5 +75,76 @@ class User extends Authenticatable
     public function admin()
     {
         return $this->hasOne(Admin::class);
+    }
+
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        $image = $this->profile_image;
+
+        /*
+    |--------------------------------------------------------------------------
+    | 画像なし
+    |--------------------------------------------------------------------------
+    */
+        if (blank($image)) {
+            return null;
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | ① 外部URL
+    |--------------------------------------------------------------------------
+    |
+    | DB例:
+    | https://images.unsplash.com/xxxxx.jpg
+    |
+    */
+        if (
+            str_starts_with($image, 'http://') ||
+            str_starts_with($image, 'https://')
+        ) {
+            return $image;
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | ② Laravel Storage
+    |--------------------------------------------------------------------------
+    |
+    | DB例:
+    | storage:teachers/mary.jpg
+    |
+    | 実ファイル:
+    | storage/app/public/teachers/mary.jpg
+    |
+    */
+        if (str_starts_with($image, 'storage:')) {
+
+            $path = substr(
+                $image,
+                strlen('storage:')
+            );
+
+            return Storage::disk('public')->url($path);
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | ③ public フォルダ
+    |--------------------------------------------------------------------------
+    |
+    | DB例:
+    | images/IMG_4426.jpeg
+    |
+    | 実ファイル:
+    | public/images/IMG_4426.jpeg
+    |
+    */
+        return asset(
+            ltrim($image, '/')
+        );
     }
 }

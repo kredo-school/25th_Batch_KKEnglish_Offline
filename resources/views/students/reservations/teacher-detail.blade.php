@@ -279,8 +279,30 @@
                         {{-- Teacher Image --}}
                         <div class="text-center mb-4">
 
-                            <img src="{{ $teacher->user->profile_image }}" alt="{{ $teacher->user->first_name }}"
-                                width="120" height="120" class="rounded-circle mb-3" style="object-fit: cover;">
+                            @if ($teacher->user?->profile_image_url)
+
+                                    <img
+                                        src="{{ $teacher->user->profile_image_url }}"
+                                        alt="{{ $teacher->user->first_name }}"
+                                        width="120"
+                                        height="120"
+                                        class="rounded-circle mb-3"
+                                        style="object-fit: cover;"
+                                    >
+
+                                @else
+
+                                    <div
+                                        class="rounded-circle bg-light d-flex justify-content-center align-items-center mx-auto mb-3 text-secondary"
+                                        style="
+                                            width: 120px;
+                                            height: 120px;
+                                        "
+                                    >
+                                        No Image
+                                    </div>
+
+                                @endif
 
                             {{-- Lesson Point --}}
                             <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
