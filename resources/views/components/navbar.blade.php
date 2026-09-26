@@ -50,152 +50,133 @@
 
             @endif
 
-
             {{-- ===============================
-                 Account
+                Account
             ================================ --}}
-            <div class="dropdown">
+            @if (!request()->routeIs('login', 'register'))
 
-                <button
-                    class="btn border-0 shadow-none dropdown-toggle d-flex align-items-center {{ $textClass }}"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
+                <div class="dropdown">
 
-                    {{-- ===============================
-                         Profile Image
-                    ================================ --}}
-                    @if($user?->profile_image)
+                    <button
+                        class="btn border-0 shadow-none dropdown-toggle d-flex align-items-center {{ $textClass }}"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
 
-                        {{--
-                            profile_image の保存形式がロールによって異なるため分岐
+                        {{-- ===============================
+                            Profile Image
+                        ================================ --}}
+                        @if($user?->profile_image)
 
-                            Student:
-                            storage内の相対パス
+                            <img
+                                src="{{ str_starts_with($user->profile_image, 'http')
+                                    ? $user->profile_image
+                                    : asset('storage/' . $user->profile_image) }}"
+                                alt="{{ $user?->first_name }}"
+                                width="40"
+                                height="40"
+                                class="rounded-circle me-2"
+                                style="object-fit: cover;"
+                            >
 
-                            Teacher:
-                            Seederで設定した外部URL
-                        --}}
-                        <img
-                            src="{{ str_starts_with($user->profile_image, 'http')
-                                ? $user->profile_image
-                                : asset('storage/' . $user->profile_image) }}"
-                            alt="{{ $user?->first_name }}"
-                            width="40"
-                            height="40"
-                            class="rounded-circle me-2"
-                            style="object-fit: cover;"
-                        >
+                        @else
 
-                    @else
+                            <i
+                                class="fa-solid fa-circle-user text-secondary me-2"
+                                style="font-size: 40px;"
+                            ></i>
 
-                       <i
-                                                class="
-                                                    fa-solid
-                                                    fa-circle-user
-                                                    text-secondary
-                                                    me-2
-                                                "
-                                                style="font-size: 40px;"
-                                            ></i>
+                        @endif
 
-                    @endif
+                        {{-- Login User Name --}}
+                        <span>
+                            {{ $user?->first_name }}
+                        </span>
+
+                    </button>
 
 
                     {{-- ===============================
-                         Login User Name
+                        Dropdown Menu
                     ================================ --}}
-                    <span>
-                        {{ $user?->first_name }}
-                    </span>
+                    <ul class="dropdown-menu dropdown-menu-end">
 
-                </button>
+                        {{-- Profile --}}
+                        @if($roleCode == 'student')
 
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('students.profile') }}"
+                                >
+                                    Profile
+                                </a>
+                            </li>
 
-                {{-- ===============================
-                     Dropdown Menu
-                ================================ --}}
-                <ul class="dropdown-menu dropdown-menu-end">
+                        @elseif($roleCode == 'teacher')
 
-                    {{-- ===============================
-                         Profile
-                    ================================ --}}
-                    @if($roleCode == 'student')
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('teachers.show', $user->teacher->id) }}"
+                                >
+                                    Profile
+                                </a>
+                            </li>
 
+                        @endif
+
+                        {{-- Divider --}}
                         <li>
-                            <a
-                                class="dropdown-item"
-                                href="{{ route('students.profile') }}"
-                            >
-                                Profile
-                            </a>
+                            <hr class="dropdown-divider">
                         </li>
 
-                    @elseif($roleCode == 'teacher')
+                        @if($roleCode == 'student' or $roleCode == 'teacher' or $roleCode == 'admin')
 
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{{ route('teachers.show', $user->teacher->id) }}"
-                            >
-                                Profile
-                            </a>
-                        </li>
+                            <li>
+                                <form
+                                    method="POST"
+                                    action="{{ route('logout') }}"
+                                >
+                                    @csrf
 
-                    @endif
+                                    <button
+                                        type="submit"
+                                        class="dropdown-item"
+                                    >
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
 
+                        @else
 
-                    {{-- Divider --}}
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('login') }}"
+                                >
+                                    Login
+                                </a>
+                            </li>
 
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('register') }}"
+                                >
+                                    Register
+                                </a>
+                            </li>
 
-                    @if($roleCode == 'student' or $roleCode == 'teacher' or $roleCode == 'admin')
+                        @endif
 
-                    <li>
+                    </ul>
 
-                        <form
-                            method="POST"
-                            action="{{ route('logout') }}"
-                        >
-                            @csrf
+                </div>
 
-                            <button
-                                type="submit"
-                                class="dropdown-item"
-                            >
-                                Logout
-                            </button>
-
-                        </form>
-
-                    </li>
-                    @else
-
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{{ route('login') }}"
-                            >
-                                Login
-                            </a>
-                        </li>
-
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{{ route('register') }}"
-                            >
-                                Register
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-
-            </div>
-
+            @endif
         </div>
 
     </div>
