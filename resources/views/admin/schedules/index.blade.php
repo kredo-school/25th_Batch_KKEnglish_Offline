@@ -37,7 +37,7 @@
     /* タイムラインテーブル */
     .timeline-table {
         width: 100%;
-        min-width: 1100px;
+        min-width: 800px;
         border-collapse: collapse;
         table-layout: fixed;
     }
@@ -209,7 +209,7 @@
                                 <thead>
                                     <tr>
                                         <th class="timeline-label-col" id="mode-header-label">Teacher</th>
-                                        @for($h = 0; $h < 24; $h++)
+                                        @for($h = 6; $h <= 23; $h++)
                                             <th>{{ sprintf('%02d:00', $h) }}</th>
                                         @endfor
                                     </tr>
@@ -288,6 +288,10 @@
         document.getElementById('mode-header-label').innerText = mode === 'teacher' ? 'Teacher' : 'Location';
         renderTimeline();
     }
+    // 表示範囲の定数 (6:00 ~ 23:00 = 17時間)
+    const DISPLAY_START = 6 * 60; // 360
+    const DISPLAY_END = 24 * 60;  // 1380
+    const DISPLAY_TOTAL = DISPLAY_END - DISPLAY_START; // 1020分
 
     function renderTimeline() {
         const tbody = document.getElementById('timeline-tbody');
@@ -296,11 +300,10 @@
 
         const dataList = currentMode === 'teacher' ? teacherData : locationData;
 
-        // データ0件時
         if (!Array.isArray(dataList) || dataList.length === 0) {
             const tr = document.createElement('tr');
             const td = document.createElement('td');
-            td.colSpan = 25; // label1 + 24h
+            td.colSpan = 19; // label1 + 18h (6:00~23:00)
             td.className = 'text-center text-muted py-4';
             td.textContent = currentMode === 'teacher'
                 ? 'No teacher data available'
@@ -311,113 +314,134 @@
         }
 
         dataList.forEach((item, index) => {
-            const tr = document.createElement('tr');
+            try {
+                const tr = document.createElement('tr');
 
-            // 左ラベル
-            const labelTd = document.createElement('td');
-            labelTd.className = 'timeline-label-col';
-            const name = item?.name ?? '';
-            const role = item?.role ?? '';
-            labelTd.innerHTML = `
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold"
-                        style="width:24px;height:24px;font-size:10px;flex-shrink:0;">
-                        ${(name || '?').charAt(0)}
-                    </div>
-                    <div class="text-truncate">
-                        <div class="fw-bold text-dark text-truncate" style="font-size:0.78rem;">${name || '(no name)'}</div>
-                        <div class="small text-muted text-truncate" style="font-size:0.65rem;">${role}</div>
-                    </div>
-                </div>
-            `;
-            tr.appendChild(labelTd);
-
-            // 右タイムライン
-            const timelineTd = document.createElement('td');
-            timelineTd.colSpan = 24;
-            timelineTd.className = 'timeline-cell-wrapper';
-
-            // 現在時刻線
-            const timeRatio = (currentTimeMinutes / (24 * 60)) * 100;
-            const timeLine = document.createElement('div');
-            timeLine.className = 'current-time-line';
-            timeLine.style.left = timeRatio + '%';
-
-            if (index === 0) {
-                const badge = document.createElement('div');
-                badge.className = 'current-time-badge';
-                badge.innerText = currentTimeStr;
-                timeLine.appendChild(badge);
-            }
-            timelineTd.appendChild(timeLine);
-
-            // 1) shift先描画（teacherモードのみ）
-            const shifts = Array.isArray(item?.shift_blocks) ? item.shift_blocks : [];
-            if (currentMode === 'teacher' && Array.isArray(item.shift_blocks) && item.shift_blocks.length > 0) {
-        item.shift_blocks.forEach(shift => {
-            // "HH:mm" を分に変換
-            const toMinutes = (hhmm) => {
-                if (!hhmm || typeof hhmm !== 'string' || !hhmm.includes(':')) return null;
-                const [h, m] = hhmm.split(':').map(v => Number(v));
-                if (Number.isNaN(h) || Number.isNaN(m)) return null;
-                return h * 60 + m;
-            };
-
-            let startMin = toMinutes(shift.start_time);
-            let endMin = toMinutes(shift.end_time);
-
-            // フォールバック（数値があれば使う）
-            if (startMin === null) startMin = Number(shift.start_minutes ?? 0);
-            if (endMin === null) endMin = startMin + Number(shift.duration_minutes ?? 0);
-
-            // 深夜跨ぎ対応（例 22:00 -> 02:00）
-            if (endMin < startMin) endMin += 1440;
-
-            const duration = Math.max(1, endMin - startMin);
-            const left = (startMin / 1440) * 100;
-            const width = (duration / 1440) * 100;
-
-            const shiftEl = document.createElement('div');
-            shiftEl.className = 'shift-block';
-            shiftEl.style.left = `${left}%`;
-            shiftEl.style.width = `${width}%`;
-            shiftEl.title = `Shift ${shift.start_time ?? ''} - ${shift.end_time ?? ''}`;
-            timelineTd.appendChild(shiftEl);
-        });
-    }
-
-            // 2) 予約描画
-            const blocks = Array.isArray(item?.blocks) ? item.blocks : [];
-            if (blocks.length > 0) {
-                blocks.forEach(block => {
-                    const startPercent = ((block.start_minutes ?? 0) / (24 * 60)) * 100;
-                    const durationPercent = ((block.duration_minutes ?? 0) / (24 * 60)) * 100;
-
-                    const blockEl = document.createElement('div');
-                    blockEl.className = `booking-block ${currentMode === 'location' ? 'location-type' : ''}`;
-                    blockEl.style.left = startPercent + '%';
-                    blockEl.style.width = Math.max(durationPercent, 4) + '%';
-                    blockEl.innerHTML = `
-                        <div class="fw-bold text-truncate">${block.title ?? ''}</div>
-                        <div class="small text-muted" style="font-size:0.65rem;">
-                            <i class="fa-regular fa-clock me-1"></i>${block.start_time ?? '--:--'} - ${block.end_time ?? '--:--'}
+                // 左ラベル
+                const labelTd = document.createElement('td');
+                labelTd.className = 'timeline-label-col';
+                const name = item?.name ?? '';
+                const role = item?.role ?? '';
+                labelTd.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold"
+                            style="width:24px;height:24px;font-size:10px;flex-shrink:0;">
+                            ${(name || '?').charAt(0)}
                         </div>
-                    `;
-                    blockEl.onclick = () => showBookingDetail(block);
-                    timelineTd.appendChild(blockEl);
-                });
-            } else if (currentMode === 'teacher' && shifts.length === 0) {
-                // teacherでshiftも予約もない時だけ空表示
-                const emptyMsg = document.createElement('div');
-                emptyMsg.className = 'text-muted small position-absolute top-50 start-50 translate-middle';
-                emptyMsg.style.pointerEvents = 'none';
-                emptyMsg.style.zIndex = '4';
-                emptyMsg.innerHTML = '<span class="badge bg-light text-secondary border px-2 py-1" style="font-size:0.65rem;">No data</span>';
-                timelineTd.appendChild(emptyMsg);
-            }
+                        <div class="text-truncate">
+                            <div class="fw-bold text-dark text-truncate" style="font-size:0.78rem;">${name || '(no name)'}</div>
+                            <div class="small text-muted text-truncate" style="font-size:0.65rem;">${role}</div>
+                        </div>
+                    </div>
+                `;
+                tr.appendChild(labelTd);
 
-            tr.appendChild(timelineTd);
-            tbody.appendChild(tr);
+                // 右タイムライン
+                const timelineTd = document.createElement('td');
+                timelineTd.colSpan = 18; // 6:00~23:00は18列
+                timelineTd.className = 'timeline-cell-wrapper';
+
+                // 現在時刻線
+                let timeRatio = ((currentTimeMinutes - DISPLAY_START) / DISPLAY_TOTAL) * 100;
+                if (timeRatio < 0) timeRatio = 0;
+                if (timeRatio > 100) timeRatio = 100;
+
+                const timeLine = document.createElement('div');
+                timeLine.className = 'current-time-line';
+                timeLine.style.left = timeRatio + '%';
+
+                if (index === 0) {
+                    const badge = document.createElement('div');
+                    badge.className = 'current-time-badge';
+                    badge.innerText = currentTimeStr;
+                    timeLine.appendChild(badge);
+                }
+                timelineTd.appendChild(timeLine);
+
+                const shifts = Array.isArray(item?.shift_blocks) ? item.shift_blocks : [];
+
+                // 1) shift先描画(teacherモードのみ)
+                if (currentMode === 'teacher' && shifts.length > 0) {
+                    shifts.forEach(shift => {
+                        const toMinutes = (hhmm) => {
+                            if (!hhmm || typeof hhmm !== 'string' || !hhmm.includes(':')) return null;
+                            const parts = hhmm.split(':');
+                            const h = Number(parts[0]);
+                            const m = Number(parts[1]);
+                            if (Number.isNaN(h) || Number.isNaN(m)) return null;
+                            return h * 60 + m;
+                        };
+
+                        let startMin = toMinutes(shift.start_time);
+                        let endMin = toMinutes(shift.end_time);
+
+                        if (startMin === null) startMin = Number(shift.start_minutes ?? 0);
+                        if (endMin === null) endMin = startMin + Number(shift.duration_minutes ?? 0);
+
+                        // 深夜跨ぎ対応
+                        if (endMin < startMin) endMin += 1440;
+
+                        // 表示範囲内に収まるようにクリップする
+                        let displayStart = Math.max(startMin, DISPLAY_START);
+                        let displayEnd = Math.min(endMin, DISPLAY_END);
+
+                        if (displayStart < displayEnd) {
+                            const left = ((displayStart - DISPLAY_START) / DISPLAY_TOTAL) * 100;
+                            const width = ((displayEnd - displayStart) / DISPLAY_TOTAL) * 100;
+
+                            const shiftEl = document.createElement('div');
+                            shiftEl.className = 'shift-block';
+                            shiftEl.style.left = `${left}%`;
+                            shiftEl.style.width = `${width}%`;
+                            shiftEl.title = `Shift ${shift.start_time ?? ''} - ${shift.end_time ?? ''}`;
+                            timelineTd.appendChild(shiftEl);
+                        }
+                    });
+                }
+
+                // 2) 予約描画
+                const blocks = Array.isArray(item?.blocks) ? item.blocks : [];
+                if (blocks.length > 0) {
+                    blocks.forEach(block => {
+                        let startMin = Number(block.start_minutes ?? 0);
+                        let endMin = startMin + Number(block.duration_minutes ?? 0);
+
+                        let displayStart = Math.max(startMin, DISPLAY_START);
+                        let displayEnd = Math.min(endMin, DISPLAY_END);
+
+                        if (displayStart < displayEnd) {
+                            const left = ((displayStart - DISPLAY_START) / DISPLAY_TOTAL) * 100;
+                            const width = ((displayEnd - displayStart) / DISPLAY_TOTAL) * 100;
+
+                            const blockEl = document.createElement('div');
+                            blockEl.className = `booking-block ${currentMode === 'location' ? 'location-type' : ''}`;
+                            blockEl.style.left = left + '%';
+                            blockEl.style.width = Math.max(width, 4) + '%';
+                            blockEl.innerHTML = `
+                                <div class="fw-bold text-truncate">${block.title ?? ''}</div>
+                                <div class="small text-muted" style="font-size:0.65rem;">
+                                    <i class="fa-regular fa-clock me-1"></i>${block.start_time ?? '--:--'} - ${block.end_time ?? '--:--'}
+                                </div>
+                            `;
+                            blockEl.onclick = () => showBookingDetail(block);
+                            timelineTd.appendChild(blockEl);
+                        }
+                    });
+                } else if (currentMode === 'teacher' && shifts.length === 0) {
+                    const emptyMsg = document.createElement('div');
+                    emptyMsg.className = 'text-muted small position-absolute top-50 start-50 translate-middle';
+                    emptyMsg.style.pointerEvents = 'none';
+                    emptyMsg.style.zIndex = '4';
+                    emptyMsg.innerHTML = '<span class="badge bg-light text-secondary border px-2 py-1" style="font-size:0.65rem;">No data</span>';
+                    timelineTd.appendChild(emptyMsg);
+                }
+
+                tr.appendChild(timelineTd);
+                tbody.appendChild(tr);
+
+            } catch (error) {
+                console.error("行の描画中にエラーが発生しました:", error, item);
+            }
         });
     }
 

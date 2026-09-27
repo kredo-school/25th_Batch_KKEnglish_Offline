@@ -1,4 +1,4 @@
-<aside class="bg-light border-end min-vh-100 p-3">
+<div class="bg-light p-3">
 
     {{-- Back --}}
     <a
@@ -335,4 +335,4 @@
 
     </div>
 
-</aside>
+</div>

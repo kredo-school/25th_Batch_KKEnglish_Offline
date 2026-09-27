@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ScheduleMatrixController;
 use App\Http\Controllers\Admin\ExpectedReservationSettingController;
 use App\Http\Controllers\Admin\SeasonPeriodController;
+use App\Http\Controllers\Admin\OperationalStatusController;
 use App\Http\Controllers\Student\ReviewController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
@@ -235,4 +236,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
     Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
     Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+    // Operational Status
+    Route::get('/operational-status', [OperationalStatusController::class, 'index'])->name('operational-status.index');
 });

@@ -130,7 +130,7 @@ class StudentController extends Controller
         */
 
         $students = $query
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view(
