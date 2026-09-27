@@ -51,7 +51,7 @@ class ShiftPatternAssignmentController extends Controller
                 },
             ])
             ->orderBy('id', 'desc')
-            ->paginate(15);
+            ->paginate(10);
 
         return view('admin.shift-pattern-assignments.index', [
             'teachers' => $teachers,

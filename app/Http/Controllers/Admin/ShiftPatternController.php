@@ -28,7 +28,7 @@ class ShiftPatternController extends Controller
                 },
             ])
             ->latest('id')
-            ->paginate(20);
+            ->paginate(10);
 
         return view('admin.shift-patterns.index', compact('patterns'));
     }

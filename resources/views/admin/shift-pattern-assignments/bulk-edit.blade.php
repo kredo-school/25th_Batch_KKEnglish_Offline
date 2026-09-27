@@ -6,10 +6,10 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">Bulk Edit Teacher Assignments</h1>
 
-        {{-- <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}"
+        <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}"
            class="btn btn-outline-secondary btn-sm">
             <i class="fa-solid fa-angles-left"></i> Back
-        </a> --}}
+        </a>
     </div>
 
     @if ($errors->any())
@@ -42,7 +42,7 @@
         {{-- この画面は曜日単位の一括変更なので weekly 固定 --}}
     <input type="hidden" name="assignment_type" value="weekly">
 
-        <div class="card">
+    <div class="card border-info mb-4">
             <div class="card-body">
 
                 <div class="mb-4">
@@ -72,7 +72,11 @@
                         Select the weekdays you want to modify.
                     </div>
                 </div>
+            </div>
+        </div>
 
+        <div class="card border-primary mb-4">
+            <div class="card-body">
                 <div class="mb-3">
                     <label for="shift_pattern_id" class="form-label fw-bold">
                         Shift Pattern
@@ -152,7 +156,6 @@
                         Cancel
                     </a>
                 </div>
-
             </div>
         </div>
     </form>
@@ -189,16 +192,18 @@
         </div>
     </div>
 
-    <div class="card-body">
-        <h5 class="text-danger">All Shifts Deletion</h5>
-        <p class="text-muted small">
-            Deletes all shift assignments for this teacher and all future unreserved schedules. (Reserved lessons will not be deleted.)
-        </p>
-        <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete all shifts for this teacher?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">Execute Bulk Deletion</button>
-        </form>
+    <div class="card border-danger mb-4">
+        <div class="card-body">
+            <h5 class="text-danger">All Shifts Deletion</h5>
+            <p class="text-muted small">
+                Deletes all shift assignments for this teacher and all future unreserved schedules. (Reserved lessons will not be deleted.)
+            </p>
+            <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete all shifts for this teacher?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">Execute Bulk Deletion</button>
+            </form>
+        </div>
     </div>
 </div>
 

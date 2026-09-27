@@ -64,7 +64,7 @@ class TeacherController extends Controller
 
         // ここで先に return してしまうと、下の勤務時間計算が実行されません。
         // 必ず最後の return view() まで処理を進めます。
-        $teachers = $q->orderBy('id', 'desc')->paginate(12)->withQueryString();
+        $teachers = $q->orderBy('id', 'desc')->paginate(10)->withQueryString();
 
         // 現在のページに表示されている先生だけを対象にします。
         $teacherIds = $teachers->getCollection()->pluck('id')->values();

@@ -5,7 +5,18 @@
             || request()->routeIs('admin.shift-patterns.*')
             || request()->routeIs('admin.shift-pattern-assignments.*');
 
-        $menu = $isScheduleMenu ? 'schedule' : 'main';
+        // Operational Statusメニューかどうか
+        $isOperationalStatusMenu = request('menu') === 'operational-status'
+            || request()->routeIs('admin.operational-status.*')
+            || request()->routeIs('admin.schedules.matrix*');
+
+        if ($isScheduleMenu) {
+            $menu = 'schedule';
+        } elseif ($isOperationalStatusMenu) {
+            $menu = 'operational-status';
+        } else {
+            $menu = 'main';
+        }
     @endphp
 
     <nav class="px-2 py-3 fw-bold fs-5">
@@ -22,12 +33,6 @@
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Today's schedule
-            </a>
-
-            {{-- 稼働状況マトリクス --}}
-            <a href="{{ route('admin.schedules.matrix', ['menu' => 'schedule']) }}"
-               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.matrix*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Operational Status
             </a>
 
             {{-- 予想期間設定 --}}
@@ -55,11 +60,36 @@
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.shift-pattern-assignments.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Teacher assignment
             </a>
+
+        @elseif($menu === 'operational-status')
+            {{-- Schedule専用サイドバー --}}
+            <a href="{{ route('admin.dashboard', ['menu' => 'main']) }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
+                <i class="fa-solid fa-angles-left"></i> Back to Dashboard
+            </a>
+
+            {{-- 稼働状況マトリクス --}}
+            <a href="{{ route('admin.operational-status.index', ['menu' => 'operational-status']) }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.operational-status.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+                Monthly Overview
+            </a>
+
+            {{-- 稼働状況マトリクス --}}
+            <a href="{{ route('admin.schedules.matrix', ['menu' => 'operational-status']) }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.matrix*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+                Weekly Overview
+            </a>
+
         @else
             {{-- 通常サイドバー --}}
             <a href="{{ route('admin.dashboard') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.dashboard') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Dashboard
+            </a>
+            {{-- 稼働状況マトリクス --}}
+            <a href="{{ route('admin.operational-status.index') }}"
+               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.operational-status.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
+                Operational Status
             </a>
 
             <a href="{{ route('admin.teachers.index') }}"
