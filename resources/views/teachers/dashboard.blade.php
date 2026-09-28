@@ -375,6 +375,88 @@
 
     </div>
 
+
+
+{{-- ===============================
+     Announcements
+================================ --}}
+<div class="card mt-4">
+
+    {{-- Header --}}
+    <div class="card-header bg-white py-3">
+
+        <h5 class="fw-bold mb-0">
+            Announcements
+        </h5>
+
+    </div>
+
+
+    {{-- Body --}}
+    <div class="card-body">
+
+        @forelse ($announcements as $announcement)
+
+            <div class="border-bottom pb-3 mb-3">
+
+                {{-- Title / Date --}}
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-start
+                        gap-3
+                        mb-1
+                    "
+                >
+
+                    <div class="fw-semibold">
+                        {{ $announcement->title }}
+                    </div>
+
+                    <small class="text-secondary text-nowrap">
+                        {{ $announcement->created_at?->format('M d') }}
+                    </small>
+
+                </div>
+
+
+                {{-- Content --}}
+                <div class="text-secondary small">
+                    {{ $announcement->content }}
+                </div>
+
+            </div>
+
+        @empty
+
+            <div class="text-center py-4">
+
+                <p class="text-secondary mb-0">
+                    No announcements.
+                </p>
+
+            </div>
+
+        @endforelse
+
+        {{-- View All --}}
+        <div class="text-end">
+
+            <a
+                href="#"
+                class="small text-decoration-none"
+            >
+                View All
+                <i class="fa-solid fa-chevron-right ms-1"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
 </div>
 
 
