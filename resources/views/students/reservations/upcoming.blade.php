@@ -36,9 +36,247 @@
     opacity: 1;
     transform: translateX(0);
 }
+
+
+/* =========================================
+   Cancel Monkey
+========================================= */
+
+.cancel-monkey-pien {
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin-bottom: 3px;
+    text-align: center;
+}
+
+.cancel-monkey-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+     background: rgba(0, 0, 0, 0.25);
+
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.cancel-monkey-overlay.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cancel-monkey-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cancel-monkey-bubble {
+    position: relative;
+
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 20px;
+
+    padding: 14px 24px;
+    margin-bottom: 16px;
+
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #444;
+}
+
+.cancel-monkey-bubble::after {
+    content: "";
+
+    position: absolute;
+    left: 50%;
+    bottom: -11px;
+
+    width: 20px;
+    height: 20px;
+
+    background: white;
+
+    border-right: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
+
+    transform:
+        translateX(-50%)
+        rotate(45deg);
+}
+
+
+/* 猿全体のステージ */
+.cancel-monkey-stage {
+    position: relative;
+
+     width: min(430px, 75vw);
+     height: min(430px, 75vw);
+
+    animation: monkeyCryMotion 4s ease-in-out forwards;
+}
+
+
+/* 2枚の猿画像を重ねる */
+.cancel-monkey-image {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* 最初に見える泣き顔 */
+.monkey-cry {
+    opacity: 1;
+    animation: cryFadeOut 3.2s ease-in-out forwards;
+}
+
+
+/* あとから自然に出てくる大泣き顔 */
+.monkey-bigcry {
+    opacity: 0;
+    animation: bigCryFadeIn 3.2s ease-in-out forwards;
+}
+
+
+/* 猿全体の自然な動き */
+@keyframes monkeyCryMotion {
+    0% {
+        transform:
+            translateY(8px)
+            scale(0.96)
+            rotate(0deg);
+    }
+
+    15% {
+        transform:
+            translateY(0)
+            scale(1)
+            rotate(0deg);
+    }
+
+    35% {
+        transform:
+            translateY(2px)
+            scale(1.01)
+            rotate(-1deg);
+    }
+
+    55% {
+        transform:
+            translateY(-3px)
+            scale(1.02)
+            rotate(1deg);
+    }
+
+    75% {
+        transform:
+            translateY(2px)
+            scale(1.03)
+            rotate(-1.5deg);
+    }
+
+    100% {
+        transform:
+            translateY(-1px)
+            scale(1.04)
+            rotate(1deg);
+    }
+}
+
+
+/* 泣き顔が少しずつ消える */
+@keyframes cryFadeOut {
+    0%,
+    35% {
+        opacity: 1;
+    }
+
+    60% {
+        opacity: 0.75;
+    }
+
+    85%,
+    100% {
+        opacity: 0;
+    }
+}
+
+
+/* 大泣き顔が少しずつ現れる */
+@keyframes bigCryFadeIn {
+    0%,
+    35% {
+        opacity: 0;
+    }
+
+    60% {
+        opacity: 0.45;
+    }
+
+    80% {
+        opacity: 0.85;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
 </style>
 
 <div class="container-fluid">
+
+        {{-- =========================================
+            Cancel Monkey
+        ========================================== --}}
+    @if (session('show_cancel_monkey'))
+
+    <div
+        id="cancelMonkeyOverlay"
+        class="cancel-monkey-overlay"
+    >
+        <div class="cancel-monkey-content">
+
+            <div class="cancel-monkey-bubble">
+
+                <div class="cancel-monkey-pien">
+                    ぴえん
+                </div>
+
+                <div>
+                    Huhu... gikansela na...
+                </div>
+
+            </div>
+
+            <div class="cancel-monkey-stage">
+
+                <img
+                    src="{{ asset('images/kk-monkey-cry.png') }}"
+                    alt="Crying Monkey"
+                    class="cancel-monkey-image monkey-cry"
+                >
+
+                <img
+                    src="{{ asset('images/kk-monkey-bigcry.png') }}"
+                    alt="Big Crying Monkey"
+                    class="cancel-monkey-image monkey-bigcry"
+                >
+
+            </div>
+
+        </div>
+    </div>
+
+@endif
 
     {{-- ===============================
         Title
@@ -669,6 +907,11 @@ document.addEventListener(
     'DOMContentLoaded',
     function () {
 
+        /*
+         * ==========================
+         * Upcoming Monkey Bubble
+         * ==========================
+         */
         const bubble =
             document.getElementById('upcomingMonkeyBubble');
 
@@ -683,6 +926,35 @@ document.addEventListener(
             }, 3500);
 
         }
+
+
+        /*
+         * ==========================
+         * Cancel Monkey Animation
+         * ==========================
+         */
+        const cancelMonkeyOverlay =
+            document.getElementById('cancelMonkeyOverlay');
+
+        if (cancelMonkeyOverlay) {
+
+            /*
+             * 約3.2秒後に消し始める
+             */
+            setTimeout(function () {
+                cancelMonkeyOverlay.classList.add('hide');
+            }, 3200);
+
+
+            /*
+             * 3.7秒後に完全削除
+             */
+            setTimeout(function () {
+                cancelMonkeyOverlay.remove();
+            }, 3700);
+
+        }
+
     }
 );
 </script>
