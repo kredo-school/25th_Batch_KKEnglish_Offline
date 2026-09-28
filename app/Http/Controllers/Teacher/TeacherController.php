@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Teacher;
 use Illuminate\Contracts\View\View;
 use App\Models\TeacherLike;
+use Illuminate\Http\RedirectResponse;
 
 class TeacherController extends Controller
 {
@@ -91,5 +92,27 @@ public function show(int $id): View
             'reviews'
         )
     );
+ }
+
+
+ public function updateProfile(Request $request):RedirectResponse
+ {
+     $teacher = Auth::user()->teacher;
+
+     abort_unless(
+         $teacher,
+         403,
+         '講師ユーザーではありません。'
+     );
+
+     $request->validate([
+         'about_me' => 'nullable|string|max:1000',
+     ]);
+
+     $teacher->update([
+         'about_me' => $request->input('about_me'),
+     ]);
+
+     return redirect()->route('teachers.show', ['id' => $teacher->id]);
  }
 }
