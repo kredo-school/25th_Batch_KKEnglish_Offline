@@ -355,10 +355,6 @@ class ReservationController extends Controller
                     . ' / Balance：'
                     . number_format($remainingPoints)
                     . ' pt >'
-             )
-            ->with(
-                'show_booking_monkey',
-                true
             );
     }
 

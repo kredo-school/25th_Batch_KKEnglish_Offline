@@ -118,7 +118,7 @@
      width: min(430px, 75vw);
      height: min(430px, 75vw);
 
-    animation: monkeyCryMotion 3.2s ease-in-out forwards;
+    animation: monkeyCryMotion 4s ease-in-out forwards;
 }
 
 
@@ -230,346 +230,6 @@
         opacity: 1;
     }
 }
-
-/* =========================================
-   Booking Monkey
-========================================= */
-
-.booking-monkey-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(0, 0, 0, 0.25);
-
-    opacity: 1;
-    transition: opacity 0.4s ease;
-}
-
-.booking-monkey-overlay.hide {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.booking-monkey-content {
-    position: relative;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.booking-monkey-bubble {
-    position: relative;
-    z-index: 3;
-
-    background: white;
-    border: 2px solid #ccc;
-    border-radius: 20px;
-
-    padding: 14px 24px;
-    margin-bottom: 16px;
-
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #444;
-
-    text-align: center;
-}
-
-.booking-monkey-bubble::after {
-    content: "";
-
-    position: absolute;
-    left: 50%;
-    bottom: -11px;
-
-    width: 20px;
-    height: 20px;
-
-    background: white;
-
-    border-right: 2px solid #ccc;
-    border-bottom: 2px solid #ccc;
-
-    transform:
-        translateX(-50%)
-        rotate(45deg);
-}
-
-.booking-monkey-title {
-    font-size: 1.7rem;
-    font-weight: 800;
-    margin-bottom: 3px;
-}
-
-
-/* =========================================
-   Monkey Stage
-========================================= */
-
-.booking-monkey-stage {
-    position: relative;
-    z-index: 2;
-
-    width: min(430px, 75vw);
-    height: min(430px, 75vw);
-
-    animation:
-        monkeyHappyMotion 3.2s
-        ease-in-out
-        forwards;
-}
-
-.booking-monkey-image {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-}
-
-.monkey-happy {
-    opacity: 1;
-
-    animation:
-        happyFadeOut 1s
-        ease-in-out
-        forwards;
-}
-
-.monkey-bighappy {
-    opacity: 0;
-
-    animation:
-        bigHappyFadeIn 3.2s
-        ease-in-out
-        forwards;
-}
-
-
-/* =========================================
-   Monkey Motion
-========================================= */
-
-@keyframes monkeyHappyMotion {
-
-    0% {
-        transform:
-            translateY(8px)
-            scale(0.96);
-    }
-
-    25% {
-        transform:
-            translateY(-5px)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translateY(0)
-            scale(1.02);
-    }
-
-    75% {
-        transform:
-            translateY(-6px)
-            scale(1.04);
-    }
-
-    100% {
-        transform:
-            translateY(-2px)
-            scale(1.05);
-    }
-}
-
-
-/* 最初のhappyは短め */
-@keyframes happyFadeOut {
-
-    0%,
-    55% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
-}
-
-
-/* bighappyは早めに出して長く表示 */
-@keyframes bigHappyFadeIn {
-
-    0%,
-    18% {
-        opacity: 0;
-    }
-
-    28% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-/* =========================================
-   Confetti
-========================================= */
-
-.booking-confetti {
-    position: absolute;
-
-    bottom: 70px;
-
-    width: 80px;
-    height: 80px;
-
-    z-index: 5;
-    pointer-events: none;
-}
-
-.booking-confetti-left {
-    left: -20px;
-}
-
-.booking-confetti-right {
-    right: -20px;
-}
-
-.booking-confetti span {
-    position: absolute;
-
-    left: 50%;
-    bottom: 0;
-
-    width: 12px;
-    height: 22px;
-
-    border-radius: 3px;
-
-    opacity: 0;
-
-    animation:
-        confettiBurst 1.4s
-        cubic-bezier(.17,.67,.33,1.25)
-        0.65s
-        forwards;
-}
-
-
-/* 左右で飛ぶ向きを反転 */
-.booking-confetti-right span {
-    transform-origin: center;
-}
-
-
-/* 色 */
-.booking-confetti span:nth-child(1),
-.booking-confetti span:nth-child(7) {
-    background: #ff4d6d;
-}
-
-.booking-confetti span:nth-child(2),
-.booking-confetti span:nth-child(8) {
-    background: #ffd43b;
-}
-
-.booking-confetti span:nth-child(3),
-.booking-confetti span:nth-child(9) {
-    background: #339af0;
-}
-
-.booking-confetti span:nth-child(4),
-.booking-confetti span:nth-child(10) {
-    background: #51cf66;
-}
-
-.booking-confetti span:nth-child(5),
-.booking-confetti span:nth-child(11) {
-    background: #845ef7;
-}
-
-.booking-confetti span:nth-child(6),
-.booking-confetti span:nth-child(12) {
-    background: #ff922b;
-}
-
-
-/* 左クラッカー */
-.booking-confetti-left span:nth-child(1)  { --x: -20px;  --y: -180px; --r: -220deg; }
-.booking-confetti-left span:nth-child(2)  { --x: 20px;   --y: -210px; --r: 180deg; }
-.booking-confetti-left span:nth-child(3)  { --x: 60px;   --y: -190px; --r: 260deg; }
-.booking-confetti-left span:nth-child(4)  { --x: 100px;  --y: -230px; --r: 320deg; }
-.booking-confetti-left span:nth-child(5)  { --x: 140px;  --y: -180px; --r: 210deg; }
-.booking-confetti-left span:nth-child(6)  { --x: 170px;  --y: -140px; --r: 300deg; }
-
-.booking-confetti-left span:nth-child(7)  { --x: 30px;   --y: -130px; --r: 180deg; }
-.booking-confetti-left span:nth-child(8)  { --x: 80px;   --y: -150px; --r: 270deg; }
-.booking-confetti-left span:nth-child(9)  { --x: 120px;  --y: -120px; --r: 240deg; }
-.booking-confetti-left span:nth-child(10) { --x: 150px;  --y: -100px; --r: 360deg; }
-.booking-confetti-left span:nth-child(11) { --x: 190px;  --y: -160px; --r: 280deg; }
-.booking-confetti-left span:nth-child(12) { --x: 210px;  --y: -110px; --r: 320deg; }
-
-
-/* 右クラッカー */
-.booking-confetti-right span:nth-child(1)  { --x: 20px;   --y: -180px; --r: 220deg; }
-.booking-confetti-right span:nth-child(2)  { --x: -20px;  --y: -210px; --r: -180deg; }
-.booking-confetti-right span:nth-child(3)  { --x: -60px;  --y: -190px; --r: -260deg; }
-.booking-confetti-right span:nth-child(4)  { --x: -100px; --y: -230px; --r: -320deg; }
-.booking-confetti-right span:nth-child(5)  { --x: -140px; --y: -180px; --r: -210deg; }
-.booking-confetti-right span:nth-child(6)  { --x: -170px; --y: -140px; --r: -300deg; }
-
-.booking-confetti-right span:nth-child(7)  { --x: -30px;  --y: -130px; --r: -180deg; }
-.booking-confetti-right span:nth-child(8)  { --x: -80px;  --y: -150px; --r: -270deg; }
-.booking-confetti-right span:nth-child(9)  { --x: -120px; --y: -120px; --r: -240deg; }
-.booking-confetti-right span:nth-child(10) { --x: -150px; --y: -100px; --r: -360deg; }
-.booking-confetti-right span:nth-child(11) { --x: -190px; --y: -160px; --r: -280deg; }
-.booking-confetti-right span:nth-child(12) { --x: -210px; --y: -110px; --r: -320deg; }
-
-
-@keyframes confettiBurst {
-
-    0% {
-        opacity: 0;
-
-        transform:
-            translate(0, 0)
-            scale(0.3)
-            rotate(0deg);
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    70% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-
-        transform:
-            translate(
-                var(--x),
-                var(--y)
-            )
-            scale(1.1)
-            rotate(var(--r));
-    }
-}
-
 </style>
 
 <div class="container-fluid">
@@ -577,109 +237,46 @@
         {{-- =========================================
             Cancel Monkey
         ========================================== --}}
-        @if (session('show_cancel_monkey'))
+    @if (session('show_cancel_monkey'))
 
-        <div
-            id="cancelMonkeyOverlay"
-            class="cancel-monkey-overlay"
-        >
-            <div class="cancel-monkey-content">
+    <div
+        id="cancelMonkeyOverlay"
+        class="cancel-monkey-overlay"
+    >
+        <div class="cancel-monkey-content">
 
-                <div class="cancel-monkey-bubble">
+            <div class="cancel-monkey-bubble">
 
-                    <div class="cancel-monkey-pien">
-                        ぴえん
-                    </div>
-
-                    <div>
-                        Huhu... gikansela na...
-                    </div>
-
+                <div class="cancel-monkey-pien">
+                    ぴえん
                 </div>
 
-                <div class="cancel-monkey-stage">
-
-                    <img
-                        src="{{ asset('images/kk-monkey-cry.png') }}"
-                        alt="Crying Monkey"
-                        class="cancel-monkey-image monkey-cry"
-                    >
-
-                    <img
-                        src="{{ asset('images/kk-monkey-bigcry.png') }}"
-                        alt="Big Crying Monkey"
-                        class="cancel-monkey-image monkey-bigcry"
-                    >
-
-                </div>
-
-            </div>
-        </div>
-
-    @endif
-
-   {{-- =========================================
-        Booking Monkey
-    ========================================== --}}
-    @if (session('show_booking_monkey'))
-
-        <div
-            id="bookingMonkeyOverlay"
-            class="booking-monkey-overlay"
-        >
-
-            <div class="booking-monkey-content">
-
-                {{-- Confetti --}}
-                <div class="booking-confetti booking-confetti-left">
-                    @for ($i = 0; $i < 12; $i++)
-                        <span></span>
-                    @endfor
-                </div>
-
-                <div class="booking-confetti booking-confetti-right">
-                    @for ($i = 0; $i < 12; $i++)
-                        <span></span>
-                    @endfor
-                </div>
-
-
-                {{-- Message --}}
-                <div class="booking-monkey-bubble">
-
-                    <div class="booking-monkey-title">
-                        Yay!
-                    </div>
-
-                    <div>
-                        Your lesson is booked!
-                    </div>
-
-                </div>
-
-
-                {{-- Monkey --}}
-                <div class="booking-monkey-stage">
-
-                    <img
-                        src="{{ asset('images/kk-monkey-happy.png') }}"
-                        alt="Happy Monkey"
-                        class="booking-monkey-image monkey-happy"
-                    >
-
-                    <img
-                        src="{{ asset('images/kk-monkey-bighappy.png') }}"
-                        alt="Very Happy Monkey"
-                        class="booking-monkey-image monkey-bighappy"
-                    >
-
+                <div>
+                    Huhu... gikansela na...
                 </div>
 
             </div>
 
-        </div>
+            <div class="cancel-monkey-stage">
 
-    @endif
+                <img
+                    src="{{ asset('images/kk-monkey-cry.png') }}"
+                    alt="Crying Monkey"
+                    class="cancel-monkey-image monkey-cry"
+                >
+
+                <img
+                    src="{{ asset('images/kk-monkey-bigcry.png') }}"
+                    alt="Big Crying Monkey"
+                    class="cancel-monkey-image monkey-bigcry"
+                >
+
+            </div>
+
+        </div>
+    </div>
+
+@endif
 
     {{-- ===============================
         Title
@@ -1355,41 +952,6 @@ document.addEventListener(
             setTimeout(function () {
                 cancelMonkeyOverlay.remove();
             }, 3700);
-
-        }
-
-        /*
-        * ==========================
-        * Booking Monkey Animation
-        * ==========================
-        */
-        const bookingMonkeyOverlay =
-            document.getElementById('bookingMonkeyOverlay');
-
-        if (bookingMonkeyOverlay) {
-
-            /*
-            * 約3.2秒後に
-            * フェードアウト開始
-            */
-            setTimeout(function () {
-
-                bookingMonkeyOverlay.classList.add(
-                    'hide'
-                );
-
-            }, 3200);
-
-
-            /*
-            * 約3.6秒後に
-            * 完全削除
-            */
-            setTimeout(function () {
-
-                bookingMonkeyOverlay.remove();
-
-            }, 3600);
 
         }
 

@@ -7,37 +7,20 @@
 <div class="container py-4">
 
     {{-- ===============================
-     Title
+         Title
     ================================ --}}
-    <div
-        class="
-            mb-4
-            d-flex
-            align-items-center
-        "
-    >
-        <div>
-            <h2 class="fw-bold mb-1">
-                Teacher Profile
-            </h2>
+    <div class="mb-4">
 
-            <p class="text-secondary mb-0">
-                Teacher information and introduction
-            </p>
-        </div>
+        <h2 class="fw-bold mb-1">
+            Teacher Profile
+        </h2>
+        <a href="{{ route('students.reservations.teacher-detail', ['teacher_id' => $teacher->id,
+            'mode' => 'teacher']) }}">Book a Lesson</a>
 
-         {{-- Studentだけ表示 --}}
-        @if (auth()->user()?->role?->role_code === 'student')
-                <a
-                    href="{{ route('students.reservations.teacher-detail', [
-                        'teacher_id' => $teacher->id,
-                        'mode' => 'teacher'
-                    ]) }}"
-                    class="btn btn-primary ms-auto me-5"
-                >
-                    Book a Lesson
-                </a>
-        @endif
+        <p class="text-secondary mb-0">
+            Teacher information and introduction
+        </p>
+
     </div>
 
 
@@ -152,7 +135,7 @@
 
             {{-- ===============================
                 Rating
-            ================================ --}}
+            =============================== --}}
             <div class="row border-bottom py-3">
 
                 <div class="col-md-3 fw-bold text-secondary">
@@ -161,19 +144,30 @@
 
                 <div class="col-md-9">
 
-                    <i class="fa-solid fa-star text-warning me-1"></i>
+                    @if (($teacher->reviews_count ?? 0) > 0)
 
-                    <span class="fw-semibold">
-                        {{ number_format($teacher->reviews_avg_rating ?? 3, 1) }}
-                    </span>
+                        <i class="fa-solid fa-star text-warning me-1"></i>
 
-                    <span class="text-secondary">
-                        ({{ $teacher->reviews_count ?? 0 }} reviews)
-                    </span>
+                        <span class="fw-semibold">
+                            {{ number_format($teacher->reviews_avg_rating, 1) }}
+                        </span>
+
+                        <span class="text-secondary">
+                            ({{ $teacher->reviews_count }} reviews)
+                        </span>
+
+                    @else
+
+                        <span class="text-secondary">
+                            No reviews
+                        </span>
+
+                    @endif
 
                 </div>
 
             </div>
+
             {{-- ===============================
                     Teaching Materials
                 ================================ --}}

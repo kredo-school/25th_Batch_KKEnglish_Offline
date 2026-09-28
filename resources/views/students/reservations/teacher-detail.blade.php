@@ -322,25 +322,29 @@
                             </div>
 
                             {{-- Rating --}}
-                            <div
-                                class="
-                                    d-flex
-                                    justify-content-center
-                                    align-items-center
-                                    gap-1
-                                    mt-2
-                                "
-                                style="font-size: 14px;"
-                            >
-                                <i class="fa-solid fa-star text-warning"></i>
+                            <div class="
+                            d-flex
+                            justify-content-center
+                            align-items-center
+                            gap-1
+                            mt-2
+                        "
+                                style="font-size: 14px;">
+                                @if (($teacher->reviews_count ?? 0) > 0)
+                                    <i class="fa-solid fa-star text-warning"></i>
 
-                                <span class="fw-semibold">
-                                    {{ number_format($teacher->reviews_avg_rating ?? 3, 1) }}
-                                </span>
+                                    <span class="fw-semibold">
+                                        {{ number_format($teacher->reviews_avg_rating, 1) }}
+                                    </span>
 
-                                <span class="text-secondary">
-                                    ({{ $teacher->reviews_count ?? 0 }})
-                                </span>
+                                    <span class="text-secondary">
+                                        ({{ $teacher->reviews_count }})
+                                    </span>
+                                @else
+                                    <span class="text-secondary">
+                                        No reviews
+                                    </span>
+                                @endif
                             </div>
 
 
