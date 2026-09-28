@@ -33,6 +33,8 @@ use App\Http\Controllers\Admin\OperationalStatusController;
 use App\Http\Controllers\Student\ReviewController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
+use App\Http\Controllers\Admin\TeacherStationAssignmentController;
+use App\Http\Controllers\Admin\StationController;
 
 // Test route for frontend testing
 
@@ -202,8 +204,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/schedules', [DashboardController::class, 'schedulesIndex'])->name('schedules.index');
     Route::get('/schedules/details', [DashboardController::class, 'details'])->name('schedules.index_details');
 
-    Route::get('/schedules/matrix', [ScheduleMatrixController::class, 'index'])->name('schedules.matrix');
-    Route::get('/schedules/matrix/details', [ScheduleMatrixController::class, 'details'])->name('schedules.matrix_details');
+    Route::get('/operational-status/matrix', [ScheduleMatrixController::class, 'index'])->name('operational-status.matrix');
+    Route::get('/operational-status/matrix/details', [ScheduleMatrixController::class, 'details'])->name('operational-status.matrix_details');
 
     // Expected Reservations (予想予約数) 設定
     Route::get('/expected-reservations', [ExpectedReservationSettingController::class, 'edit'])->name('expected-reservations.edit');
@@ -242,4 +244,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
 
     // Operational Status
     Route::get('/operational-status', [OperationalStatusController::class, 'index'])->name('operational-status.index');
+
+    // Station Management
+    Route::resource('stations', StationController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    // Teacher Station Assignment Management
+    Route::get('/teacher-station-assignments',[TeacherStationAssignmentController::class, 'index'])->name('teacher-station-assignments.index');
+    Route::get('/teacher-station-assignments/create',[TeacherStationAssignmentController::class, 'create'])->name('teacher-station-assignments.create');
+    Route::post('/teacher-station-assignments',[TeacherStationAssignmentController::class, 'store'])->name('teacher-station-assignments.store');
+    Route::get('/teacher-station-assignments/{teacherStationAssignment}/edit',[TeacherStationAssignmentController::class, 'edit'])->name('teacher-station-assignments.edit');
+    Route::put('/teacher-station-assignments/StationAssignment',[TeacherStationAssignmentController::class, 'update'])->name('teacher-station-assignments.update');
+    Route::put('/teacher-station-assignments/lesson/{reservation}',[TeacherStationAssignmentController::class, 'override'])->name('teacher-station-assignments.override');
 });

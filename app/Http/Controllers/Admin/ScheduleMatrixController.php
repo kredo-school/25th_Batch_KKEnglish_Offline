@@ -107,7 +107,7 @@ class ScheduleMatrixController extends Controller
             }
         }
 
-        return view('admin.schedules.matrix', compact('dates', 'hours', 'matrix', 'start', 'totalCapacity', 'totalBooked'));
+        return view('admin.operational-status.matrix', compact('dates', 'hours', 'matrix', 'start', 'totalCapacity', 'totalBooked'));
     }
 
     /**
@@ -117,11 +117,11 @@ class ScheduleMatrixController extends Controller
     {
         $dateStr = $request->input('date', Carbon::today()->toDateString());
         $date = Carbon::parse($dateStr);
-        
+
         $intervals = [];
         $current = $date->copy()->setTime(9, 0);
         $end = $date->copy()->setTime(22, 0); // 22:00まで
-        
+
         // シフト枠（配置人数用）の取得
         $schedules = DB::table('teacher_schedules')
             ->where('available_date', $dateStr)
@@ -131,12 +131,12 @@ class ScheduleMatrixController extends Controller
         // ========== 追加・変更箇所 ==========
         // 1. 日付から「平日 (weekday)」か「週末 (weekend)」かを自動判定
         $dayType = $date->isWeekend() ? 'weekend' : 'weekday';
-        
+
         // 2. データベースの「期間設定（SeasonPeriod）」を確認して時期を判定する
         $seasonRecord = SeasonPeriod::where('start_date', '<=', $dateStr)
             ->where('end_date', '>=', $dateStr)
             ->first();
-            
+
         // 該当する期間設定があればその時期を、設定がなければデフォルトで 'normal' を使用する
         $season = $seasonRecord ? $seasonRecord->season_type : 'normal';
 
@@ -153,10 +153,10 @@ class ScheduleMatrixController extends Controller
             $slotStart = $current->copy();
             $slotEnd = $current->copy()->addMinutes(30);
             $timeStr = $slotStart->format('H:i');
-            
+
             // 設定テーブルからこの時間の「予想予約数」を取得（設定されていなければ0）
             $booked = isset($expectedSettings[$timeStr]) ? $expectedSettings[$timeStr]->expected_count : 0;
-            
+
             // 配置人数（その30分枠に勤務している講師数）
             $capacity = 0;
             foreach ($schedules as $sch) {
@@ -166,11 +166,11 @@ class ScheduleMatrixController extends Controller
                     $capacity++;
                 }
             }
-            
+
             $spare = 2; // 予備人数（要件に応じて固定値、または今後DB化可能）
             $required = $booked + $spare; // 必要講師数 = 予想予約数 + 予備人数
             $diff = $capacity - $required; // 過不足
-            
+
             $intervals[] = [
                 'start' => $slotStart->format('H:i'),
                 'end' => $slotEnd->format('H:i'),
@@ -181,10 +181,10 @@ class ScheduleMatrixController extends Controller
                 'diff' => $diff,
                 'status' => $diff >= 0 ? '余裕' : '不足',
             ];
-            
+
             $current->addMinutes(30);
         }
-        
-        return view('admin.schedules.matrix_details', compact('date', 'intervals'));
+
+        return view('admin.operational-status.matrix_details', compact('date', 'intervals'));
     }
 }

@@ -15,7 +15,7 @@
             class="d-block px-3 py-2 rounded mb-1 text-decoration-none btn btn-outline-secondary btn-sm {{ request()->routeIs('admin.expected-reservations.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
             Expected reservations settings
         </a>
-        <a href="{{ route('admin.schedules.matrix', ['start_date' => $date->copy()->startOfWeek()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i>Back</a>
+        <a href="{{ route('admin.operational-status.matrix', ['start_date' => $date->copy()->startOfWeek()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i>Back</a>
     </div>
 
     <div class="card">
