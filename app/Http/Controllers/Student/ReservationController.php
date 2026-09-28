@@ -582,6 +582,10 @@ class ReservationController extends Controller
                 . '    Remaining Points：'
                 . number_format($remainingPoints)
                 . ' pt >'
+          )
+            ->with(
+                'show_cancel_monkey',
+                true
         );
     }
 
