@@ -6,8 +6,8 @@
         <h1 class="h4 mb-0">Operational Status</h1>
         <div class="d-flex gap-2">
             {{-- 1週間前/後へのナビゲーション --}}
-            <a href="{{ route('admin.schedules.matrix', ['start_date' => $start->copy()->subDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Prev</a>
-            <a href="{{ route('admin.schedules.matrix', ['start_date' => $start->copy()->addDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm">Next <i class="fa-solid fa-angles-right"></i></a>
+            <a href="{{ route('admin.operational-status.matrix', ['start_date' => $start->copy()->subDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Prev</a>
+            <a href="{{ route('admin.operational-status.matrix', ['start_date' => $start->copy()->addDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm">Next <i class="fa-solid fa-angles-right"></i></a>
         </div>
     </div>
 
@@ -34,7 +34,7 @@
                             @foreach($dates as $d)
                                 <th class="py-2">
                                     <div class="mb-1">{{ $weekMap[$d->dayOfWeek] }}</div>
-                                    <a href="{{ route('admin.schedules.matrix_details', ['date' => $d->toDateString()]) }}" class="text-decoration-none fw-bold">
+                                    <a href="{{ route('admin.operational-status.matrix_details', ['date' => $d->toDateString()]) }}" class="text-decoration-none fw-bold">
                                         {{ $d->format('m/d') }}
                                     </a>
                                 </th>

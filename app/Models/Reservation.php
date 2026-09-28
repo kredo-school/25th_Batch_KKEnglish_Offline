@@ -78,10 +78,15 @@ class Reservation extends Model
     }
 
     public function review(): HasOne
-{
-    return $this->hasOne(
-        Review::class,
-        'reservation_id'
-    );
-}
+    {
+        return $this->hasOne(
+            Review::class,
+            'reservation_id'
+        );
+    }
+
+    public function stationOverride(): HasOne
+    {
+        return $this->hasOne(LessonStationOverride::class);
+    }
 }

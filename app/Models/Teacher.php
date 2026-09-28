@@ -18,7 +18,6 @@ use App\Models\ScheduleException;
 use App\Models\Reservation;
 use App\Models\TeacherShiftPatternAssignment;
 
-
 class Teacher extends Model
 {
     use HasFactory;
@@ -95,5 +94,10 @@ class Teacher extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function stationAssignments(): HasMany
+    {
+        return $this->hasMany(TeacherStationAssignment::class);
     }
 }
