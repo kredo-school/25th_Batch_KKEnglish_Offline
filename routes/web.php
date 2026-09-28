@@ -53,7 +53,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
     Route::get('/materials/{material}', [MaterialController::class, 'show'])->name('materials.show');
 
+
     Route::get('/teachers/{id}', [TeacherController::class, 'show'])->whereNumber('id')->name('teachers.show');
+
+
 });
 
 // Student Routes
@@ -76,12 +79,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
-    // Route::post('/student/lessons/{reservation}/cancel', [LessonController::class, 'cancel'])
-    //     ->name('student.lessons.cancel');
 
-    // Review routes
-    // Route::get('/students/reviews', [ReviewController::class, 'create'])->name('students.reviews.create');
-    // Route::post('/students/reviews', [ReviewController::class, 'store'])->name('students.reviews.store');
+
     // Student reservations
      // 予約一覧・検索画面
     Route::get('/students/reservations', [ReservationController::class, 'index'])->name('students.reservations.index');
@@ -122,6 +121,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 // Teacher Dashboard
 Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teachers/dashboard',[TeacherDashboardController::class, 'index'])->name('teachers.dashboard');
+
+
+    Route::patch('/teachers/profile', [TeacherController::class, 'updateProfile'])
+        ->name('teachers.profile.update');
 
     // My Schedule 画面
     Route::get('/teachers/schedule', [ScheduleController::class, 'index'])->name('teachers.schedule');

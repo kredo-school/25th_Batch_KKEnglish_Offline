@@ -318,7 +318,7 @@
                  Form
             ================================ --}}
             <form
-                action="#"
+                action="{{ route('teachers.profile.update') }}"
                 method="POST"
             >
 
@@ -402,7 +402,7 @@
                     <button
                         type="submit"
                         class="btn btn-primary"
-                        disabled
+
                     >
                         Save
                     </button>
