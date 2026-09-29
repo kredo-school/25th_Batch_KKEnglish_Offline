@@ -4,7 +4,8 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid" id="teacher-reservations-page"
+    data-teacher-id="{{ auth()->user()->teacher?->id }}">
 
     {{-- ===============================
          Title
@@ -151,7 +152,6 @@
                                                 class="rounded-circle me-2"
                                                 style="object-fit: cover;"
                                             >
-
                                         @else
 
                                             <i

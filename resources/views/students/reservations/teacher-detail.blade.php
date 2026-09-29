@@ -1083,7 +1083,6 @@
             data-schedule-id="${slot.schedule_id}"
             data-start-at="${slot.start_at}"
             data-end-at="${slot.end_at}"
-            ${canBook ? '' : 'disabled'}
         >
             ${
                 canBook
@@ -1443,22 +1442,38 @@
                     'click',
                     function(event) {
 
-
                         const button =
                             event.target.closest(
                                 '.book-slot-btn'
                             );
 
-
                         if (!button) {
                             return;
                         }
 
+                        /*
+                        * Material未選択
+                        */
                         if (!materialId) {
 
-                            alert(
-                                'Please select a material before booking.'
-                            );
+                            const materialSelect =
+                                document.getElementById(
+                                    'detailMaterial'
+                                );
+
+                            if (materialSelect) {
+
+                                materialSelect.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
+                                });
+
+                                setTimeout(function() {
+
+                                    materialSelect.focus();
+
+                                }, 400);
+                            }
 
                             return;
                         }
@@ -1472,7 +1487,6 @@
                             .dataset
                             .scheduleId;
 
-
                         document
                             .getElementById(
                                 'bookingStartAt'
@@ -1482,7 +1496,6 @@
                             .dataset
                             .startAt;
 
-
                         document
                             .getElementById(
                                 'bookingEndAt'
@@ -1491,7 +1504,6 @@
                             button
                             .dataset
                             .endAt;
-
 
                         document
                             .getElementById(

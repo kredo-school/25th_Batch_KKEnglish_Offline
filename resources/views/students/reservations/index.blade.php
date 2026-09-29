@@ -4,7 +4,8 @@
 
 @section('content')
 
-    <div class="container-fluid">
+    <div class="containe-fluid" id="student-reservations-page"
+        data-student-id="{{ auth()->user()->student?->id }}">
 
         {{-- ===============================
         Title
@@ -25,7 +26,7 @@
         {{-- ===============================
         Validation Errors
         ================================ --}}
-        @if ($errors->any())
+        @if ($errors->any())r
 
             <div class="alert alert-danger">
 
