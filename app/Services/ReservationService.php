@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\ReservationCreated;
 use App\Models\LessonRecord;
 use App\Models\Reservation;
 use App\Models\ReservationHistory;
@@ -23,10 +24,12 @@ class ReservationService
         Student $student,
         array $data
     ): Reservation {
-        return DB::transaction(function () use (
+        $reservation = DB::transaction(function () use (
             $student,
             $data
         ) {
+            // ここに現在の予約作成・ポイント消費処理をそのまま置く
+
 
             $student = Student::query()
                 ->whereKey($student->getKey())
@@ -316,6 +319,9 @@ class ReservationService
 
             return $reservation->refresh();
         });
+            ReservationCreated::dispatch((int) $reservation->teacher_id);
+
+            return $reservation;
     }
 
     /*
@@ -550,7 +556,7 @@ class ReservationService
                     : '講師が生徒の欠席を登録',
             ]);
 
-            /*
+         /*
          * =====================================
          * 更新後のReservationを返す
          * =====================================

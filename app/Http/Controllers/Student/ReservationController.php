@@ -36,7 +36,6 @@ class ReservationController extends Controller
         $student =
             $request->user()->student;
 
-
         $validated =
             $request->validate([
 
