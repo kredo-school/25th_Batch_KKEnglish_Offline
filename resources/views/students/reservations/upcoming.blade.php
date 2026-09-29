@@ -118,7 +118,7 @@
      width: min(430px, 75vw);
      height: min(430px, 75vw);
 
-    animation: monkeyCryMotion 3.2s ease-in-out forwards;
+    animation: monkeyCryMotion 2.7s ease-in-out forwards;
 }
 
 
@@ -136,14 +136,14 @@
 /* 最初に見える泣き顔 */
 .monkey-cry {
     opacity: 1;
-    animation: cryFadeOut 3.2s ease-in-out forwards;
+    animation: cryFadeOut 2.7s ease-in-out forwards;
 }
 
 
 /* あとから自然に出てくる大泣き顔 */
 .monkey-bigcry {
     opacity: 0;
-    animation: bigCryFadeIn 3.2s ease-in-out forwards;
+    animation: bigCryFadeIn 2.7s ease-in-out forwards;
 }
 
 
@@ -320,7 +320,7 @@
     height: min(430px, 75vw);
 
     animation:
-        monkeyHappyMotion 3.2s
+        monkeyHappyMotion 2.7s
         ease-in-out
         forwards;
 }
@@ -348,7 +348,7 @@
     opacity: 0;
 
     animation:
-        bigHappyFadeIn 3.2s
+        bigHappyFadeIn 2.7s
         ease-in-out
         forwards;
 }
@@ -777,6 +777,10 @@
                                 </th>
 
                                 <th class="py-3">
+                                    Room
+                                </th>
+
+                                <th class="py-3">
                                     Points
                                 </th>
 
@@ -974,6 +978,16 @@
                                             ?? '-'
                                         }}
 
+                                    </td>
+
+                                    {{-- ===============================
+                                        Room
+                                    ================================ --}}
+                                    <td>
+                                        <div class="text-secondary small">
+                                            <i class="fa-solid fa-location-dot me-1"></i>
+                                            Room 3
+                                        </div>
                                     </td>
 
 
@@ -1342,19 +1356,19 @@ document.addEventListener(
         if (cancelMonkeyOverlay) {
 
             /*
-             * 約3.2秒後に消し始める
+             * 約2.7秒後に消し始める
              */
             setTimeout(function () {
                 cancelMonkeyOverlay.classList.add('hide');
-            }, 3200);
+            }, 2700);
 
 
             /*
-             * 3.7秒後に完全削除
+             * 3.2秒後に完全削除
              */
             setTimeout(function () {
                 cancelMonkeyOverlay.remove();
-            }, 3700);
+            }, 3200);
 
         }
 
@@ -1369,7 +1383,7 @@ document.addEventListener(
         if (bookingMonkeyOverlay) {
 
             /*
-            * 約3.2秒後に
+            * 約2.7秒後に
             * フェードアウト開始
             */
             setTimeout(function () {
@@ -1378,18 +1392,18 @@ document.addEventListener(
                     'hide'
                 );
 
-            }, 3200);
+            }, 2700);
 
 
             /*
-            * 約3.6秒後に
+            * 約3.2秒後に
             * 完全削除
             */
             setTimeout(function () {
 
                 bookingMonkeyOverlay.remove();
 
-            }, 3600);
+            }, 3200);
 
         }
 

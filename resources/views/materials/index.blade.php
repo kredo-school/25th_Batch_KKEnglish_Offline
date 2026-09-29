@@ -19,12 +19,22 @@
                     <div class="card-body d-flex align-items-center">
 
                         {{-- 教材画像 --}}
-                        <img src="{{ $material->cover_image }}"
-                             alt="{{ $material->name }}"
-                             width="90"
-                             height="90"
-                             class="rounded me-3"
-                             style="object-fit: cover;">
+                        <img
+                            src="{{
+                                $material->cover_image
+                                    ? (
+                                        str_starts_with($material->cover_image, 'http')
+                                            ? $material->cover_image
+                                            : asset('storage/' . $material->cover_image)
+                                    )
+                                    : asset('images/no-image.png')
+                            }}"
+                            alt="{{ $material->name }}"
+                            width="90"
+                            height="90"
+                            class="rounded me-3"
+                            style="object-fit: cover;"
+                        >
 
                         <div>
 

@@ -61,7 +61,7 @@
        <div class="d-flex align-items-center mb-1">
 
     <h2 class="fw-bold mb-0">
-        Lesson History
+        Learning History
     </h2>
 
     <div class="lesson-monkey-area">

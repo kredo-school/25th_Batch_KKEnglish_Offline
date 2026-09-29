@@ -37,7 +37,8 @@ use App\Http\Controllers\Admin\TeacherStationAssignmentController;
 use App\Http\Controllers\Admin\StationController;
 
 // Test route for frontend testing
-
+Route::view('/students/progress-test','students.progress.index')
+->name('students.progress.test');
 
 // Public routes
 Route::get('/', function () {

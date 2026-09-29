@@ -24,11 +24,6 @@
             Lesson History
         </a>
 
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            (Notifications)
-        </a>
-
     </nav>
 
 <style>
