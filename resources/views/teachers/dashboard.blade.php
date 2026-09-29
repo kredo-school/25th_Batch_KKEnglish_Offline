@@ -4,7 +4,8 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid" id="teacher-dashboard-page"
+    data-teacher-id="{{ auth()->user()->teacher?->id }}">
 
     {{-- ===============================
          Hello Header

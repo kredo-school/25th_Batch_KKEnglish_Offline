@@ -100,7 +100,7 @@
 
 </head>
 
-<body>
+<body data-teacher-id="{{ $roleCode === 'teacher' ? $user?->teacher?->id : '' }}">
 
 <div id="app">
 
