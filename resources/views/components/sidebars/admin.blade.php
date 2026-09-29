@@ -35,25 +35,13 @@
                 <i class="fa-solid fa-angles-left"></i> Back to Dashboard
             </a>
 
-            <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle ">Schedule management</div>
+            <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle ">Scheduler</div>
 
             {{-- 今日のスケジュール --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 Today's schedule
             </a>
-
-            {{-- 予想期間設定 --}}
-            {{-- <a href="{{ route('admin.season-periods.index', ['menu' => 'schedule']) }}"
-               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.season-periods.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Season settings
-            </a> --}}
-
-            {{-- 予想予約数設定 --}}
-            {{-- <a href="{{ route('admin.expected-reservations.edit', ['menu' => 'schedule']) }}"
-               class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.expected-reservations.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Expected reservations settings
-            </a> --}}
 
             <hr>
 
@@ -106,7 +94,7 @@
                 Expected reservations settings
             </a>
 
-            @elseif($menu === 'station')
+        @elseif($menu === 'station')
 
             {{-- Station List専用サイドバー --}}
             <a href="{{ route('admin.dashboard', ['menu' => 'main']) }}"
@@ -115,30 +103,21 @@
                 Back to Dashboard
             </a>
 
-            <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle">
+            {{-- <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle">
                 Station Management
-            </div>
+            </div> --}}
 
             {{-- Station List --}}
-            <a href="{{ route(
-                    'admin.stations.index',
-                    ['menu' => 'station']
-                ) }}"
+            <a href="{{ route('admin.stations.index',['menu' => 'station']) }}"
             class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-            {{ request()->routeIs('admin.stations.*')
-                    ? 'bg-secondary-subtle fw-semibold'
-                    : '' }}">
+            {{ request()->routeIs('admin.stations.*') ? 'bg-secondary-subtle fw-semibold': '' }}">
                 <i class="fa-solid fa-location-dot me-2"></i>
                 Station List
             </a>
 
             {{-- Teacher Station Assignmentへ --}}
-            <a href="{{ route(
-                    'admin.teacher-station-assignments.index',
-                    ['menu' => 'station-assignment']
-                ) }}"
-            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-
+            <a href="{{ route('admin.teacher-station-assignments.index',['menu' => 'station']) }}"
+            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teacher-station-assignments.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 <i class="fa-solid fa-chalkboard-user me-2"></i>
                 Teacher Station Assignment
             </a>
@@ -157,7 +136,7 @@
             {{-- Schedule management (クリックすると Schedule専用メニューに切り替わります) --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Schedule management
+                Scheduler
             </a>
 
             <a href="{{ route('admin.stations.index', ['menu' => 'station']) }}"
