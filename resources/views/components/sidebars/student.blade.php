@@ -9,25 +9,25 @@
         <a href="{{ route('students.reservations.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
            {{ request()->routeIs('students.reservations.index') ? 'student-active fw-semibold' : '' }}">
-            Book a lesson
+            Book a Lesson
         </a>
 
          <a href="{{ route('students.reservations.upcoming') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
            {{ request()->routeIs('students.reservations.upcoming') ? 'student-active fw-semibold' : '' }}">
-            My lessons
+            Upcoming Lessons
         </a>
 
          <a href="{{ route('students.teacher-list') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
            {{ request()->routeIs('students.teacher-list') ? 'student-active fw-semibold' : '' }}">
-            Teacher list
+            Teacher List
         </a>
 
         <a href="{{ route('students.history.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('student.history.index') ? 'student-active fw-semibold' : '' }}">
-            Learning history
+           {{ request()->routeIs('students.history.index') ? 'student-active fw-semibold' : '' }}">
+            Learning History
         </a>
 
         <a href="{{ route('materials.index') }}"
@@ -36,14 +36,10 @@
             Teaching Materials
         </a>
 
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            (Learning Progress)
-        </a>
-
-        <a href="#"
-           class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none">
-            (Notifications)
+        <a href="{{ route('students.progress.test') }}"
+            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
+            {{ request()->routeIs('students.progress.test') ? 'student-active fw-semibold' : '' }}">
+            Learning Progress
         </a>
 
     </nav>
