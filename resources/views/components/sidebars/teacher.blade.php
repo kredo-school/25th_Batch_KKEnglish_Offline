@@ -14,13 +14,13 @@
 
          <a href="{{ route('teachers.reservations.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('teachers.reservations.index') ? 'teacher-active' : '' }}">
+           {{ request()->routeIs('teachers.reservations.*') ? 'teacher-active' : '' }}">
             Upcoming Lessons
         </a>
 
         <a href="{{ route('teachers.history.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('teachers.history.index') ? 'teacher-active' : '' }}">
+           {{ request()->routeIs('teachers.history.*') ? 'teacher-active' : '' }}">
             Lesson History
         </a>
 

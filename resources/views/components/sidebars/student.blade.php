@@ -20,13 +20,15 @@
 
          <a href="{{ route('students.teacher-list') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('students.teacher-list') ? 'student-active fw-semibold' : '' }}">
+           {{ request()->routeIs('students.teacher-list','teachers.show') ? 'student-active fw-semibold' : '' }}">
             Teacher List
         </a>
 
         <a href="{{ route('students.history.index') }}"
            class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-           {{ request()->routeIs('students.history.index') ? 'student-active fw-semibold' : '' }}">
+           {{ request()->routeIs('students.history.index',
+                                  'students.point-history.index',
+                                  'students.reviews.create') ? 'student-active fw-semibold' : '' }}">
             Learning History
         </a>
 

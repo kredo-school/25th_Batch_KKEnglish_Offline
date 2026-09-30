@@ -250,6 +250,17 @@
 
     <div class="container-fluid">
 
+        {{-- Back --}}
+        <div class="mb-3">
+            <a
+                href="{{ route('students.reservations.index') }}"
+                class="btn btn-outline-secondary btn-sm"
+            >
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Back
+            </a>
+        </div>
+
         {{-- ===============================
          Title
     ================================ --}}
