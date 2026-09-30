@@ -13,7 +13,7 @@
             href="{{ route('students.history.index') }}"
             class="btn btn-outline-secondary btn-sm"
         >
-            <i class="fa-solid fa-angles-left me-1"></i>
+            <i class="fa-solid fa-arrow-left me-1"></i>
             Back
         </a>
 

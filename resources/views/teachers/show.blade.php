@@ -6,6 +6,21 @@
 
 <div class="container py-4">
 
+          {{-- StudentだけBackを表示 --}}
+        @if (auth()->user()?->role?->role_code === 'student')
+            <div class="mb-4">
+                <a
+                    href="{{ route('students.teacher-list') }}"
+                    class="btn btn-outline-secondary btn-sm"
+                >
+                    <i class="fa-solid fa-arrow-left me-1"></i>
+                    Back
+                </a>
+            </div>
+        @endif
+
+
+
     {{-- ===============================
      Title
     ================================ --}}

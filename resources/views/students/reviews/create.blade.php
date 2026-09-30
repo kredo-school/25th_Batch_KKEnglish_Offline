@@ -17,6 +17,17 @@
 
 <div class="container py-4">
 
+    {{-- Back --}}
+    <div class="mb-3">
+        <a
+            href="{{ route('students.history.index') }}"
+            class="btn btn-outline-secondary btn-sm"
+        >
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
 
     {{-- ===============================
          Title
@@ -461,19 +472,9 @@
                 <div
                     class="
                         d-flex
-                        justify-content-between
+                        justify-content-end
                     "
                 >
-
-                    <a
-                        href="{{ route(
-                            'students.history.index'
-                        ) }}"
-                        class="btn btn-outline-secondary"
-                    >
-                        Back
-                    </a>
-
 
                     <button
                         type="submit"

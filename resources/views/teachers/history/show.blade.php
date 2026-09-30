@@ -39,6 +39,17 @@
 
 <div class="container py-4">
 
+    {{-- Back --}}
+    <div class="mb-3">
+        <a
+            href="{{ route('teachers.history.index') }}"
+            class="btn btn-outline-secondary btn-sm"
+        >
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
 
     {{-- ===============================
          Title
@@ -607,26 +618,6 @@
         </div>
 
     @endif
-
-
-
-    {{-- ===============================
-         Back
-    ================================ --}}
-    <div class="mt-4">
-
-        <a
-            href="{{ route(
-                'teachers.history.index'
-            ) }}"
-            class="btn btn-outline-secondary"
-        >
-            Back
-        </a>
-
-    </div>
-
-</div>
 
 
 
