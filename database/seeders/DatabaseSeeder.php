@@ -28,6 +28,11 @@ class DatabaseSeeder extends Seeder
             TransactionTypeSeeder::class,
             StudentSeeder::class,
             AdminSeeder::class,
+            ReservationSeeder::class,
+            PointTransactionSeeder::class,
+            LessonRecordSeeder::class,
+            ReviewSeeder::class,
+            TeacherLikeSeeder::class,
         ]);
 
         User::factory()->create([
