@@ -16,7 +16,7 @@
 
         <a href="{{ route('admin.teacher-station-assignments.index', ['menu' => 'station-assignment']) }}"
            class="btn btn-outline-secondary">
-            Back
+            <i class="fa-solid fa-angles-left"></i> Back
         </a>
     </div>
 

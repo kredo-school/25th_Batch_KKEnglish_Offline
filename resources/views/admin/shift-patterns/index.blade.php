@@ -4,7 +4,7 @@
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h2 mb-0 fw-bold">Shift Pattern Management</h1>
-        <a href="{{ route('admin.shift-patterns.create') }}" class="btn btn-primary btn-sm">＋ New Pattern</a>
+        <a href="{{ route('admin.shift-patterns.create') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus me-1"></i>New Pattern</a>
     </div>
 
     {{-- 成功メッセージ --}}
@@ -71,12 +71,12 @@
                         <td>{{ $pattern->slot_minutes ?? '-' }}</td>
                         <td>{{ $pattern->teachers_count ?? 0 }}</td>
                         <td class="text-end">
-                            <a href="{{ route('admin.shift-patterns.edit', $pattern) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                            <a href="{{ route('admin.shift-patterns.edit', $pattern) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-pen-to-square me-1"></i> Edit</a>
                             <a href="{{ route('admin.shift-pattern-assignments.create', ['pattern_id' => $pattern->id]) }}" class="btn btn-outline-secondary btn-sm">Assign</a>
                             <form action="{{ route('admin.shift-patterns.destroy', $pattern) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete</button>
                             </form>
                         </td>
                     </tr>

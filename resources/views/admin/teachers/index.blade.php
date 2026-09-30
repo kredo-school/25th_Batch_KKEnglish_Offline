@@ -28,7 +28,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold mb-0">Teacher List</h2>
-        <a href="{{ route('admin.teachers.create') }}" class="btn btn-primary">Teacher Register</a>
+        <a href="{{ route('admin.teachers.create') }}" class="btn btn-primary"><i class="fa-solid fa-plus me-1"></i>Teacher Register</a>
     </div>
 
     @if (session('success'))

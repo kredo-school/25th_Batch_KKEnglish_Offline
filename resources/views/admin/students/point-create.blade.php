@@ -56,7 +56,7 @@
                 </div>
                 <div class="d-flex gap-2">
                     <a href="{{ route('admin.students.show', $student) }}" class="btn btn-outline-secondary">Cancel</a>
-                    <button class="btn btn-primary">Add Points</button>
+                    <button class="btn btn-primary"><i class="fa-solid fa-plus me-1"></i>Add Points</button>
                 </div>
             </form>
         </div>

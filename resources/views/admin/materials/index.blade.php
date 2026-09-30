@@ -7,7 +7,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold mb-0">Teaching Materials</h2>
-        <a href="{{ route('admin.materials.create') }}" class="btn btn-primary btn-sm">＋ New Registration</a>
+        <a href="{{ route('admin.materials.create') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus me-1"></i>New Registration</a>
     </div>
 
     @if (session('success'))
@@ -78,7 +78,7 @@
                             {{-- 操作ボタン --}}
                             <div class="d-flex flex-wrap gap-2">
                                 <a href="{{ route('admin.materials.edit', $material) }}" class="btn btn-outline-primary btn-sm">
-                                    Edit
+                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit
                                 </a>
 
                                 @if($material->status === 'active')
@@ -98,7 +98,7 @@
                                 <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('Would you like to delete this material?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete</button>
                                 </form>
                             </div>
 

@@ -35,7 +35,7 @@
                     <div class="text-muted small">Current Remaining Points</div>
                     <div class="display-6 fw-bold">{{ number_format($pointBalance) }} <span class="fs-5">pt</span></div>
                     <a href="{{ route('admin.students.points.create', $student) }}" class="btn btn-primary mt-3">
-                        + Add Points
+                        <i class="fa-solid fa-plus me-1"></i>Add Points
                     </a>
                 </div>
             </div>

@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold mb-0">Teacher Details</h2>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+            <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-pen-to-square me-1"></i> Edit</a>
             <a href="{{ route('admin.teachers.materials.edit', $teacher) }}" class="btn btn-outline-info btn-sm">Materials</a>
             <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to List</a>
         </div>

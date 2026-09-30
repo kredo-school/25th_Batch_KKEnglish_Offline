@@ -15,7 +15,7 @@
         <a href="{{ route('admin.stations.index', ['menu' => 'station']) }}"
            class="btn btn-outline-secondary">
 
-            Back to Station List
+            <i class="fa-solid fa-angles-left"></i> Back to Station List
 
         </a>
 
