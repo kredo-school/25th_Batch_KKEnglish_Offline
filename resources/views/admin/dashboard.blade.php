@@ -19,7 +19,7 @@
         <div class="col-12">
 
             {{-- Hello Header --}}
-            <div class="bg-light p-4 mb-3">
+            <div class="bg-light p-2 mb-0">
                 <h2 class="fw-bold mb-1">Hello, {{ auth()->user()->first_name ?? '' }}</h2>
                 <p class="text-secondary mb-0">{{ now()->format('Y-m-d') }}</p>
                 <p class="fw-semibold mb-0">

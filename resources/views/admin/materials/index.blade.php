@@ -22,14 +22,27 @@
                     <div class="card-body d-flex align-items-start">
 
                         {{-- 教材画像 --}}
+                        @php
+                            if (!$material->cover_image) {
+                                $imageUrl = asset('images/no-image.png');
+                            } elseif (Str::startsWith($material->cover_image, ['http://', 'https://'])) {
+                                // Web上の画像
+                                $imageUrl = $material->cover_image;
+                            } else {
+                                // Laravelのstorageに保存された画像
+                                $imageUrl = asset('storage/' . $material->cover_image);
+                            }
+                        @endphp
+
                         <a href="{{ route('admin.materials.show', $material) }}" class="d-inline-block">
-                            <img src="{{ $material->cover_image ? asset('storage/' . $material->cover_image) : asset('images/no-image.png') }}"
-                             alt="{{ $material->name }}"
-                             width="90"
-                             height="90"
-                             class="rounded me-3"
-                             style="object-fit: cover;">
+                            <img src="{{ $imageUrl }}"
+                                alt="{{ $material->name }}"
+                                width="90"
+                                height="90"
+                                class="rounded me-3"
+                                style="object-fit: cover;">
                         </a>
+
 
                         <div class="flex-grow-1">
 

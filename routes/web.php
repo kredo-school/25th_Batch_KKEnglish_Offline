@@ -35,6 +35,7 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
 use App\Http\Controllers\Admin\TeacherStationAssignmentController;
 use App\Http\Controllers\Admin\StationController;
+use App\Http\Controllers\Admin\LessonStationOverrideController;
 
 // Test route for frontend testing
 Route::view('/students/progress-test','students.progress.index')
@@ -249,6 +250,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     // Station Management
     Route::resource('stations', StationController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
+    // Lesson Station Override Management
+    Route::get(
+    '/teacher-station-assignments/overrides',
+    [LessonStationOverrideController::class, 'index']
+)->name('teacher-station-assignments.overrides.index');
+
+Route::get(
+    '/teacher-station-assignments/{teacherStationAssignment}/edit',
+    [TeacherStationAssignmentController::class, 'edit']
+)->name('teacher-station-assignments.edit');
+
     // Teacher Station Assignment Management
     Route::get('/teacher-station-assignments',[TeacherStationAssignmentController::class, 'index'])->name('teacher-station-assignments.index');
     Route::get('/teacher-station-assignments/create',[TeacherStationAssignmentController::class, 'create'])->name('teacher-station-assignments.create');
@@ -256,4 +268,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     Route::get('/teacher-station-assignments/{teacherStationAssignment}/edit',[TeacherStationAssignmentController::class, 'edit'])->name('teacher-station-assignments.edit');
     Route::put('/teacher-station-assignments/StationAssignment',[TeacherStationAssignmentController::class, 'update'])->name('teacher-station-assignments.update');
     Route::put('/teacher-station-assignments/lesson/{reservation}',[TeacherStationAssignmentController::class, 'override'])->name('teacher-station-assignments.override');
+
+    // Lesson Station Override Management
+    Route::get(
+        '/teacher-station-assignments/overrides',
+        [LessonStationOverrideController::class, 'index']
+    )->name('teacher-station-assignments.overrides.index');
+
+    Route::post(
+        '/teacher-station-assignments/overrides',
+        [LessonStationOverrideController::class, 'store']
+    )->name('teacher-station-assignments.overrides.store');
+
+    Route::delete(
+        '/lesson-station-overrides/{lessonStationOverride}',
+        [LessonStationOverrideController::class, 'destroy']
+    )->name('lesson-station-overrides.destroy');
 });

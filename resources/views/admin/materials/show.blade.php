@@ -13,14 +13,26 @@
     <div class="card">
         <div class="card-body">
             <div class="d-flex align-items-start gap-4">
-                <img
-                    src="{{ $material->cover_image ? asset('storage/' . $material->cover_image) : asset('images/no-image.png') }}"
-                    alt="{{ $material->name }}"
-                    width="140"
-                    height="140"
-                    class="rounded border"
-                    style="object-fit: cover;"
-                >
+                @php
+                if (!$material->cover_image) {
+                    $imageUrl = asset('images/no-image.png');
+                } elseif (Str::startsWith($material->cover_image, ['http://', 'https://'])) {
+                    // Web上の画像
+                    $imageUrl = $material->cover_image;
+                } else {
+                    // Laravelのstorageに保存された画像
+                    $imageUrl = asset('storage/' . $material->cover_image);
+                }
+                @endphp
+
+                <a href="{{ route('admin.materials.show', $material) }}" class="d-inline-block">
+                    <img src="{{ $imageUrl }}"
+                        alt="{{ $material->name }}"
+                        width="90"
+                        height="90"
+                        class="rounded me-3"
+                        style="object-fit: cover;">
+                </a>
 
                 <div class="flex-grow-1">
                     <h4 class="fw-bold mb-3">{{ $material->name }}</h4>
@@ -41,11 +53,10 @@
 
             <div class="mt-4 d-flex flex-wrap gap-2">
                 <a href="{{ route('admin.materials.edit', $material) }}" class="btn btn-outline-primary btn-sm">Edit</a>
-                <a href="{{ route('admin.materials.teachers.edit', $material) }}"
-   class="btn btn-outline-success btn-sm">
-    <i class="fa-solid fa-user-plus"></i>
-    Assign Teachers
-</a>
+                <a href="{{ route('admin.materials.teachers.edit', $material) }}" class="btn btn-outline-success btn-sm">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Assign Teachers
+                </a>
 
                 @if($material->status === 'active')
                     <form method="POST" action="{{ route('admin.materials.suspend', $material) }}" onsubmit="return confirm('Would you like to suspend this material?');">

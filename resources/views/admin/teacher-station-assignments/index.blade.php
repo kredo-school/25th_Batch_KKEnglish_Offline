@@ -14,6 +14,11 @@
             </p>
         </div>
 
+        <a href="{{ route('admin.teacher-station-assignments.overrides.index') }}"
+   class="btn btn-outline-primary">
+    <i class="fa-solid fa-location-dot me-1"></i>
+    Station Override
+</a>
         <a href="{{ route('admin.teacher-station-assignments.create', ['menu' => 'station-assignment']) }}"
            class="btn btn-primary">
             <i class="fa-solid fa-plus me-1"></i>
