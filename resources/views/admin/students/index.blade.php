@@ -7,7 +7,7 @@
          ページタイトル
     ============================================================ --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h2 mb-0 fw-bold">Student List</h1>
+        <h2 class="fw-bold mb-0">Student List</h2>
     </div>
 
 

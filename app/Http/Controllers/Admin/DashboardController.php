@@ -302,7 +302,7 @@ if (Schema::hasTable('announcements')) {
     //         ->select([
     //             't.id',
     //             't.user_id',
-    //             DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as name"),
+    //             DB::raw("CONCAT(COALESCE(u.first_name,''), ' ', COALESCE(u.last_name,'')) as name"),
     //             't.specialty as role',
     //         ])
     //         ->get();
@@ -317,7 +317,7 @@ if (Schema::hasTable('announcements')) {
     //             'r.teacher_id',
     //             'r.start_at',
     //             'r.end_at',
-    //             DB::raw("CONCAT(COALESCE(su.last_name,''), ' ', COALESCE(su.first_name,'')) as student_name"),
+    //             DB::raw("CONCAT(COALESCE(su.first_name,''), ' ', COALESCE(su.last_name,'')) as student_name"),
     //             'm.name as material_name'
     //         ])
     //         ->get();
@@ -418,7 +418,7 @@ if (Schema::hasTable('announcements')) {
         ->leftJoin('users as u', 'u.id', '=', 't.user_id')
         ->select([
             't.id as teacher_id',
-            DB::raw("CONCAT(COALESCE(u.last_name,''), ' ', COALESCE(u.first_name,'')) as name"),
+            DB::raw("CONCAT(COALESCE(u.first_name,''), ' ', COALESCE(u.last_name,'')) as name"),
             't.specialty as role',
         ])
         ->get()
@@ -436,7 +436,7 @@ if (Schema::hasTable('announcements')) {
             'r.teacher_id',
             'r.start_at',
             'r.end_at',
-            DB::raw("CONCAT(COALESCE(su.last_name,''), ' ', COALESCE(su.first_name,'')) as student_name"),
+            DB::raw("CONCAT(COALESCE(su.first_name,''), ' ', COALESCE(su.last_name,'')) as student_name"),
             'm.name as material_name',
         ])
         ->orderBy('r.start_at')
@@ -512,58 +512,503 @@ if (Schema::hasTable('announcements')) {
     })->values();
 
     // 8) Station timeline（フラット予約を使う）
-    $rooms = collect([
-        ['id' => 'room_1', 'name' => 'Station A (Room 101)', 'role' => 'Main Building'],
-        ['id' => 'room_2', 'name' => 'Station B (Room 102)', 'role' => 'Main Building'],
-        ['id' => 'room_3', 'name' => 'Station C (Room 103)', 'role' => 'Annex'],
-        ['id' => 'room_4', 'name' => 'Online Booth 1', 'role' => 'Remote'],
-        ['id' => 'room_5', 'name' => 'Online Booth 2', 'role' => 'Remote'],
+    // $rooms = collect([
+    //     ['id' => 'room_1', 'name' => 'Station A (Room 101)', 'role' => 'Main Building'],
+    //     ['id' => 'room_2', 'name' => 'Station B (Room 102)', 'role' => 'Main Building'],
+    //     ['id' => 'room_3', 'name' => 'Station C (Room 103)', 'role' => 'Annex'],
+    //     ['id' => 'room_4', 'name' => 'Online Booth 1', 'role' => 'Remote'],
+    //     ['id' => 'room_5', 'name' => 'Online Booth 2', 'role' => 'Remote'],
+    // ]);
+
+    // $roomCount = $rooms->count();
+
+    // $locationTimeline = $rooms->map(function ($room, $index) use ($reservationsFlat, $roomCount) {
+    //     $assignedReservations = $reservationsFlat
+    //         ->values()
+    //         ->filter(function ($res, $key) use ($index, $roomCount) {
+    //             return $roomCount > 0 && ($key % $roomCount) === $index;
+    //         })
+    //         ->map(function ($res) {
+    //             $start = Carbon::parse($res->start_at);
+    //             $end = Carbon::parse($res->end_at);
+
+    //             return [
+    //                 'id' => $res->id,
+    //                 'title' => ($res->student_name ?: 'Unknown Student') . ' - Lesson',
+    //                 'start_time' => $start->format('H:i'),
+    //                 'end_time' => $end->format('H:i'),
+    //                 'start_minutes' => $start->hour * 60 + $start->minute,
+    //                 'duration_minutes' => max($end->diffInMinutes($start), 1),
+    //                 'type' => 'room_used',
+    //             ];
+    //         })
+    //         ->values();
+
+    //     return [
+    //         'id' => $room['id'],
+    //         'name' => $room['name'],
+    //         'role' => $room['role'],
+    //         'blocks' => $assignedReservations,
+    //     ];
+    // });
+
+    // $now = Carbon::now();
+
+    // return view('admin.schedules.index', [
+    //     'todayDate' => $today->format('Y/m/d'),
+    //     'capacity' => $capacity,
+    //     'booked' => $booked,
+    //     'autoBooked' => $autoBooked,
+    //     'teacherTimeline' => $teacherTimeline,
+    //     'locationTimeline' => $locationTimeline,
+    //     'currentTimeMinutes' => $now->hour * 60 + $now->minute,
+    //     'currentTimeStr' => $now->format('H:i'),
+    // ]);
+    // 8) Station timeline
+// 実際の stations テーブルから取得する
+
+$stations = DB::table('stations')
+    ->where('is_active', true)
+    ->orderBy('name')
+    ->get([
+        'id',
+        'name',
+        'code',
+        'is_active',
     ]);
 
-    $roomCount = $rooms->count();
 
-    $locationTimeline = $rooms->map(function ($room, $index) use ($reservationsFlat, $roomCount) {
-        $assignedReservations = $reservationsFlat
-            ->values()
-            ->filter(function ($res, $key) use ($index, $roomCount) {
-                return $roomCount > 0 && ($key % $roomCount) === $index;
-            })
-            ->map(function ($res) {
-                $start = Carbon::parse($res->start_at);
-                $end = Carbon::parse($res->end_at);
+/*
+|--------------------------------------------------------------------------
+| Teacher の Station Assignment
+|--------------------------------------------------------------------------
+|
+| 今日の日付が
+|
+| start_date <= 今日
+|
+| かつ
+|
+| end_date が NULL または 今日 <= end_date
+|
+| のAssignmentを取得する
+|--------------------------------------------------------------------------
+*/
 
-                return [
-                    'id' => $res->id,
-                    'title' => ($res->student_name ?: 'Unknown Student') . ' - Lesson',
-                    'start_time' => $start->format('H:i'),
-                    'end_time' => $end->format('H:i'),
-                    'start_minutes' => $start->hour * 60 + $start->minute,
-                    'duration_minutes' => max($end->diffInMinutes($start), 1),
-                    'type' => 'room_used',
-                ];
-            })
-            ->values();
+$stationAssignments = DB::table(
+    'teacher_station_assignments'
+)
+    ->where(
+        'start_date',
+        '<=',
+        $todayStr
+    )
+    ->where(function ($query) use ($todayStr) {
+        $query
+            ->whereNull('end_date')
+            ->orWhere(
+                'end_date',
+                '>=',
+                $todayStr
+            );
+    })
+    ->orderByDesc('start_date')
+    ->orderByDesc('id')
+    ->get([
+        'id',
+        'teacher_id',
+        'station_id',
+        'start_date',
+        'end_date',
+    ]);
+
+
+/*
+|--------------------------------------------------------------------------
+| Teacher → Station
+|--------------------------------------------------------------------------
+|
+| 同じTeacherに複数のAssignmentが残っている場合は、
+| 新しいAssignmentを優先する。
+|--------------------------------------------------------------------------
+*/
+
+$teacherStationMap = [];
+
+foreach ($stationAssignments as $assignment) {
+
+    if (
+        !isset(
+            $teacherStationMap[
+                $assignment->teacher_id
+            ]
+        )
+    ) {
+        $teacherStationMap[
+            $assignment->teacher_id
+        ] = $assignment->station_id;
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Lesson単位のStation Override
+|--------------------------------------------------------------------------
+|
+| Lesson Station Overrideが存在する場合、
+| Teacherの通常Assignmentよりこちらを優先する。
+|--------------------------------------------------------------------------
+*/
+
+$reservationIds =
+    $reservationsFlat
+        ->pluck('id')
+        ->values()
+        ->all();
+
+$stationOverrides = collect();
+
+if (!empty($reservationIds)) {
+
+    $stationOverrides = DB::table(
+        'lesson_station_overrides'
+    )
+        ->whereIn(
+            'reservation_id',
+            $reservationIds
+        )
+        ->get([
+            'reservation_id',
+            'station_id',
+        ])
+        ->keyBy('reservation_id');
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Station Timeline
+|--------------------------------------------------------------------------
+|
+| 全Stationを最初に作る。
+|
+| 予約がないStationも表示する。
+|--------------------------------------------------------------------------
+*/
+
+$locationTimeline = $stations
+    ->map(function ($station) {
 
         return [
-            'id' => $room['id'],
-            'name' => $room['name'],
-            'role' => $room['role'],
-            'blocks' => $assignedReservations,
+            'id' => $station->id,
+
+            'name' =>
+                $station->name,
+
+            'role' =>
+                $station->code,
+
+            'shift_blocks' => [],
+
+            'blocks' => [],
         ];
-    });
+    })
+    ->keyBy('id')
+    ->toArray();
 
-    $now = Carbon::now();
 
-    return view('admin.schedules.index', [
-        'todayDate' => $today->format('Y/m/d'),
-        'capacity' => $capacity,
-        'booked' => $booked,
-        'autoBooked' => $autoBooked,
-        'teacherTimeline' => $teacherTimeline,
-        'locationTimeline' => $locationTimeline,
-        'currentTimeMinutes' => $now->hour * 60 + $now->minute,
-        'currentTimeStr' => $now->format('H:i'),
-    ]);
+/*
+|--------------------------------------------------------------------------
+| StationにTeacherのShiftを配置
+|--------------------------------------------------------------------------
+|
+| Teacherの通常Station Assignmentに基づいて、
+| そのTeacherのShiftをStation側にも表示する。
+|--------------------------------------------------------------------------
+*/
+
+foreach ($allShifts as $teacherId => $shiftRows) {
+
+    $stationId =
+        $teacherStationMap[$teacherId]
+        ?? null;
+
+    if (
+        !$stationId
+        || !isset(
+            $locationTimeline[$stationId]
+        )
+    ) {
+        continue;
+    }
+
+
+    $teacher =
+        $teachersMaster->get($teacherId);
+
+    $teacherName =
+        $teacher->name
+        ?? 'Teacher #' . $teacherId;
+
+
+    foreach (
+        $shiftRows as $idx => $shift
+    ) {
+
+        $start =
+            Carbon::parse(
+                $shift->start_time
+            );
+
+        $end =
+            Carbon::parse(
+                $shift->end_time
+            );
+
+        $minutes =
+            max(
+                $end->diffInMinutes($start),
+                1
+            );
+
+
+        $locationTimeline[
+            $stationId
+        ]['shift_blocks'][] = [
+
+            'id' =>
+                'station_shift_'
+                . $stationId
+                . '_'
+                . $teacherId
+                . '_'
+                . $idx,
+
+            'title' =>
+                'Shift',
+
+            'teacher_name' =>
+                $teacherName,
+
+            'start_time' =>
+                $start->format('H:i'),
+
+            'end_time' =>
+                $end->format('H:i'),
+
+            'start_minutes' =>
+                $start->hour * 60
+                + $start->minute,
+
+            'duration_minutes' =>
+                $minutes,
+
+            'type' =>
+                'shift_assignment',
+        ];
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| StationにLessonを配置
+|--------------------------------------------------------------------------
+*/
+
+foreach ($reservationsFlat as $res) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | ① Lesson Station Override
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        isset(
+            $stationOverrides[
+                $res->id
+            ]
+        )
+    ) {
+
+        $stationId =
+            $stationOverrides[
+                $res->id
+            ]->station_id;
+
+    /*
+    |--------------------------------------------------------------------------
+    | ② Teacherの通常Station Assignment
+    |--------------------------------------------------------------------------
+    */
+
+    } else {
+
+        $stationId =
+            $teacherStationMap[
+                $res->teacher_id
+            ]
+            ?? null;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stationが決まらない予約
+    |--------------------------------------------------------------------------
+    |
+    | Station未割当として表示しない。
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        !$stationId
+        || !isset(
+            $locationTimeline[$stationId]
+        )
+    ) {
+        continue;
+    }
+
+
+    $start =
+        Carbon::parse(
+            $res->start_at
+        );
+
+    $end =
+        Carbon::parse(
+            $res->end_at
+        );
+
+
+    $teacher =
+        $teachersMaster->get(
+            $res->teacher_id
+        );
+
+    $teacherName =
+        $teacher->name
+        ?? 'Unknown Teacher';
+
+
+    $studentName =
+        $res->student_name
+        ?: 'Unknown Student';
+
+
+    $materialName =
+        $res->material_name
+        ?: 'Lesson';
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | StationのLesson表示
+    |--------------------------------------------------------------------------
+    |
+    | 例：
+    |
+    | John Smith
+    | Student A
+    | Grammar
+    |--------------------------------------------------------------------------
+    */
+
+    $locationTimeline[
+        $stationId
+    ]['blocks'][] = [
+
+        'id' =>
+            'station_booking_' . $res->id,
+
+        'title' =>
+            $teacherName
+            . ' / '
+            . $studentName
+            . ' / '
+            . $materialName,
+
+        'teacher_name' =>
+            $teacherName,
+
+        'student_name' =>
+            $studentName,
+
+        'material_name' =>
+            $materialName,
+
+        'start_time' =>
+            $start->format('H:i'),
+
+        'end_time' =>
+            $end->format('H:i'),
+
+        'start_minutes' =>
+            $start->hour * 60
+            + $start->minute,
+
+        'duration_minutes' =>
+            max(
+                $end->diffInMinutes($start),
+                1
+            ),
+
+        'type' =>
+            'room_used',
+
+        'reservation_id' =>
+            $res->id,
+    ];
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| 配列に戻す
+|--------------------------------------------------------------------------
+*/
+
+$locationTimeline = array_values($locationTimeline);
+
+
+/*
+|--------------------------------------------------------------------------
+| 現在時刻
+|--------------------------------------------------------------------------
+*/
+
+$now = Carbon::now();
+
+
+/*
+|--------------------------------------------------------------------------
+| View
+|--------------------------------------------------------------------------
+*/
+
+return view('admin.schedules.index', [
+    'todayDate' => $today->format('Y/m/d'),
+
+    'capacity' => $capacity,
+
+    'booked' => $booked,
+
+    'autoBooked' => $autoBooked,
+
+    'teacherTimeline' => $teacherTimeline,
+
+    'locationTimeline' => $locationTimeline,
+
+    'currentTimeMinutes' =>
+        $now->hour * 60
+        + $now->minute,
+
+    'currentTimeStr' =>
+        $now->format('H:i'),
+]);
 }
     // {
     //     $validated = $request->validate([

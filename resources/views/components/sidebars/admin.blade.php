@@ -27,7 +27,19 @@
 
 @endphp
 
-    <nav class="px-2 py-3 fw-bold fs-5">
+<style>
+    .admin-sidebar a,
+    .admin-sidebar .admin-sidebar-title {
+        white-space: nowrap;
+        font-size: clamp(0.75rem, 1.2vw, 1rem);
+    }
+
+    .admin-sidebar .admin-sidebar-title {
+        font-size: clamp(0.7rem, 1.1vw, 0.875rem);
+    }
+</style>
+
+    <nav class="px-2 py-3 fw-bold fs-5 admin-sidebar">
         @if($menu === 'schedule')
             {{-- Schedule専用サイドバー --}}
             <a href="{{ route('admin.dashboard', ['menu' => 'main']) }}"
@@ -119,7 +131,7 @@
             <a href="{{ route('admin.teacher-station-assignments.index',['menu' => 'station']) }}"
             class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teacher-station-assignments.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 <i class="fa-solid fa-chalkboard-user me-2"></i>
-                Teacher Station Assignment
+                Teacher Assignment
             </a>
         @else
             {{-- 通常サイドバー --}}

@@ -249,23 +249,23 @@
     const serverTeacherData = @json($teacherTimeline ?? []);
     const serverLocationData = @json($locationTimeline ?? []);
 
-    const fallbackTeachers = [
-        { id: 1, name: 'Erik Sorensen', role: 'Instructor', blocks: [{ title: 'John Doe (English A)', start_time: '04:00', end_time: '08:00', start_minutes: 240, duration_minutes: 240 }] },
-        { id: 2, name: 'Maria Rossi', role: 'Instructor', blocks: [{ title: 'Jane Smith (English B)', start_time: '00:00', end_time: '04:00', start_minutes: 0, duration_minutes: 240 }, { title: 'Alex Brown (English C)', start_time: '12:00', end_time: '16:00', start_minutes: 720, duration_minutes: 240 }] },
-        { id: 3, name: 'Hans Müller', role: 'Instructor', blocks: [{ title: 'Tom Wilson (Speaking)', start_time: '08:00', end_time: '12:00', start_minutes: 480, duration_minutes: 240 }] },
-        { id: 4, name: 'Lucas Martin', role: 'Instructor', blocks: [] },
-        { id: 5, name: 'Igor Volkov', role: 'Instructor', blocks: [{ title: 'Anna Lee (Grammar)', start_time: '07:00', end_time: '16:00', start_minutes: 420, duration_minutes: 540 }] }
-    ];
+    // const fallbackTeachers = [
+    //     { id: 1, name: 'Erik Sorensen', role: 'Instructor', blocks: [{ title: 'John Doe (English A)', start_time: '04:00', end_time: '08:00', start_minutes: 240, duration_minutes: 240 }] },
+    //     { id: 2, name: 'Maria Rossi', role: 'Instructor', blocks: [{ title: 'Jane Smith (English B)', start_time: '00:00', end_time: '04:00', start_minutes: 0, duration_minutes: 240 }, { title: 'Alex Brown (English C)', start_time: '12:00', end_time: '16:00', start_minutes: 720, duration_minutes: 240 }] },
+    //     { id: 3, name: 'Hans Müller', role: 'Instructor', blocks: [{ title: 'Tom Wilson (Speaking)', start_time: '08:00', end_time: '12:00', start_minutes: 480, duration_minutes: 240 }] },
+    //     { id: 4, name: 'Lucas Martin', role: 'Instructor', blocks: [] },
+    //     { id: 5, name: 'Igor Volkov', role: 'Instructor', blocks: [{ title: 'Anna Lee (Grammar)', start_time: '07:00', end_time: '16:00', start_minutes: 420, duration_minutes: 540 }] }
+    // ];
 
-    const fallbackLocations = [
-        { id: 1, name: 'Station A (Room 101)', role: 'Main Building', blocks: [{ title: 'Erik Sorensen / John Doe', start_time: '04:00', end_time: '08:00', start_minutes: 240, duration_minutes: 240 }] },
-        { id: 2, name: 'Station B (Room 102)', role: 'Main Building', blocks: [{ title: 'Maria Rossi / Jane Smith', start_time: '00:00', end_time: '04:00', start_minutes: 0, duration_minutes: 240 }] },
-        { id: 3, name: 'Station C (Room 103)', role: 'Annex', blocks: [] },
-        { id: 4, name: 'Online Booth 1', role: 'Remote', blocks: [{ title: 'Hans Müller / Tom Wilson', start_time: '08:00', end_time: '12:00', start_minutes: 480, duration_minutes: 240 }] }
-    ];
+    // const fallbackLocations = [
+    //     { id: 1, name: 'Station A (Room 101)', role: 'Main Building', blocks: [{ title: 'Erik Sorensen / John Doe', start_time: '04:00', end_time: '08:00', start_minutes: 240, duration_minutes: 240 }] },
+    //     { id: 2, name: 'Station B (Room 102)', role: 'Main Building', blocks: [{ title: 'Maria Rossi / Jane Smith', start_time: '00:00', end_time: '04:00', start_minutes: 0, duration_minutes: 240 }] },
+    //     { id: 3, name: 'Station C (Room 103)', role: 'Annex', blocks: [] },
+    //     { id: 4, name: 'Online Booth 1', role: 'Remote', blocks: [{ title: 'Hans Müller / Tom Wilson', start_time: '08:00', end_time: '12:00', start_minutes: 480, duration_minutes: 240 }] }
+    // ];
 
     const teacherData = Array.isArray(serverTeacherData) ? serverTeacherData : [];
-    const locationData = (serverLocationData && serverLocationData.length > 0) ? serverLocationData : fallbackLocations;
+    const locationData = Array.isArray(serverLocationData) ? serverLocationData : [];
 
     const serverCurrentTimeMinutes = @json($currentTimeMinutes ?? null);
     const serverCurrentTimeStr = @json($currentTimeStr ?? null);
@@ -358,46 +358,157 @@
                 }
                 timelineTd.appendChild(timeLine);
 
-                const shifts = Array.isArray(item?.shift_blocks) ? item.shift_blocks : [];
+                // 1) Shift描画
+const shifts = Array.isArray(item?.shift_blocks)
+    ? item.shift_blocks
+    : [];
 
-                // 1) shift先描画(teacherモードのみ)
-                if (currentMode === 'teacher' && shifts.length > 0) {
-                    shifts.forEach(shift => {
-                        const toMinutes = (hhmm) => {
-                            if (!hhmm || typeof hhmm !== 'string' || !hhmm.includes(':')) return null;
-                            const parts = hhmm.split(':');
-                            const h = Number(parts[0]);
-                            const m = Number(parts[1]);
-                            if (Number.isNaN(h) || Number.isNaN(m)) return null;
-                            return h * 60 + m;
-                        };
+if (shifts.length > 0) {
 
-                        let startMin = toMinutes(shift.start_time);
-                        let endMin = toMinutes(shift.end_time);
+    shifts.forEach(shift => {
 
-                        if (startMin === null) startMin = Number(shift.start_minutes ?? 0);
-                        if (endMin === null) endMin = startMin + Number(shift.duration_minutes ?? 0);
+        const toMinutes = (hhmm) => {
 
-                        // 深夜跨ぎ対応
-                        if (endMin < startMin) endMin += 1440;
+            if (
+                !hhmm
+                || typeof hhmm !== 'string'
+                || !hhmm.includes(':')
+            ) {
+                return null;
+            }
 
-                        // 表示範囲内に収まるようにクリップする
-                        let displayStart = Math.max(startMin, DISPLAY_START);
-                        let displayEnd = Math.min(endMin, DISPLAY_END);
+            const parts = hhmm.split(':');
 
-                        if (displayStart < displayEnd) {
-                            const left = ((displayStart - DISPLAY_START) / DISPLAY_TOTAL) * 100;
-                            const width = ((displayEnd - displayStart) / DISPLAY_TOTAL) * 100;
+            const h = Number(parts[0]);
+            const m = Number(parts[1]);
 
-                            const shiftEl = document.createElement('div');
-                            shiftEl.className = 'shift-block';
-                            shiftEl.style.left = `${left}%`;
-                            shiftEl.style.width = `${width}%`;
-                            shiftEl.title = `Shift ${shift.start_time ?? ''} - ${shift.end_time ?? ''}`;
-                            timelineTd.appendChild(shiftEl);
-                        }
-                    });
-                }
+            if (
+                Number.isNaN(h)
+                || Number.isNaN(m)
+            ) {
+                return null;
+            }
+
+            return h * 60 + m;
+        };
+
+
+        let startMin = toMinutes(
+            shift.start_time
+        );
+
+        let endMin = toMinutes(
+            shift.end_time
+        );
+
+
+        if (startMin === null) {
+            startMin = Number(
+                shift.start_minutes ?? 0
+            );
+        }
+
+
+        if (endMin === null) {
+            endMin =
+                startMin
+                + Number(
+                    shift.duration_minutes ?? 0
+                );
+        }
+
+
+        /*
+         * 深夜跨ぎ
+         */
+
+        if (endMin < startMin) {
+            endMin += 1440;
+        }
+
+
+        /*
+         * 表示範囲に合わせてClip
+         */
+
+        let displayStart = Math.max(
+            startMin,
+            DISPLAY_START
+        );
+
+        let displayEnd = Math.min(
+            endMin,
+            DISPLAY_END
+        );
+
+
+        if (displayStart < displayEnd) {
+
+            const left =
+                (
+                    (displayStart - DISPLAY_START)
+                    / DISPLAY_TOTAL
+                ) * 100;
+
+
+            const width =
+                (
+                    (displayEnd - displayStart)
+                    / DISPLAY_TOTAL
+                ) * 100;
+
+
+            const shiftEl =
+                document.createElement('div');
+
+
+            shiftEl.className =
+                'shift-block';
+
+
+            shiftEl.style.left =
+                `${left}%`;
+
+
+            shiftEl.style.width =
+                `${width}%`;
+
+
+            /*
+             * Stationモードでは
+             * Shiftの上にTeacher名を表示
+             */
+
+            if (currentMode === 'location') {
+
+                shiftEl.innerHTML = `
+                    <div
+                        class="fw-bold text-truncate text-dark"
+                        style="font-size:0.68rem;"
+                    >
+                        ${shift.teacher_name ?? ''}
+                    </div>
+                `;
+
+            }
+
+
+            shiftEl.title =
+                `Shift ${
+                    shift.teacher_name
+                    ? shift.teacher_name + ' '
+                    : ''
+                }${shift.start_time ?? ''} - ${
+                    shift.end_time ?? ''
+                }`;
+
+
+            timelineTd.appendChild(
+                shiftEl
+            );
+        }
+    });
+}
 
                 // 2) 予約描画
                 const blocks = Array.isArray(item?.blocks) ? item.blocks : [];
