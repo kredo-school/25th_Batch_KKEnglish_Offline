@@ -13,19 +13,16 @@ class UserFactory extends Factory
 
     private function roleIdByCode(string $code): int
     {
-        $code = strtoupper($code);
+        $id = Role::query()
+            ->where('role_code', $code)
+            ->value('id');
 
-        $id = Role::query()->where('role_code', $code)->value('id');
         if ($id) {
             return (int) $id;
         }
 
         return (int) Role::query()->create([
-            'role_name' => match ($code) {
-                'ADM' => 'admin',
-                'TEA' => 'teacher',
-                default => 'student',
-            },
+            'role_name' => $code,
             'role_code' => $code,
         ])->id;
     }
@@ -35,7 +32,10 @@ class UserFactory extends Factory
         return [
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'role_id' => $this->roleIdByCode('STU'),
+
+            // デフォルトはstudent
+            'role_id' => $this->roleIdByCode('student'),
+
             'email' => fake()->unique()->safeEmail(),
             'phone_number' => fake()->phoneNumber(),
             'profile_image' => null,
@@ -51,21 +51,21 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn () => [
-            'role_id' => $this->roleIdByCode('ADM'),
+            'role_id' => $this->roleIdByCode('admin'),
         ]);
     }
 
     public function teacher(): static
     {
         return $this->state(fn () => [
-            'role_id' => $this->roleIdByCode('TEA'),
+            'role_id' => $this->roleIdByCode('teacher'),
         ]);
     }
 
     public function student(): static
     {
         return $this->state(fn () => [
-            'role_id' => $this->roleIdByCode('STU'),
+            'role_id' => $this->roleIdByCode('student'),
         ]);
     }
 }
