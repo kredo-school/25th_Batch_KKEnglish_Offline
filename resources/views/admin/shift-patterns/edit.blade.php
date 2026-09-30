@@ -145,12 +145,12 @@
                     <td><input type="time" name="breaks[{{ $i }}][start_time]" class="form-control" value="{{ $b['start_time'] ?? '' }}" required></td>
                     <td><input type="time" name="breaks[{{ $i }}][end_time]" class="form-control" value="{{ $b['end_time'] ?? '' }}" required></td>
                     <td><input type="text" name="breaks[{{ $i }}][reason]" class="form-control" value="{{ $b['reason'] ?? '' }}"></td>
-                    <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Delete</button></td>
+                    <td><button type="button" class="btn btn-outline-danger btn-sm remove-row"><i class="fa-solid fa-trash me-1"></i> Delete</button></td>
                 </tr>
             @endforeach
             </tbody>
         </table>
-        <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-break">＋ Add Break</button>
+        <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-break"><i class="fa-solid fa-plus me-1"></i>Add Break</button>
 
         <div>
             <button type="submit" class="btn btn-primary">Update</button>

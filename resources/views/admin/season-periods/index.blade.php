@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h4 mb-0">Season Period Settings</h1>
         <a href="{{ route('admin.operational-status.matrix_details', ['date' => request('date', now()->toDateString())]) }}"
-   class="btn btn-outline-secondary btn-sm"> <i class="fa-solid fa-angles-left"></i> Back </a>
+   class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back </a>
     </div>
 
     @if (session('status'))
@@ -41,7 +41,7 @@
                                 <option value="quiet">Quiet (閑散期)</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Add</button>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-plus me-1"></i>Add</button>
                     </form>
                 </div>
             </div>
@@ -77,7 +77,7 @@
                                     <td>
                                         <form action="{{ route('admin.season-periods.destroy', $p) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this period?');">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                            <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete</button>
                                         </form>
                                     </td>
                                 </tr>

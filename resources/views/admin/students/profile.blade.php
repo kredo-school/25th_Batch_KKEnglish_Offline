@@ -42,8 +42,8 @@
                                 @endif
                             </div>
                             <div>
-                                <button type="button" class="btn btn-outline-primary btn-sm mb-1">Edit</button><br>
-                                <button type="button" class="btn btn-outline-danger btn-sm">Delete</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm mb-1"><i class="fa-solid fa-pen-to-square me-1"></i> Edit</button><br>
+                                <button type="button" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete</button>
                             </div>
                         </div>
 
@@ -123,7 +123,7 @@
                         </div>
 
                         <div class="text-end">
-                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save me-1"></i> Save</button>
                         </div>
                     </form>
                 </div>

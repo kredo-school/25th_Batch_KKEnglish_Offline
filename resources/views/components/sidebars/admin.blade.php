@@ -47,7 +47,7 @@
                 <i class="fa-solid fa-angles-left"></i> Back to Dashboard
             </a>
 
-            <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle ">Scheduler</div>
+            <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle "><i class="fa-solid fa-calendar-days"></i> Scheduler</div>
 
             {{-- 今日のスケジュール --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
@@ -77,7 +77,7 @@
             </a>
 
         <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle ">
-            Operational Status
+            <i class="fa-solid fa-square-poll-vertical"></i> Operational Status
         </div>
 
             {{-- Monthly Overview --}}
@@ -142,13 +142,13 @@
             {{-- 稼働状況マトリクス --}}
             <a href="{{ route('admin.operational-status.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.operational-status.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Operational Status
+                <i class="fa-solid fa-square-poll-vertical"></i> Operational Status
             </a>
 
             {{-- Schedule management (クリックすると Schedule専用メニューに切り替わります) --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Scheduler
+                <i class="fa-solid fa-calendar-days"></i> Scheduler
             </a>
 
             <a href="{{ route('admin.stations.index', ['menu' => 'station']) }}"
@@ -161,23 +161,23 @@
 
             <a href="{{ route('admin.teachers.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teachers.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Teacher List
+                <i class="fa-solid fa-person-chalkboard"></i> Teacher List
             </a>
 
             <a href="{{ route('admin.materials.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.materials.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Material List
+                <i class="fa-solid fa-book"></i> Material List
             </a>
 
             <a href="{{ route('admin.students.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.students.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Student List
+                <i class="fa-solid fa-user-pen"></i> Student List
             </a>
 
             {{-- User management --}}
             <a href="{{ route('admin.users.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.users.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                User List
+                <i class="fa-solid fa-circle-user"></i> User List
             </a>
 
             <hr>
@@ -185,7 +185,7 @@
             {{-- Announcement management --}}
             <a href="{{ route('admin.announcements.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.announcements.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                Announcement
+                <i class="fa-solid fa-bullhorn"></i> Announcement
             </a>
         @endif
     </nav>

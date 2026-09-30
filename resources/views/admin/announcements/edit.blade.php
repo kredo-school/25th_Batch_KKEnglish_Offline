@@ -54,7 +54,7 @@
             <form action="{{ route('admin.announcements.destroy', $announcement) }}" method="POST" class="text-start" onsubmit="return confirm('本当にこのお知らせを削除しますか？この操作は元に戻せません。');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-outline-danger btn-sm my-3">Delete</button>
+                <button type="submit" class="btn btn-outline-danger btn-sm my-3"><i class="fa-solid fa-trash me-1"></i> Delete</button>
             </form>
         </div>
     </div>

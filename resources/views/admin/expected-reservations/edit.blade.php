@@ -70,7 +70,7 @@
 
         <div class="mt-4">
             <div class="d-flex align-items-center gap-2 mb-4">
-                <button type="submit" class="btn btn-primary px-4">Save Settings</button>
+                <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-save me-1"></i> Save Settings</button>
                 <a href="{{ route('admin.operational-status.matrix_details', ['date' => request('date', now()->toDateString())]) }}"
                 class="btn btn-outline-secondary btn-sm"> <i class="fa-solid fa-angles-left"></i> Back </a>
             </div>

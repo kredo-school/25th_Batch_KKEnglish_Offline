@@ -4,7 +4,7 @@
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h2 mb-0 fw-bold">Teacher Assignment List</h1>
-        <a href="{{ route('admin.shift-pattern-assignments.create', ['menu' => 'schedule']) }}" class="btn btn-primary btn-sm">＋ Assign Shift Pattern</a>
+        <a href="{{ route('admin.shift-pattern-assignments.create', ['menu' => 'schedule']) }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus me-1"></i>Assign Shift Pattern</a>
     </div>
 
     @if (session('status'))
@@ -141,7 +141,7 @@
                                             <div class="mt-1">
                                                 <a href="{{ route('admin.shift-pattern-assignments.bulk-edit', $teacher) }}"
                                                     class="btn btn-outline-primary btn-sm">
-                                                     Edit
+                                                     <i class="fa-solid fa-pen-to-square me-1"></i> Edit
                                                 </a>
                                             </div>
 

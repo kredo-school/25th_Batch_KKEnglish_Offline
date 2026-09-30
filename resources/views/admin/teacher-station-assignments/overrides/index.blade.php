@@ -197,7 +197,7 @@
 
                                         <button type="submit"
                                                 class="btn btn-sm btn-outline-danger">
-                                            Delete
+                                           <i class="fa-solid fa-trash me-1"></i> Delete
                                         </button>
 
                                     </form>

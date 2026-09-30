@@ -4,7 +4,7 @@
 <div class="container py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold mb-0">Announcements</h2>
-        <a href="{{ route('admin.announcements.create') }}" class="btn btn-primary btn-sm">+ Create New</a>
+        <a href="{{ route('admin.announcements.create') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus me-1"></i>Create New</a>
     </div>
 
     @if(session('status'))
@@ -44,7 +44,7 @@
                             <td>{{ $announcement->title }}</td>
                             <td class="text-center">
                                 {{-- 今後、編集・削除機能などを追加する場合はここのリンクを変更します --}}
-                                <a href="{{ route('admin.announcements.edit', $announcement) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                <a href="{{ route('admin.announcements.edit', $announcement) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-pen-to-square me-1"></i> Edit</a>
                             </td>
                         </tr>
                     @empty

@@ -149,7 +149,7 @@
 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
-                        Save Changes
+                       <i class="fa-solid fa-save me-1"></i> Save Changes
                     </button>
                     <a href="{{ route('admin.shift-pattern-assignments.index', ['menu' => 'schedule']) }}"
                        class="btn btn-outline-secondary">
@@ -186,7 +186,7 @@
                     type="submit"
                     class="btn btn-warning"
                 >
-                    Delete Selected Weekday Shifts
+                    <i class="fa-solid fa-trash me-1"></i> Delete Selected Weekday Shifts
                 </button>
             </form>
         </div>
@@ -201,7 +201,7 @@
             <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete all shifts for this teacher?');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-danger">Execute Bulk Deletion</button>
+                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash me-1"></i> Execute Bulk Deletion</button>
             </form>
         </div>
     </div>
