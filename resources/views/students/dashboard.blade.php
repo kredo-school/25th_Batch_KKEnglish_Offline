@@ -163,10 +163,6 @@
     text-decoration: none;
 }
 
-#calendar .fc-toolbar-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-}
 
 /* =========================================
    Cancel Monkey
@@ -362,6 +358,71 @@
     }
 }
 
+/* =========================================
+   FullCalendar
+========================================= */
+
+#calendar a {
+    color: #212529;
+    text-decoration: none;
+}
+
+/* Month Title */
+#calendar .fc-toolbar-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+
+/* Previous / Next */
+#calendar .fc-button-primary {
+    background-color: #fff;
+    border-color: #dee2e6;
+    color: #6c757d;
+    box-shadow: none;
+}
+
+#calendar .fc-button-primary:hover {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #495057;
+}
+
+#calendar .fc-button-primary:focus,
+#calendar .fc-button-primary:active {
+    background-color: #f1f3f5 !important;
+    border-color: #ced4da !important;
+    color: #495057 !important;
+    box-shadow: none !important;
+}
+
+
+/* Sunday Header */
+#calendar .fc-col-header-cell.fc-day-sun {
+    background-color: #fff5f5;
+}
+
+#calendar .fc-col-header-cell.fc-day-sun a {
+    color: #dc3545;
+}
+
+
+/* Saturday Header */
+#calendar .fc-col-header-cell.fc-day-sat {
+    background-color: #f4f8ff;
+}
+
+#calendar .fc-col-header-cell.fc-day-sat a {
+    color: #0d6efd;
+}
+
+
+/* Today */
+#calendar .fc-day-today {
+    background-color: #fffbea !important;
+}
+
 </style>
 
 
@@ -475,7 +536,7 @@
             </h2>
 
             <p class="text-secondary mb-0">
-                {{ now()->format('l, F j') }}
+                {{ now()->format('F j, l') }}
             </p>
 
             <p class="fw-semibold mb-0">
@@ -1050,24 +1111,9 @@
 
             <div class="card">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-
-                    <div
-                        class="
-                            d-flex
-                            align-items-center
-                            mb-3
-                        "
-                    >
-
-                        <i
-                            class="
-                                fa-regular
-                                fa-calendar
-                                me-2
-                            "
-                        ></i>
+                    <div class="mb-2">
 
                         <h5 class="dashboard-section-title">
                             Reservation Calendar
@@ -1437,7 +1483,7 @@ document.addEventListener(
                         'dayGridMonth',
 
                     locale:
-                        'ja',
+                        'en',
 
                     headerToolbar: {
                         left: 'title',
