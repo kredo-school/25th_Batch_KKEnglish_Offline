@@ -26,7 +26,7 @@ class ShiftPatternSeeder extends Seeder
         $patterns = [
             [
                 'pattern_code' => 'morning',
-                'pattern_name' => '朝シフト',
+                'pattern_name' => 'Morning Shift',
                 'start_time' => '6:00',
                 'end_time' => '14:00',
                 'end_day_offset' => 0,
@@ -36,7 +36,7 @@ class ShiftPatternSeeder extends Seeder
             ],
             [
                 'pattern_code' => 'afternoon',
-                'pattern_name' => '昼シフト',
+                'pattern_name' => 'Afternoon Shift',
                 'start_time' => '12:00',
                 'end_time' => '20:00',
                 'end_day_offset' => 0,
@@ -46,7 +46,7 @@ class ShiftPatternSeeder extends Seeder
             ],
             [
                 'pattern_code' => 'evening',
-                'pattern_name' => '夜シフト',
+                'pattern_name' => 'Evening Shift',
                 'start_time' => '16:00',
                 'end_time' => '24:00',
                 'end_day_offset' => 0,
