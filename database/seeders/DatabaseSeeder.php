@@ -10,30 +10,52 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
         $this->call([
+            // Master
             RoleSeeder::class,
-            MaterialSeeder::class,
-            TeacherProfileSeeder::class,
-            ExceptionTypeSeeder::class,
-            ShiftPatternSeeder::class,
-            TeacherScheduleSeeder::class,
-            MaterialTeacherSeeder::class,
+            ReservationStatusSeeder::class,
             TransactionTypeSeeder::class,
+            ExceptionTypeSeeder::class,
+
+            // Users
             StudentSeeder::class,
             AdminSeeder::class,
+
+            // ShiftPatternSeederはAdmin作成後
+            ShiftPatternSeeder::class,
+
+            // Teacher
+            MaterialSeeder::class,
+            TeacherProfileSeeder::class,
+            MaterialTeacherSeeder::class,
+
+            // Schedule
+            TeacherScheduleSeeder::class,
+
+            // Reservation
             ReservationSeeder::class,
+
+            // Reservation related
             PointTransactionSeeder::class,
             LessonRecordSeeder::class,
             ReviewSeeder::class,
+
+            // Other
             TeacherLikeSeeder::class,
+            AnnouncementSeeder::class,
         ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Test User
+        |--------------------------------------------------------------------------
+        */
 
         User::factory()->create([
             'role_id' => 1,

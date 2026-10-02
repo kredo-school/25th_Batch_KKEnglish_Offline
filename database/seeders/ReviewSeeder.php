@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Reservation;
 use App\Models\Review;
+use App\Models\Teacher;
 use Illuminate\Database\Seeder;
 use RuntimeException;
 
@@ -15,9 +16,6 @@ class ReviewSeeder extends Seeder
         |--------------------------------------------------------------------------
         | Completed Reservations
         |--------------------------------------------------------------------------
-        |
-        | completed かつ LessonRecord が存在する予約を取得
-        |
         */
 
         $reservations = Reservation::query()
@@ -45,115 +43,212 @@ class ReviewSeeder extends Seeder
 
         /*
         |--------------------------------------------------------------------------
-        | 約70%をレビュー済みにする
+        | Comments
         |--------------------------------------------------------------------------
         */
 
-        $reviewCount = (int) floor(
-            $reservations->count() * 0.7
-        );
+        $comments = [
 
-        $reviewReservations = $reservations
-            ->shuffle()
-            ->take($reviewCount);
+            5 => [
+                'Excellent lesson! The teacher was very friendly and helpful.',
+                'I really enjoyed this lesson. The explanations were very clear.',
+                'Great teacher! I learned a lot and enjoyed speaking English.',
+                'The lesson was very helpful and easy to understand.',
+                'Amazing lesson. I felt comfortable speaking English.',
+                'The teacher gave me very useful feedback.',
+                'I would definitely like to book another lesson.',
+                'One of the best English lessons I have taken.',
+            ],
+
+            4 => [
+                'Good lesson. The teacher explained everything clearly.',
+                'I enjoyed the lesson and learned some useful expressions.',
+                'The teacher was friendly and the lesson was interesting.',
+                'It was a good lesson. I would like to take another class.',
+                'The lesson was useful and easy to follow.',
+                'I enjoyed practicing conversation with this teacher.',
+            ],
+
+            3 => [
+                'The lesson was good, but I need more practice.',
+                'It was helpful and I learned some new vocabulary.',
+                'The lesson was okay. I would like to practice more speaking.',
+                'The lesson was useful, although some parts were difficult.',
+            ],
+        ];
 
         /*
         |--------------------------------------------------------------------------
-        | Reviews
+        | Review each teacher
         |--------------------------------------------------------------------------
+        |
+        | Teacherごとにcompleted予約を取得。
+        | completed予約の80〜100%程度をレビュー済みにする。
+        |
         */
 
-        foreach ($reviewReservations as $reservation) {
+        $teachers = Teacher::query()
+            ->orderBy('id')
+            ->limit(30)
+            ->get();
+
+        $totalReviews = 0;
+
+        foreach ($teachers as $teacher) {
 
             /*
             |--------------------------------------------------------------------------
-            | Rating
+            | Teacher's completed reservations
+            |--------------------------------------------------------------------------
+            */
+
+            $teacherReservations = $reservations
+                ->where('teacher_id', $teacher->id)
+                ->values();
+
+            /*
+            |--------------------------------------------------------------------------
+            | completed予約がないTeacher
+            |--------------------------------------------------------------------------
+            */
+
+            if ($teacherReservations->isEmpty()) {
+
+                $this->command?->warn(
+                    "Teacher {$teacher->id}: "
+                    . 'completed reservation がないためレビューを作成できません。'
+                );
+
+                continue;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Review count
             |--------------------------------------------------------------------------
             |
-            | 実際のデモ画面で★4〜5が多く見えるように分散
+            | Teacherのcompleted予約の80〜100%をレビュー化
             |
             */
 
-            $rating = fake()->randomElement([
-                3,
-                4,
-                4,
-                4,
-                5,
-                5,
-                5,
-                5,
+            $percentage = fake()->randomElement([
+                0.8,
+                0.9,
+                1.0,
             ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Comment
-            |--------------------------------------------------------------------------
-            */
-
-            $comments = [
-                5 => [
-                    'Excellent lesson! The teacher was very friendly and helpful.',
-                    'I really enjoyed this lesson. The explanations were very clear.',
-                    'Great teacher! I learned a lot and enjoyed speaking English.',
-                    'The lesson was very helpful and easy to understand.',
-                ],
-
-                4 => [
-                    'Good lesson. The teacher explained everything clearly.',
-                    'I enjoyed the lesson and learned some useful expressions.',
-                    'The teacher was friendly and the lesson was interesting.',
-                    'It was a good lesson. I would like to take another class.',
-                ],
-
-                3 => [
-                    'The lesson was good, but I need more practice.',
-                    'It was helpful and I learned some new vocabulary.',
-                    'The lesson was okay. I would like to practice more speaking.',
-                ],
-            ];
-
-            $comment = fake()->randomElement(
-                $comments[$rating]
+            $reviewCount = max(
+                1,
+                (int) ceil(
+                    $teacherReservations->count()
+                    * $percentage
+                )
             );
 
+            $reviewReservations = $teacherReservations
+                ->shuffle()
+                ->take($reviewCount);
+
             /*
             |--------------------------------------------------------------------------
-            | Create / Update
+            | Create Reviews
             |--------------------------------------------------------------------------
             */
 
-            Review::updateOrCreate(
-                [
-                    'reservation_id' =>
-                        $reservation->id,
-                ],
-                [
-                    'student_id' =>
-                        $reservation->student_id,
+            foreach ($reviewReservations as $reservation) {
 
-                    'teacher_id' =>
-                        $reservation->teacher_id,
+                /*
+                |--------------------------------------------------------------------------
+                | Rating
+                |--------------------------------------------------------------------------
+                |
+                | ★4〜5中心
+                | ★3も少しだけ入れる
+                |
+                */
 
-                    'rating' =>
-                        $rating,
+                $rating = fake()->randomElement([
+                    3,
+                    4,
+                    4,
+                    4,
+                    4,
+                    5,
+                    5,
+                    5,
+                    5,
+                    5,
+                ]);
 
-                    'comment' =>
-                        $comment,
-                ]
+                $comment = fake()->randomElement(
+                    $comments[$rating]
+                );
+
+                Review::updateOrCreate(
+                    [
+                        'reservation_id' =>
+                            $reservation->id,
+                    ],
+                    [
+                        'student_id' =>
+                            $reservation->student_id,
+
+                        'teacher_id' =>
+                            $reservation->teacher_id,
+
+                        'rating' =>
+                            $rating,
+
+                        'comment' =>
+                            $comment,
+                    ]
+                );
+
+                $totalReviews++;
+            }
+
+            $this->command?->info(
+                "Teacher {$teacher->id}: "
+                . "{$reviewReservations->count()} reviews"
             );
         }
 
-        $this->command?->info(
-            "Reviews created: {$reviewReservations->count()}"
-        );
+        /*
+        |--------------------------------------------------------------------------
+        | Update Teacher Rating Average
+        |--------------------------------------------------------------------------
+        |
+        | reviewsテーブルの実際の評価から
+        | teachers.rating_average を更新
+        |
+        */
+
+        foreach ($teachers as $teacher) {
+
+            $average = Review::query()
+                ->where(
+                    'teacher_id',
+                    $teacher->id
+                )
+                ->avg('rating');
+
+            if ($average !== null) {
+
+                $teacher->update([
+                    'rating_average' =>
+                        round($average, 2),
+                ]);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Result
+        |--------------------------------------------------------------------------
+        */
 
         $this->command?->info(
-            'Reservations without review: '
-            . (
-                $reservations->count()
-                - $reviewReservations->count()
-            )
+            "Total reviews created: {$totalReviews}"
         );
     }
 }

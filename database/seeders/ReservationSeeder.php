@@ -47,13 +47,14 @@ class ReservationSeeder extends Seeder
             ->get()
             ->keyBy('status_code');
 
-        foreach ([
-            'confirmed',
-            'completed',
-            'absent',
-            'cancelled',
-        ] as $statusCode) {
-
+        foreach (
+            [
+                'confirmed',
+                'completed',
+                'absent',
+                'cancelled',
+            ] as $statusCode
+        ) {
             if (!$statuses->has($statusCode)) {
                 throw new RuntimeException(
                     "ReservationStatus: {$statusCode} がありません。"
@@ -91,7 +92,7 @@ class ReservationSeeder extends Seeder
         | 予約可能枠を作成
         |--------------------------------------------------------------------------
         |
-        | 30分間隔で25分レッスンを作成
+        | 30分間隔で25分レッスン
         |
         | 例:
         | 09:00 - 09:25
@@ -108,38 +109,70 @@ class ReservationSeeder extends Seeder
                 continue;
             }
 
-            // このTeacherが担当できる教材
+            /*
+            |--------------------------------------------------------------------------
+            | Teacherが担当できる教材
+            |--------------------------------------------------------------------------
+            */
+
             $materials = $schedule->teacher->materials;
 
             if ($materials->isEmpty()) {
                 continue;
             }
 
-            $shiftStart = Carbon::parse(
+            /*
+            |--------------------------------------------------------------------------
+            | Schedule Date / Time
+            |--------------------------------------------------------------------------
+            */
+
+            $date = Carbon::parse(
                 $schedule->available_date
-                . ' '
-                . $schedule->start_time
+            )->toDateString();
+
+            $startTime = Carbon::parse(
+                $schedule->start_time
+            )->format('H:i:s');
+
+            $endTime = Carbon::parse(
+                $schedule->end_time
+            )->format('H:i:s');
+
+            $shiftStart = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                "{$date} {$startTime}"
             );
 
-            $shiftEnd = Carbon::parse(
-                $schedule->available_date
-                . ' '
-                . $schedule->end_time
+            $shiftEnd = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                "{$date} {$endTime}"
             );
 
             /*
-             * 夜勤など日付をまたぐ場合
-             */
+            |--------------------------------------------------------------------------
+            | 夜勤など日付をまたぐ場合
+            |--------------------------------------------------------------------------
+            */
+
             if ($shiftEnd->lte($shiftStart)) {
                 $shiftEnd->addDay();
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | 25分レッスン + 5分休憩
+            |--------------------------------------------------------------------------
+            */
+
             $current = $shiftStart->copy();
 
             while (
-                $current->copy()->addMinutes(25)->lte($shiftEnd)
+                $current
+                    ->copy()
+                    ->addMinutes(25)
+                    ->lte($shiftEnd)
             ) {
-
                 $slots->push([
                     'schedule' => $schedule,
                     'start_at' => $current->copy(),
@@ -162,26 +195,276 @@ class ReservationSeeder extends Seeder
 
         /*
         |--------------------------------------------------------------------------
-        | Shuffle
-        |--------------------------------------------------------------------------
-        */
-
-        $slots = $slots->shuffle();
-
-        /*
-        |--------------------------------------------------------------------------
-        | 目標100件
+        | Reservation Settings
         |--------------------------------------------------------------------------
         */
 
         $targetCount = 100;
+
+        $completedPerTeacher = 2;
+
         $createdCount = 0;
 
         /*
         |--------------------------------------------------------------------------
-        | Reservations
+        | Phase 1
+        |--------------------------------------------------------------------------
+        |
+        | Teacher 30人全員に
+        | completed予約を最低2件作成
+        |
+        | 30 teachers × 2 = 60 reservations
+        |
+        */
+
+        $teacherIds = $schedules
+            ->pluck('teacher_id')
+            ->unique()
+            ->sort()
+            ->values();
+
+        foreach ($teacherIds as $teacherId) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | このTeacherの過去枠だけ取得
+            |--------------------------------------------------------------------------
+            |
+            | completedは過去の授業だけにする
+            |
+            */
+
+            $teacherPastSlots = $slots
+                ->filter(function ($slot) use ($teacherId) {
+
+                    return
+                        $slot['schedule']->teacher_id == $teacherId
+                        && $slot['start_at']->isPast();
+                })
+                ->shuffle();
+
+            /*
+            |--------------------------------------------------------------------------
+            | 過去枠が2件未満なら警告
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $teacherPastSlots->count()
+                < $completedPerTeacher
+            ) {
+                $this->command?->warn(
+                    "Teacher {$teacherId}: "
+                    . "過去枠が{$teacherPastSlots->count()}件しかありません。"
+                );
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Teacherごとに2件作成
+            |--------------------------------------------------------------------------
+            */
+
+            $teacherCreatedCount = 0;
+
+            foreach ($teacherPastSlots as $slot) {
+
+                if (
+                    $teacherCreatedCount
+                    >= $completedPerTeacher
+                ) {
+                    break;
+                }
+
+                if ($createdCount >= $targetCount) {
+                    break 2;
+                }
+
+                $schedule = $slot['schedule'];
+
+                $startAt = $slot['start_at'];
+
+                $endAt = $slot['end_at'];
+
+                /*
+                |--------------------------------------------------------------------------
+                | Teacher Conflict
+                |--------------------------------------------------------------------------
+                */
+
+                $teacherConflict = Reservation::query()
+                    ->where(
+                        'teacher_id',
+                        $schedule->teacher_id
+                    )
+                    ->where(
+                        'start_at',
+                        '<',
+                        $endAt
+                    )
+                    ->where(
+                        'end_at',
+                        '>',
+                        $startAt
+                    )
+                    ->exists();
+
+                if ($teacherConflict) {
+                    continue;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Student
+                |--------------------------------------------------------------------------
+                |
+                | 予約数が少ないStudentを優先
+                |
+                */
+
+                $student = $students
+                    ->sortBy(function ($student) {
+
+                        return Reservation::query()
+                            ->where(
+                                'student_id',
+                                $student->id
+                            )
+                            ->count();
+                    })
+                    ->first(
+                        function ($student) use (
+                            $startAt,
+                            $endAt
+                        ) {
+
+                            return !Reservation::query()
+                                ->where(
+                                    'student_id',
+                                    $student->id
+                                )
+                                ->where(
+                                    'start_at',
+                                    '<',
+                                    $endAt
+                                )
+                                ->where(
+                                    'end_at',
+                                    '>',
+                                    $startAt
+                                )
+                                ->exists();
+                        }
+                    );
+
+                if (!$student) {
+                    continue;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Material
+                |--------------------------------------------------------------------------
+                */
+
+                $material =
+                    $slot['materials']->random();
+
+                /*
+                |--------------------------------------------------------------------------
+                | Point Cost
+                |--------------------------------------------------------------------------
+                */
+
+                $pointCost =
+                    $schedule
+                        ->teacher
+                        ->point_consumed
+                    ?? 100;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Completed Reservation
+                |--------------------------------------------------------------------------
+                */
+
+                Reservation::create([
+                    'student_id' =>
+                        $student->id,
+
+                    'teacher_id' =>
+                        $schedule->teacher_id,
+
+                    'schedule_id' =>
+                        $schedule->schedule_id,
+
+                    'material_id' =>
+                        $material->material_id,
+
+                    'status_id' =>
+                        $statuses['completed']
+                            ->status_id,
+
+                    'start_at' =>
+                        $startAt,
+
+                    'end_at' =>
+                        $endAt,
+
+                    'point_cost' =>
+                        $pointCost,
+
+                    'cancelled_by' =>
+                        null,
+
+                    'cancelled_at' =>
+                        null,
+
+                    'cancellation_reason' =>
+                        null,
+                ]);
+
+                $createdCount++;
+
+                $teacherCreatedCount++;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Teacher Result
+            |--------------------------------------------------------------------------
+            */
+
+            $this->command?->info(
+                "Teacher {$teacherId}: "
+                . "{$teacherCreatedCount} completed reservations"
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Phase 1 Result
         |--------------------------------------------------------------------------
         */
+
+        $this->command?->info(
+            "Guaranteed completed reservations: {$createdCount}"
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Phase 2
+        |--------------------------------------------------------------------------
+        |
+        | 残りをランダム生成
+        |
+        | Phase 1 = 約60件
+        | Phase 2 = 約40件
+        | 合計 = 100件
+        |
+        */
+
+        $slots = $slots->shuffle();
 
         foreach ($slots as $slot) {
 
@@ -190,13 +473,18 @@ class ReservationSeeder extends Seeder
             }
 
             $schedule = $slot['schedule'];
+
             $startAt = $slot['start_at'];
+
             $endAt = $slot['end_at'];
 
             /*
             |--------------------------------------------------------------------------
-            | Teacherの重複チェック
+            | Teacher Conflict
             |--------------------------------------------------------------------------
+            |
+            | Phase 1で使用済みの枠もここで除外される
+            |
             */
 
             $teacherConflict = Reservation::query()
@@ -222,7 +510,7 @@ class ReservationSeeder extends Seeder
 
             /*
             |--------------------------------------------------------------------------
-            | Studentを選択
+            | Student
             |--------------------------------------------------------------------------
             |
             | 予約数が少ないStudentを優先
@@ -238,31 +526,31 @@ class ReservationSeeder extends Seeder
                             $student->id
                         )
                         ->count();
-
                 })
-                ->first(function ($student) use (
-                    $startAt,
-                    $endAt
-                ) {
+                ->first(
+                    function ($student) use (
+                        $startAt,
+                        $endAt
+                    ) {
 
-                    return !Reservation::query()
-                        ->where(
-                            'student_id',
-                            $student->id
-                        )
-                        ->where(
-                            'start_at',
-                            '<',
-                            $endAt
-                        )
-                        ->where(
-                            'end_at',
-                            '>',
-                            $startAt
-                        )
-                        ->exists();
-
-                });
+                        return !Reservation::query()
+                            ->where(
+                                'student_id',
+                                $student->id
+                            )
+                            ->where(
+                                'start_at',
+                                '<',
+                                $endAt
+                            )
+                            ->where(
+                                'end_at',
+                                '>',
+                                $startAt
+                            )
+                            ->exists();
+                    }
+                );
 
             if (!$student) {
                 continue;
@@ -272,29 +560,35 @@ class ReservationSeeder extends Seeder
             |--------------------------------------------------------------------------
             | Material
             |--------------------------------------------------------------------------
-            |
-            | Teacherが担当できる教材だけ使用
-            |
             */
 
-            $material = $slot['materials']->random();
+            $material =
+                $slot['materials']->random();
 
             /*
             |--------------------------------------------------------------------------
             | Status
             |--------------------------------------------------------------------------
+            |
+            | 過去
+            | → completed / absent / cancelled
+            |
+            | 未来
+            | → confirmed
+            |
             */
 
             if ($startAt->isPast()) {
 
-                $statusCode = fake()->randomElement([
-                    'completed',
-                    'completed',
-                    'completed',
-                    'completed',
-                    'absent',
-                    'cancelled',
-                ]);
+                $statusCode =
+                    fake()->randomElement([
+                        'completed',
+                        'completed',
+                        'completed',
+                        'completed',
+                        'absent',
+                        'cancelled',
+                    ]);
 
             } else {
 
@@ -303,21 +597,25 @@ class ReservationSeeder extends Seeder
 
             /*
             |--------------------------------------------------------------------------
-            | Cancel情報
+            | Cancel Information
             |--------------------------------------------------------------------------
             */
 
             $cancelledBy = null;
+
             $cancelledAt = null;
+
             $cancellationReason = null;
 
             if ($statusCode === 'cancelled') {
 
-                $cancelledBy = $student->user_id;
+                $cancelledBy =
+                    $student->user_id;
 
-                $cancelledAt = $startAt
-                    ->copy()
-                    ->subDay();
+                $cancelledAt =
+                    $startAt
+                        ->copy()
+                        ->subDay();
 
                 $cancellationReason =
                     'Cancelled by student (Seeder data)';
@@ -327,14 +625,12 @@ class ReservationSeeder extends Seeder
             |--------------------------------------------------------------------------
             | Point Cost
             |--------------------------------------------------------------------------
-            |
-            | Teacherのpoint_consumedを使用
-            | nullの場合は100
-            |
             */
 
             $pointCost =
-                $schedule->teacher->point_consumed
+                $schedule
+                    ->teacher
+                    ->point_consumed
                 ?? 100;
 
             /*
@@ -344,7 +640,8 @@ class ReservationSeeder extends Seeder
             */
 
             Reservation::create([
-                'student_id' => $student->id,
+                'student_id' =>
+                    $student->id,
 
                 'teacher_id' =>
                     $schedule->teacher_id,
@@ -356,12 +653,17 @@ class ReservationSeeder extends Seeder
                     $material->material_id,
 
                 'status_id' =>
-                    $statuses[$statusCode]->status_id,
+                    $statuses[$statusCode]
+                        ->status_id,
 
-                'start_at' => $startAt,
-                'end_at' => $endAt,
+                'start_at' =>
+                    $startAt,
 
-                'point_cost' => $pointCost,
+                'end_at' =>
+                    $endAt,
+
+                'point_cost' =>
+                    $pointCost,
 
                 'cancelled_by' =>
                     $cancelledBy,
@@ -376,8 +678,22 @@ class ReservationSeeder extends Seeder
             $createdCount++;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Final Result
+        |--------------------------------------------------------------------------
+        */
+
         $this->command?->info(
             "Reservations created: {$createdCount}"
         );
+
+        if ($createdCount < $targetCount) {
+
+            $this->command?->warn(
+                "目標{$targetCount}件に対して"
+                . "{$createdCount}件しか作成できませんでした。"
+            );
+        }
     }
 }
