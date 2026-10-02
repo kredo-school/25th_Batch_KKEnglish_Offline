@@ -1,10 +1,14 @@
     @php
 
     $isOperationalStatusMenu = request('menu') === 'operational-status'
-        || request()->routeIs('admin.operational-status.*');
+        || request()->routeIs('admin.operational-status.*')
+        || request()->routeIs('admin.season-periods.*')
+        || request()->routeIs('admin.expected-reservations.*')
+        ;
 
     $isStationMenu = request('menu') === 'station'
-        || request()->routeIs('admin.stations.*');
+        || request()->routeIs('admin.stations.*')
+        || request()->routeIs('admin.teacher-station-assignments.*');
 
     $isScheduleMenu = !$isOperationalStatusMenu
         && !$isStationMenu
@@ -47,7 +51,7 @@
                 <i class="fa-solid fa-angles-left"></i> Back to Dashboard
             </a>
 
-            <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle "><i class="fa-solid fa-calendar-days"></i> Scheduler</div>
+            <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle "><i class="fa-solid fa-calendar-days me-2"></i> Scheduler</div>
 
             {{-- 今日のスケジュール --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
@@ -77,7 +81,7 @@
             </a>
 
         <div class="px-3 py-2 mb-1 fw-semibold text-muted fs-6 bg-secondary-subtle ">
-            <i class="fa-solid fa-square-poll-vertical"></i> Operational Status
+            <i class="fa-solid fa-square-poll-vertical me-2"></i> Operational Status
         </div>
 
             {{-- Monthly Overview --}}
@@ -142,13 +146,13 @@
             {{-- 稼働状況マトリクス --}}
             <a href="{{ route('admin.operational-status.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.operational-status.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                <i class="fa-solid fa-square-poll-vertical"></i> Operational Status
+                <i class="fa-solid fa-square-poll-vertical me-2"></i> Operational Status
             </a>
 
             {{-- Schedule management (クリックすると Schedule専用メニューに切り替わります) --}}
             <a href="{{ route('admin.schedules.index', ['menu' => 'schedule']) }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.schedules.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                <i class="fa-solid fa-calendar-days"></i> Scheduler
+                <i class="fa-solid fa-calendar-days me-2"></i> Scheduler
             </a>
 
             <a href="{{ route('admin.stations.index', ['menu' => 'station']) }}"
@@ -161,23 +165,23 @@
 
             <a href="{{ route('admin.teachers.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teachers.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                <i class="fa-solid fa-person-chalkboard"></i> Teacher List
+                <i class="fa-solid fa-person-chalkboard me-1"></i> Teacher List
             </a>
 
             <a href="{{ route('admin.materials.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.materials.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                <i class="fa-solid fa-book"></i> Material List
+                <i class="fa-solid fa-book me-2"></i> Material List
             </a>
 
             <a href="{{ route('admin.students.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.students.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                <i class="fa-solid fa-user-pen"></i> Student List
+                <i class="fa-solid fa-user-pen me-1"></i> Student List
             </a>
 
             {{-- User management --}}
             <a href="{{ route('admin.users.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.users.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                <i class="fa-solid fa-circle-user"></i> User List
+                <i class="fa-solid fa-circle-user me-2"></i> User List
             </a>
 
             <hr>
@@ -185,7 +189,7 @@
             {{-- Announcement management --}}
             <a href="{{ route('admin.announcements.index') }}"
                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.announcements.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
-                <i class="fa-solid fa-bullhorn"></i> Announcement
+                <i class="fa-solid fa-bullhorn me-2"></i> Announcement
             </a>
         @endif
     </nav>

@@ -13,30 +13,66 @@
         @csrf
         @method('PUT')
 
-        <ul class="nav nav-tabs mb-4" id="seasonTabs" role="tablist">
-            @foreach($seasons as $key => $label)
-                <li class="nav-item bg-secondary-subtle" role="presentation">
-                    <button class="nav-link {{ $loop->first ? 'active' : '' }}"
-                            id="{{ $key }}-tab" data-bs-toggle="tab"
-                            data-bs-target="#{{ $key }}-pane"
-                            type="button" role="tab"
-                            aria-controls="{{ $key }}-pane"
-                            aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                        {{ $label }}
-                    </button>
-                </li>
-            @endforeach
-        </ul>
+        {{-- Season Tabs + Back --}}
+        <div class="row">
+            <div class="col-md-8">
 
-        <div class="tab-content" id="seasonTabsContent">
-            @foreach($seasons as $key => $label)
-                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                     id="{{ $key }}-pane" role="tabpanel"
-                     aria-labelledby="{{ $key }}-tab" tabindex="0">
+                <div class="d-flex justify-content-between align-items-end mb-4">
 
-                    <div class="row">
-                        <div class="col-md-8">
+                    {{-- Season Tabs --}}
+                    <ul class="nav nav-tabs mb-0"
+                        id="seasonTabs"
+                        role="tablist">
+
+                        @foreach($seasons as $key => $label)
+                            <li class="nav-item bg-secondary-subtle"
+                                role="presentation">
+
+                                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                        id="{{ $key }}-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#{{ $key }}-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="{{ $key }}-pane"
+                                        aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+
+                                    {{ $label }}
+
+                                </button>
+
+                            </li>
+                        @endforeach
+
+                    </ul>
+
+
+                    {{-- Back --}}
+                    <a href="{{ route('admin.operational-status.matrix_details', [
+                        'date' => request('date', now()->toDateString())
+                    ]) }}"
+                       class="btn btn-outline-secondary btn-sm">
+
+                        <i class="fa-solid fa-angles-left"></i>
+                        Back
+
+                    </a>
+
+                </div>
+
+                {{-- Tab Contents --}}
+                <div class="tab-content" id="seasonTabsContent">
+
+                    @foreach($seasons as $key => $label)
+
+                        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                             id="{{ $key }}-pane"
+                             role="tabpanel"
+                             aria-labelledby="{{ $key }}-tab"
+                             tabindex="0">
+
                             <table class="table table-bordered text-center align-middle">
+
                                 <thead class="table-light">
                                     <tr>
                                         <th>Time</th>
@@ -44,35 +80,56 @@
                                         <th>Weekend</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
+
                                     @foreach($times as $time)
+
                                         <tr>
-                                            <th class="bg-light">{{ $time }}</th>
+
+                                            <th class="bg-light">
+                                                {{ $time }}
+                                            </th>
+
                                             <td>
-                                                <input type="number" min="0" class="form-control text-center"
+                                                <input type="number"
+                                                       min="0"
+                                                       class="form-control text-center"
                                                        name="expected[{{ $key }}][weekday][{{ $time }}]"
                                                        value="{{ $settings[$key]['weekday'][$time] ?? 0 }}">
                                             </td>
+
                                             <td>
-                                                <input type="number" min="0" class="form-control text-center"
+                                                <input type="number"
+                                                       min="0"
+                                                       class="form-control text-center"
                                                        name="expected[{{ $key }}][weekend][{{ $time }}]"
                                                        value="{{ $settings[$key]['weekend'][$time] ?? 0 }}">
                                             </td>
+
                                         </tr>
+
                                     @endforeach
+
                                 </tbody>
+
                             </table>
+
                         </div>
-                    </div>
+
+                    @endforeach
+
                 </div>
-            @endforeach
+
+            </div>
         </div>
 
+        {{-- Save --}}
         <div class="mt-4">
             <div class="d-flex align-items-center gap-2 mb-4">
                 <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-save me-1"></i> Save Settings</button>
                 <a href="{{ route('admin.operational-status.matrix_details', ['date' => request('date', now()->toDateString())]) }}"
-                class="btn btn-outline-secondary btn-sm"> <i class="fa-solid fa-angles-left"></i> Back </a>
+                class="btn btn-outline-secondary btn-sm"> Cancel </a>
             </div>
         </div>
     </form>

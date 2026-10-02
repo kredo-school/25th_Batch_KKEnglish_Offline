@@ -230,11 +230,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
 
     Route::delete('/shift-pattern-assignments/{assignment}', [ShiftPatternAssignmentController::class, 'destroy'])->name('shift-pattern-assignments.destroy');
 
+    // Shift Pattern Assignment by Teacher
     Route::get('/shift-pattern-assignments/teacher/{teacher}/bulk-edit',[ShiftPatternAssignmentController::class, 'bulkEdit'])->name('shift-pattern-assignments.bulk-edit');
     Route::put('/shift-pattern-assignments/teacher/{teacher}/bulk-update',[ShiftPatternAssignmentController::class, 'bulkUpdate'])->name('shift-pattern-assignments.bulk-update');
     Route::delete('/shift-pattern-assignments/teachers/{teacher}/bulk-destroy',[ShiftPatternAssignmentController::class, 'bulkDestroy'])->name('shift-pattern-assignments.bulk-destroy');
 
     Route::delete('/shift-pattern-assignments/teacher/{teacher}', [ShiftPatternAssignmentController::class, 'destroyByTeacher'])->name('shift-pattern-assignments.destroy-by-teacher');
+
+    // Shift Pattern Assignment by Pattern
+    Route::get('/shift-pattern-assignments/pattern/{shiftPattern}/bulk-edit',[ShiftPatternAssignmentController::class, 'bulkEditByPattern'])->name('shift-pattern-assignments.bulk-edit-by-pattern');
+    Route::put('/shift-pattern-assignments/pattern/{shiftPattern}/bulk-edit',
+    [ShiftPatternAssignmentController::class, 'bulkUpdateByPattern'])->name('shift-pattern-assignments.bulk-update-by-pattern');
+    Route::delete('/shift-pattern-assignments/pattern/{shiftPattern}/bulk-destroy',
+    [ShiftPatternAssignmentController::class, 'bulkDestroyByPattern'])->name('shift-pattern-assignments.bulk-destroy-by-pattern');
 
     // Announcement Management
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');

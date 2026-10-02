@@ -17,14 +17,23 @@ class ShiftPatternController extends Controller
 {
     public function index()
     {
+        $today = today();
+
         $patterns = ShiftPattern::query()
             ->withCount([
-                'assignments as teachers_count' => function ($query) {
-                    $query->select(
-                        DB::raw(
-                            'COUNT(DISTINCT teacher_id)'
-                        )
-                    );
+                'assignments as teachers_count' => function ($query) use ($today) {
+                    $query
+                        ->whereDate('start_date', '<=', $today)
+                        ->where(function ($q) use ($today) {
+                            $q->whereNull('end_date')
+                                ->orWhereDate('end_date', '>=', $today);
+                        })
+                        ->select(DB::raw('COUNT(DISTINCT teacher_id)'));
+                },
+
+                // 過去シフトが存在するか
+                'assignments as past_assignments_count' => function ($query) use ($today) {
+                    $query->whereDate('end_date', '<', $today);
                 },
             ])
             ->latest('id')
