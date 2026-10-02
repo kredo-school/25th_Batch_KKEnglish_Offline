@@ -23,8 +23,9 @@ class PointTransactionSeeder extends Seeder
             ->first();
 
         $refundType = TransactionType::query()
-            ->where('type_code', 'refund')
+            ->where('type_code', 'reservation_refund')
             ->first();
+
 
         if (!$useType) {
             throw new RuntimeException(
@@ -34,7 +35,7 @@ class PointTransactionSeeder extends Seeder
 
         if (!$refundType) {
             throw new RuntimeException(
-                'TransactionType: refund がありません。'
+                'TransactionType: reservation_refund がありません。'
             );
         }
 

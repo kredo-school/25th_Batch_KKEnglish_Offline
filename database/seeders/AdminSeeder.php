@@ -20,8 +20,9 @@ class AdminSeeder extends Seeder
         $adminUser = User::factory()
             ->admin()
             ->create([
-                'first_name' => 'Demo',
-                'last_name' => 'Admin',
+                'first_name' => 'Fujimaki',
+                'last_name' => 'Taro',
+                'profile_image' => 'https://images.openai.com/static-rsc-4/sDlrqO2l4zwNn-Aq_LfAjWhT3yG57tDLqDYKX7EWjkjer-Y7W0JbOPCXcmnFIrvAqIajEJdvCzipP458HRlb9dA_2CBrrSHj6IBUuU5XikY_PbYqKJX36F55JZVHPiRk0fInEH1dqoal-O9PVGDs_dfQ1GGbqJyXBWXKr7JA2EE?purpose=inline',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('password'),
                 'nationality' => 'JP',

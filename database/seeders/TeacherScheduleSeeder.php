@@ -14,9 +14,12 @@ class TeacherScheduleSeeder extends Seeder
 {
     public function run(): void
     {
-        // ========================================
-        // 管理者を取得
-        // ========================================
+        /*
+        |--------------------------------------------------------------------------
+        | Admin
+        |--------------------------------------------------------------------------
+        */
+
         $adminUser = User::query()
             ->whereHas('role', function ($query) {
                 $query->where('role_code', 'admin');
@@ -29,23 +32,35 @@ class TeacherScheduleSeeder extends Seeder
             );
         }
 
-        // ========================================
-        // Teacher ID 1～10 を取得
-        // ========================================
+        /*
+        |--------------------------------------------------------------------------
+        | Teachers
+        |--------------------------------------------------------------------------
+        |
+        | 先頭30人のTeacherを取得
+        |
+        */
+
         $teachers = Teacher::query()
-            ->whereBetween('id', [1, 10])
             ->orderBy('id')
+            ->limit(30)
             ->get();
 
-        if ($teachers->isEmpty()) {
+        if ($teachers->count() < 30) {
             throw new RuntimeException(
-                'Teacher ID 1～10の講師を作成してください。'
+                "Teacherが30人必要です。現在: {$teachers->count()}人"
             );
         }
 
-        // ========================================
-        // ShiftPattern ID 1～3 を取得
-        // ========================================
+        /*
+        |--------------------------------------------------------------------------
+        | Shift Patterns
+        |--------------------------------------------------------------------------
+        |
+        | Pattern 1～3を使用
+        |
+        */
+
         $patterns = ShiftPattern::query()
             ->whereIn('id', [1, 2, 3])
             ->orderBy('id')
@@ -57,10 +72,15 @@ class TeacherScheduleSeeder extends Seeder
             );
         }
 
-        // ========================================
-        // 期間
-        // 2026-09-04 ～ 2026-10-15
-        // ========================================
+        /*
+        |--------------------------------------------------------------------------
+        | Schedule Period
+        |--------------------------------------------------------------------------
+        |
+        | 2026-09-04 ～ 2026-10-15
+        |
+        */
+
         $startDate = Carbon::create(
             2026,
             9,
@@ -73,43 +93,121 @@ class TeacherScheduleSeeder extends Seeder
             15
         )->startOfDay();
 
-        $date = $startDate->copy();
+        /*
+        |--------------------------------------------------------------------------
+        | Teacher Schedules
+        |--------------------------------------------------------------------------
+        |
+        | Teacherごとに勤務シフトを固定
+        |
+        | 1人目  → Pattern 1
+        | 2人目  → Pattern 2
+        | 3人目  → Pattern 3
+        | 4人目  → Pattern 1
+        | ...
+        | 30人目 → Pattern 3
+        |
+        | 30人なので
+        |
+        | Pattern 1 → 10人
+        | Pattern 2 → 10人
+        | Pattern 3 → 10人
+        |
+        */
 
-        // ========================================
-        // 毎日の勤務シフトを作成
-        // ========================================
-        while ($date->lte($endDate)) {
+        foreach ($teachers as $index => $teacher) {
 
-            foreach ($teachers as $teacher) {
+            /*
+            |--------------------------------------------------------------------------
+            | Fixed Shift Pattern
+            |--------------------------------------------------------------------------
+            |
+            | $index
+            | 0 → Pattern 1
+            | 1 → Pattern 2
+            | 2 → Pattern 3
+            | 3 → Pattern 1
+            | ...
+            |
+            */
 
-                // Pattern 1～3を順番に分散
-                $patternIndex = (
-                    $teacher->id
-                    + $date->dayOfYear
-                ) % $patterns->count();
+            $patternIndex =
+                $index % $patterns->count();
 
-                $pattern = $patterns[$patternIndex];
+            $pattern =
+                $patterns[$patternIndex];
+
+            /*
+            |--------------------------------------------------------------------------
+            | Date
+            |--------------------------------------------------------------------------
+            */
+
+            $date = $startDate->copy();
+
+            while ($date->lte($endDate)) {
 
                 TeacherSchedule::updateOrCreate(
                     [
-                        'teacher_id' => $teacher->id,
-                        'available_date' => $date->toDateString(),
+                        'teacher_id' =>
+                            $teacher->id,
+
+                        'available_date' =>
+                            $date->toDateString(),
                     ],
                     [
-                        'shift_pattern_id' => $pattern->id,
-                        'start_time' => $pattern->start_time,
-                        'end_time' => $pattern->end_time,
-                        'status' => 'confirmed',
-                        'created_by' => $adminUser->id,
-                        'confirmed_by' => $adminUser->id,
-                        'confirmed_at' => now(),
-                        'cancelled_by' => null,
-                        'cancelled_at' => null,
+                        'shift_pattern_id' =>
+                            $pattern->id,
+
+                        'start_time' =>
+                            $pattern->start_time,
+
+                        'end_time' =>
+                            $pattern->end_time,
+
+                        'status' =>
+                            'confirmed',
+
+                        'created_by' =>
+                            $adminUser->id,
+
+                        'confirmed_by' =>
+                            $adminUser->id,
+
+                        'confirmed_at' =>
+                            now(),
+
+                        'cancelled_by' =>
+                            null,
+
+                        'cancelled_at' =>
+                            null,
                     ]
                 );
+
+                $date->addDay();
             }
 
-            $date->addDay();
+            /*
+            |--------------------------------------------------------------------------
+            | Result
+            |--------------------------------------------------------------------------
+            */
+
+            $this->command?->info(
+                "Teacher {$teacher->id}: "
+                . "Shift Pattern {$pattern->id}"
+            );
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Final Result
+        |--------------------------------------------------------------------------
+        */
+
+        $this->command?->info(
+            'Teacher schedules created for 30 teachers.'
+        );
     }
 }

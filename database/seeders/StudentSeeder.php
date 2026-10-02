@@ -23,8 +23,8 @@ class StudentSeeder extends Seeder
         $demoUser = User::factory()
             ->student()
             ->create([
-                'first_name' => 'Demo',
-                'last_name' => 'Student',
+                'first_name' => 'Yamada',
+                'last_name' => 'Taro',
                 'email' => 'student@example.com',
                 'password' => Hash::make('password'),
                 'nationality' => 'JP',
