@@ -37,6 +37,7 @@ namespace App\Services\Admin;
 use App\Models\ShiftPattern;
 use App\Models\TeacherSchedule;
 use App\Models\TeacherShiftPatternAssignment;
+use App\Models\ScheduleException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -123,6 +124,99 @@ class TeacherScheduleGenerationService
         }
 
         return compact('generated', 'skipped');
+    }
+
+    /**
+     * 指定したTeacherの今後28日間のScheduleを一度作り直す。
+     *
+     * ただし、すでにReservationが入っているScheduleは削除しない。
+     *
+     * @param int $createdBy
+     * @param array<int> $teacherIds
+     * @return array{
+     *     deleted:int,
+     *     generated:int,
+     *     skipped:int
+     * }
+     */
+    public function replaceWindowForTeachers(
+        int $createdBy,
+        array $teacherIds
+    ): array {
+        if (empty($teacherIds)) {
+            return [
+                'deleted' => 0,
+                'generated' => 0,
+                'skipped' => 0,
+            ];
+        }
+
+        $today = \Carbon\CarbonImmutable::today(
+            // \App\Support\AppTime::BUSINESS_TZ
+        );
+
+        $windowEnd = $today->addDays(
+            self::WINDOW_DAYS - 1
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 既存Scheduleのうち、Reservationが入っていないものだけ削除対象にする
+        |--------------------------------------------------------------------------
+        */
+        $schedules = TeacherSchedule::query()
+            ->whereIn('teacher_id', $teacherIds)
+            ->whereBetween('available_date', [
+                $today->toDateString(),
+                $windowEnd->toDateString(),
+            ])
+            ->whereIn('status', [
+                'confirmed',
+                'draft',
+            ])
+            ->whereDoesntHave('reservations')
+            ->get();
+
+        $scheduleIds = $schedules
+            ->pluck('schedule_id')
+            ->filter()
+            ->values()
+            ->all();
+
+        /*
+        |--------------------------------------------------------------------------
+        | ScheduleExceptionが削除予定Scheduleを参照している場合、
+        | 先にschedule_idをNULLにする
+        |--------------------------------------------------------------------------
+        */
+        if (!empty($scheduleIds)) {
+
+            ScheduleException::query()
+                ->whereIn('schedule_id', $scheduleIds)
+                ->update([
+                    'schedule_id' => null,
+                ]);
+
+            TeacherSchedule::query()
+                ->whereIn('schedule_id', $scheduleIds)
+                ->delete();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | TeacherのScheduleを28日間再生成
+        |--------------------------------------------------------------------------
+        */
+        $result = $this->regenerateWindow(
+            $createdBy,
+            $teacherIds
+        );
+
+        return [
+            'deleted' => count($scheduleIds),
+            'generated' => $result['generated'] ?? 0,
+            'skipped' => $result['skipped'] ?? 0,
+        ];
     }
 
     /**

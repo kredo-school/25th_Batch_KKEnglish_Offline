@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Station Assignment')
+@section('title', 'Teacher Assignment')
 
 @section('content')
 
@@ -8,7 +8,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold mb-1">Station Assignment</h2>
+            <h2 class="fw-bold mb-1">Teacher Assignment</h2>
             <p class="text-muted mb-0">
                 Assign default stations to teachers by period.
             </p>

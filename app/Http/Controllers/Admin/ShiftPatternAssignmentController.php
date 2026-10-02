@@ -15,6 +15,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 
 class ShiftPatternAssignmentController extends Controller
 {
@@ -882,6 +883,358 @@ public function bulkUpdate(Teacher $teacher, Request $request): RedirectResponse
                     'error' => '一括変更中にエラーが発生しました: ' . $e->getMessage(),
                 ]);
         }
+    }
+    public function bulkEditByPattern(ShiftPattern $shiftPattern)
+    {
+        $assignments = TeacherShiftPatternAssignment::with([
+            'teacher.user',
+            'shiftPattern',
+        ])
+            ->where('shift_pattern_id', $shiftPattern->id)
+
+            // end_date が今日より前のものは移動対象にしない
+            ->where(function ($query) {
+                $query->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', today());
+            })
+
+            ->get()
+            ->sortBy(function ($assignment) {
+
+                $teacherName = strtolower(
+                    trim(
+                        ($assignment->teacher->user->first_name ?? '')
+                        . ' '
+                        . ($assignment->teacher->user->last_name ?? '')
+                    )
+                );
+
+                return $teacherName
+                    . '_'
+                    . str_pad(
+                        (string) $assignment->weekday,
+                        2,
+                        '0',
+                        STR_PAD_LEFT
+                    );
+            })
+            ->values();
+
+        $patterns = ShiftPattern::query()
+            ->orderBy('pattern_name')
+            ->get();
+
+        return view(
+            'admin.shift-pattern-assignments.bulk-edit-by-pattern',
+            compact(
+                'shiftPattern',
+                'assignments',
+                'patterns'
+            )
+        );
+    }
+
+    public function bulkUpdateByPattern(
+        Request $request,
+        ShiftPattern $shiftPattern
+    ) {
+        /*
+        |--------------------------------------------------------------------------
+        | 1. 入力値を先にバリデーション
+        |--------------------------------------------------------------------------
+        */
+
+        $validated = $request->validate([
+            'assignment_ids' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'assignment_ids.*' => [
+                'integer',
+                'exists:teacher_shift_pattern_assignments,id',
+            ],
+
+            'shift_pattern_id' => [
+                'required',
+                'integer',
+                'exists:shift_patterns,id',
+            ],
+
+            'start_date' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+            ],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. バリデーション後に値を取得
+        |--------------------------------------------------------------------------
+        */
+
+        $assignmentIds = $validated['assignment_ids'];
+
+        $newShiftPatternId = $validated['shift_pattern_id'];
+
+        $startDate = Carbon::parse(
+            $validated['start_date']
+        )->startOfDay();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. 終了日を過ぎたAssignmentは変更禁止
+        |--------------------------------------------------------------------------
+        */
+
+        $expiredAssignmentIds = TeacherShiftPatternAssignment::query()
+            ->where('shift_pattern_id', $shiftPattern->id)
+            ->whereIn('id', $assignmentIds)
+            ->whereNotNull('end_date')
+            ->whereDate('end_date', '<', today())
+            ->pluck('id');
+
+
+        if ($expiredAssignmentIds->isNotEmpty()) {
+            return back()
+                ->withErrors([
+                    'assignment_ids' =>
+                        '終了日を過ぎた Shift Pattern Assignment は変更できません。',
+                ])
+                ->withInput();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4. 対象Assignmentを取得
+        |--------------------------------------------------------------------------
+        */
+
+        $assignments = TeacherShiftPatternAssignment::query()
+            ->where('shift_pattern_id', $shiftPattern->id)
+            ->whereIn('id', $assignmentIds)
+            ->where(function ($query) {
+                $query->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', today());
+            })
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 5. 対象教師
+        |--------------------------------------------------------------------------
+        */
+
+        $teacherIds = $assignments
+            ->pluck('teacher_id')
+            ->unique()
+            ->values()
+            ->all();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 6. Assignmentを変更
+        |--------------------------------------------------------------------------
+        */
+
+        DB::transaction(function () use (
+            $assignments,
+            $newShiftPatternId,
+            $startDate
+        ) {
+
+            foreach ($assignments as $assignment) {
+
+                $assignmentStart = $assignment->start_date
+                    ? Carbon::parse($assignment->start_date)->startOfDay()
+                    : null;
+
+                $assignmentEnd = $assignment->end_date
+                    ? Carbon::parse($assignment->end_date)->startOfDay()
+                    : null;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | ケース1
+                | 既存Assignmentの途中から変更
+                |
+                | 09/01 ～ 12/31
+                | 10/01から変更
+                |
+                | ↓
+                |
+                | 09/01 ～ 09/30 旧Pattern
+                | 10/01 ～ 12/31 新Pattern
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    $assignmentStart &&
+                    $startDate->gt($assignmentStart)
+                ) {
+
+                    /*
+                    | 変更開始日が既存の終了日より後なら変更しない
+                    */
+                    if (
+                        $assignmentEnd &&
+                        $startDate->gt($assignmentEnd)
+                    ) {
+                        continue;
+                    }
+
+
+                    /*
+                    | 旧Assignmentを前日で終了
+                    */
+                    $assignment->update([
+                        'end_date' => $startDate
+                            ->copy()
+                            ->subDay()
+                            ->toDateString(),
+                    ]);
+
+
+                    /*
+                    | 同じ新Assignmentが既に存在するか確認
+                    */
+                    $existingNewAssignment =
+                        TeacherShiftPatternAssignment::query()
+                            ->where('teacher_id', $assignment->teacher_id)
+                            ->where('shift_pattern_id', $newShiftPatternId)
+                            ->where('weekday', $assignment->weekday)
+                            ->whereDate(
+                                'start_date',
+                                $startDate->toDateString()
+                            )
+                            ->where(function ($query) use ($assignmentEnd) {
+
+                                if ($assignmentEnd) {
+                                    $query->whereDate(
+                                        'end_date',
+                                        $assignmentEnd->toDateString()
+                                    );
+                                } else {
+                                    $query->whereNull('end_date');
+                                }
+                            })
+                            ->first();
+
+
+                    /*
+                    | 存在しなければ作成
+                    */
+                    if (!$existingNewAssignment) {
+
+                        TeacherShiftPatternAssignment::create([
+                            'teacher_id' => $assignment->teacher_id,
+                            'shift_pattern_id' => $newShiftPatternId,
+                            'assignment_type' => $assignment->assignment_type,
+                            'weekday' => $assignment->weekday,
+                            'start_date' => $startDate->toDateString(),
+                            'end_date' => $assignmentEnd
+                                ? $assignmentEnd->toDateString()
+                                : null,
+                            'priority' => $assignment->priority,
+                        ]);
+                    }
+
+                    continue;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | ケース2
+                | 既存Assignmentの開始日と変更開始日が同じ
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    $assignmentStart &&
+                    $startDate->eq($assignmentStart)
+                ) {
+
+                    $assignment->update([
+                        'shift_pattern_id' => $newShiftPatternId,
+                    ]);
+
+                    continue;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | ケース3
+                | 変更開始日が既存Assignmentより前
+                |
+                | 既存：10/01 ～ 12/31
+                | 変更：09/15
+                |
+                | ↓
+                |
+                | 09/15 ～ 12/31 新Pattern
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    $assignmentStart &&
+                    $startDate->lt($assignmentStart)
+                ) {
+
+                    $assignment->update([
+                        'shift_pattern_id' => $newShiftPatternId,
+                        'start_date' => $startDate->toDateString(),
+                    ]);
+
+                    continue;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | ケース4
+                | start_dateがない古いデータ
+                |--------------------------------------------------------------------------
+                */
+
+                $assignment->update([
+                    'shift_pattern_id' => $newShiftPatternId,
+                    'start_date' => $startDate->toDateString(),
+                ]);
+            }
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 7. Schedule再生成
+        |--------------------------------------------------------------------------
+        */
+
+        $this->scheduleGenerator->replaceWindowForTeachers(
+            (int) $request->user()->id,
+            $teacherIds
+        );
+
+
+        return redirect()
+            ->route('admin.shift-patterns.index', [
+                'menu' => 'schedule',
+            ])
+            ->with(
+                'status',
+                count($assignmentIds)
+                . ' assignment(s) shift pattern updated successfully.'
+            );
     }
 
 }

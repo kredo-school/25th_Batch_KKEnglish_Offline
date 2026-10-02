@@ -68,8 +68,8 @@
                         @endforeach
                     </div>
 
-                    <div class="form-text">
-                        Select the weekdays you want to modify.
+                    <div class="form-text text-bold alert alert-info p-2">
+                        <strong>Select the weekdays you want to modify.</strong>
                     </div>
                 </div>
             </div>

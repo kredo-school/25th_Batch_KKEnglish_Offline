@@ -58,6 +58,7 @@
                         <th>Timezone</th>
                         <th>Slot(min)</th>
                         <th>Teachers</th>
+                        <th>Past Shift</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -69,7 +70,22 @@
                         <td>{{ $pattern->pattern_name }}</td>
                         <td>{{ $pattern->timezone ?? 'UTC' }}</td>
                         <td>{{ $pattern->slot_minutes ?? '-' }}</td>
-                        <td>{{ $pattern->teachers_count ?? 0 }}</td>
+                        <td>@if (($pattern->teachers_count ?? 0) > 0)
+                            <a href="{{ route('admin.shift-pattern-assignments.bulk-edit-by-pattern', [
+                                'shiftPattern' => $pattern->id
+                            ]) }}"
+                            class="text-decoration-none fw-semibold">
+                                {{ $pattern->teachers_count }}
+                            </a>
+                        @else
+                            0
+                        @endif
+                        </td>
+                        <td class="text-center">
+                            @if (($pattern->past_assignments_count ?? 0) > 0)
+                                <i class="fa-solid fa-check text-success" title="Past shifts exist"></i>
+                            @endif
+                        </td>
                         <td class="text-end">
                             <a href="{{ route('admin.shift-patterns.edit', $pattern) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-pen-to-square me-1"></i> Edit</a>
                             <a href="{{ route('admin.shift-pattern-assignments.create', ['pattern_id' => $pattern->id]) }}" class="btn btn-outline-secondary btn-sm">Assign</a>

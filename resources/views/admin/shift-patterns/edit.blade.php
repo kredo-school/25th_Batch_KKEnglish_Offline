@@ -161,46 +161,63 @@
 
 <script>
 (() => {
-    const rulesTbody = document.querySelector('#rules-table tbody');
+
     const breaksTbody = document.querySelector('#breaks-table tbody');
+    const addBreakButton = document.getElementById('add-break');
 
-    document.getElementById('add-rule').addEventListener('click', () => {
-        const i = rulesTbody.querySelectorAll('tr').length;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><input type="number" name="rules[${i}][weekday]" min="0" max="6" class="form-control" required></td>
-            <td><input type="time" name="rules[${i}][start_time]" class="form-control" required></td>
-            <td><input type="time" name="rules[${i}][end_time]" class="form-control" required></td>
-            <td>
-              <select name="rules[${i}][lesson_type]" class="form-control" required>
-                <option value="online">online</option>
-                <option value="in_person">in_person</option>
-                <option value="both" selected>both</option>
-              </select>
-            </td>
-            <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Delete</button></td>
-        `;
-        rulesTbody.appendChild(tr);
-    });
+    // Add Break
+    addBreakButton.addEventListener('click', () => {
 
-    document.getElementById('add-break').addEventListener('click', () => {
         const i = breaksTbody.querySelectorAll('tr').length;
+
         const tr = document.createElement('tr');
+
         tr.innerHTML = `
-            <td><input type="number" name="breaks[${i}][weekday]" min="0" max="6" class="form-control" required></td>
-            <td><input type="time" name="breaks[${i}][start_time]" class="form-control" required></td>
-            <td><input type="time" name="breaks[${i}][end_time]" class="form-control" required></td>
-            <td><input type="text" name="breaks[${i}][reason]" class="form-control"></td>
-            <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">削除</button></td>
+            <td>
+                <input type="time"
+                       name="breaks[${i}][start_time]"
+                       class="form-control"
+                       required>
+            </td>
+
+            <td>
+                <input type="time"
+                       name="breaks[${i}][end_time]"
+                       class="form-control"
+                       required>
+            </td>
+
+            <td>
+                <input type="text"
+                       name="breaks[${i}][reason]"
+                       class="form-control">
+            </td>
+
+            <td>
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm remove-row">
+                    <i class="fa-solid fa-trash me-1"></i>
+                    Delete
+                </button>
+            </td>
         `;
+
         breaksTbody.appendChild(tr);
     });
 
+
+    // Delete Break
     document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remove-row')) {
-            e.target.closest('tr')?.remove();
+
+        const button = e.target.closest('.remove-row');
+
+        if (!button) {
+            return;
         }
+
+        button.closest('tr')?.remove();
     });
+
 })();
 </script>
 @endsection

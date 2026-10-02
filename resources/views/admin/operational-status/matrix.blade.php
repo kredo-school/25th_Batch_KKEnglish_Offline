@@ -7,6 +7,7 @@
         <div class="d-flex gap-2">
             {{-- 1週間前/後へのナビゲーション --}}
             <a href="{{ route('admin.operational-status.matrix', ['start_date' => $start->copy()->subDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Prev</a>
+            <a href="{{ route('admin.operational-status.matrix', ['start_date' => now()->startOfWeek()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm"> This Week</a>
             <a href="{{ route('admin.operational-status.matrix', ['start_date' => $start->copy()->addDays(7)->toDateString()]) }}" class="btn btn-outline-secondary btn-sm">Next <i class="fa-solid fa-angles-right"></i></a>
         </div>
     </div>
@@ -15,7 +16,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <p class="mb-1">Information Summary</p>
+                    <p class="mb-1">Weekly Information Summary</p>
                     <p class="mb-1">All Capacity: {{ $totalCapacity }}</p>
                     <p class="mb-1">Booked: {{ $totalBooked }}</p>
                 </div>

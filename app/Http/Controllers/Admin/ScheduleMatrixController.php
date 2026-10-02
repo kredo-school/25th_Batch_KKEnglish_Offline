@@ -18,11 +18,11 @@ class ScheduleMatrixController extends Controller
      */
     public function index(Request $request)
     {
-        $startDate = $request->input('start_date', Carbon::today()->toDateString());
+        $startDate = $request->filled('start_date') ? $request->input('start_date') : Carbon::now()->startOfWeek()->toDateString();
         $start = Carbon::parse($startDate);
-        $dates = [];
+        $dates = collect();
         for ($i = 0; $i < 7; $i++) {
-            $dates[] = $start->copy()->addDays($i);
+            $dates->push($start->copy()->addDays($i));
         }
 
         $hours = range(9, 21); // 9:00 ~ 21:00
