@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Station;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -47,6 +48,8 @@ class DatabaseSeeder extends Seeder
 
             // Other
             TeacherLikeSeeder::class,
+            StationSeeder::class,
+            TeacherStationAssignmentSeeder::class,
             AnnouncementSeeder::class,
         ]);
 
