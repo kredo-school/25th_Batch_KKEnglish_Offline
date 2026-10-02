@@ -23,7 +23,7 @@ class MaterialSeeder extends Seeder
                 'target_level' => 'Beginner - Advanced',
                 'duration' => 50,
                 'printed_textbook' => 'Purchase Required',
-                'status' => true,
+                'status' => 'active',
             ],
 
             [
@@ -34,7 +34,7 @@ class MaterialSeeder extends Seeder
                 'target_level' => 'Beginner - Pre-Advanced',
                 'duration' => 50,
                 'printed_textbook' => 'Not Provided',
-                'status' => true,
+                'status' => 'active',
             ],
 
             [
@@ -45,7 +45,7 @@ class MaterialSeeder extends Seeder
                 'target_level' => 'Beginner - Advanced',
                 'duration' => 50,
                 'printed_textbook' => 'Not Provided',
-                'status' => true,
+                'status' => 'active',
             ],
 
             [
@@ -56,7 +56,7 @@ class MaterialSeeder extends Seeder
                 'target_level' => 'Intro - Pre-Advanced',
                 'duration' => 50,
                 'printed_textbook' => 'Not Provided',
-                'status' => true,
+                'status' => 'active',
             ],
 
             [
@@ -67,7 +67,7 @@ class MaterialSeeder extends Seeder
                 'target_level' => 'Beginner - Pre-Intermediate',
                 'duration' => 50,
                 'printed_textbook' => 'Not Provided',
-                'status' => true,
+                'status' => 'active',
             ],
 
             [
@@ -78,7 +78,7 @@ class MaterialSeeder extends Seeder
                 'target_level' => 'Beginner - Pre-Advanced',
                 'duration' => 50,
                 'printed_textbook' => 'Not Provided',
-                'status' => true,
+                'status' => 'active',
             ],
 
             [
@@ -89,7 +89,7 @@ class MaterialSeeder extends Seeder
                 'target_level' => 'Beginner - Advanced',
                 'duration' => 50,
                 'printed_textbook' => 'Not Provided',
-                'status' => true,
+                'status' => 'active',
             ],
         ];
 
