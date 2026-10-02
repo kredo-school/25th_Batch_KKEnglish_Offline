@@ -14,7 +14,7 @@ use App\Models\TeacherStationAssignment;
 class ScheduleMatrixController extends Controller
 {
     /**
-     * 1枚目：週間マトリクス画面 (9:00 - 21:00)
+     * 1枚目：週間マトリクス画面 (6:00 - 24:00)
      */
     public function index(Request $request)
     {
@@ -25,7 +25,7 @@ class ScheduleMatrixController extends Controller
             $dates->push($start->copy()->addDays($i));
         }
 
-        $hours = range(9, 21); // 9:00 ~ 21:00
+        $hours = range(6, 24); // 6:00 ~ 24:00
 
         // 該当期間の予約を取得
         $reservations = DB::table('reservations')
@@ -117,7 +117,7 @@ class ScheduleMatrixController extends Controller
     }
 
     /**
-     * 2枚目：日付指定の詳細画面 (9:00 - 22:00, 30分間隔)
+     * 2枚目：日付指定の詳細画面 (6:00 - 24:00, 30分間隔)
      */
     public function details(Request $request)
     {
@@ -135,8 +135,8 @@ class ScheduleMatrixController extends Controller
         |--------------------------------------------------------------------------
         */
         $intervals = [];
-        $current = $date->copy()->setTime(9, 0);
-        $end = $date->copy()->setTime(22, 0); // 22:00まで
+        $current = $date->copy()->setTime(6, 0);
+        $end = $date->copy()->setTime(24, 0); // 24:00まで
 
         /*
         |--------------------------------------------------------------------------

@@ -36,9 +36,9 @@
                         <div class="mb-4">
                             <label class="form-label">Season Type</label>
                             <select name="season_type" class="form-select" required>
-                                <option value="normal">Normal (通常期)</option>
-                                <option value="busy">Busy (繁忙期)</option>
-                                <option value="quiet">Quiet (閑散期)</option>
+                                <option value="normal">Normal</option>
+                                <option value="busy">Busy</option>
+                                <option value="quiet">Quiet</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-plus me-1"></i>Add</button>

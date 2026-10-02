@@ -21,19 +21,19 @@ class ExpectedReservationSettingController extends Controller
             $settings[$record->season_type][$record->day_type][$time] = $record->expected_count;
         }
 
-        // 時間帯のリスト（9:00 〜 21:30）を作成
+        // 時間帯のリスト（6:00 〜 24:00）を作成
         $times = [];
-        $current = Carbon::createFromTime(9, 0);
-        $end = Carbon::createFromTime(22, 0);
+        $current = Carbon::createFromTime(6, 0);
+        $end = Carbon::createFromTime(24, 0);
         while ($current->lt($end)) {
             $times[] = $current->format('H:i');
             $current->addMinutes(30);
         }
 
         $seasons = [
-            'normal' => '通常期 (Normal)',
-            'busy' => '繁忙期 (Busy)',
-            'quiet' => '閑散期 (Quiet)',
+            'normal' => 'Normal',
+            'busy' => 'Busy',
+            'quiet' => 'Quiet',
         ];
 
         return view('admin.expected-reservations.edit', compact('settings', 'times', 'seasons'));
