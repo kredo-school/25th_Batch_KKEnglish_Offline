@@ -71,7 +71,7 @@ class ReservationController extends Controller
                 'status',
             ])
             ->orderBy('start_at')
-            ->get();
+            ->paginate(10);
 
         /*
          * Bladeへ渡す
@@ -116,6 +116,8 @@ class ReservationController extends Controller
             403,
             'この予約を表示する権限がありません。'
         );
+
+
 
         /*
          * 詳細画面で必要な関連データを取得

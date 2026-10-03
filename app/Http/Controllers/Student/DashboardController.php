@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\Reservation;
+use App\Models\Station;
 
 class DashboardController extends Controller
 {
@@ -19,7 +20,6 @@ class DashboardController extends Controller
             403,
             '生徒ユーザーではありません。'
         );
-
         $todayLessons = Reservation::query()
 
             ->where('student_id', $student->id)
@@ -58,7 +58,7 @@ class DashboardController extends Controller
 
                     default => 'upcoming',
                 };
-                
+
                 return $reservation;
             });
 
@@ -104,7 +104,7 @@ class DashboardController extends Controller
                 ]
             )
             ->latest()
-            ->get();
+            ->paginate(2);
 
 
         // 可能であれば
@@ -171,6 +171,9 @@ class DashboardController extends Controller
                 }
             );
 
+        $stations = Station::query()
+            ->orderBy('name')
+            ->get();
 
         return view(
             'students.dashboard',
@@ -180,7 +183,8 @@ class DashboardController extends Controller
                 'announcements',
                 'nextLesson',
                 'calendarReservations',
-                'calendarEvents'
+                'calendarEvents',
+                'stations'
             )
         );
     }
