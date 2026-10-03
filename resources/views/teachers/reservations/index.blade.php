@@ -65,6 +65,10 @@
                             </th>
 
                             <th class="py-3">
+                                Station
+                            </th>
+
+                            <th class="py-3">
                                 Status
                             </th>
 
@@ -183,6 +187,19 @@
 
                                 </td>
 
+                                {{-- Station --}}
+                                <td>
+
+                                    <div class="text-secondary small">
+
+                                        <i class="fa-solid fa-location-dot me-1"></i>
+
+                                        Station 3
+
+                                    </div>
+
+                                </td>
+
 
                                 {{-- Status --}}
                                 <td>
@@ -256,7 +273,7 @@
                             <tr>
 
                                 <td
-                                    colspan="6"
+                                    colspan="7"
                                     class="text-center py-5 text-secondary"
                                 >
 

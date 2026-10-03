@@ -38,9 +38,9 @@
             Teaching Materials
         </a>
 
-        <a href="{{ route('students.progress.test') }}"
+        <a href="{{ route('students.progress.index') }}"
             class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none
-            {{ request()->routeIs('students.progress.test') ? 'student-active fw-semibold' : '' }}">
+            {{ request()->routeIs('students.progress.index') ? 'student-active fw-semibold' : '' }}">
             Learning Progress
         </a>
 

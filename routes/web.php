@@ -39,10 +39,6 @@ use App\Http\Controllers\Admin\LessonStationOverrideController;
 use App\Http\Controllers\Student\LearningProgressController;
 
 
-// Test route for frontend testing
-Route::view('/students/progress-test','students.progress.index')
-->name('students.progress.test');
-
 // Public routes
 Route::get('/', function () {
     return view('welcome');

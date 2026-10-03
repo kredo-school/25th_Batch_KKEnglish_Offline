@@ -131,7 +131,20 @@ class DashboardController extends Controller
             )
 
             ->latest()
-            ->paginate(2);
+            ->take(2)
+            ->get();
+
+        // モーダルには全件表示
+        $allAnnouncements = Announcement::query()
+            ->whereIn(
+                'target',
+                [
+                    'all',
+                    'teachers',
+                ]
+            )
+            ->latest()
+            ->get();
 
         $stations = Station::query()
             ->orderBy('name')
@@ -151,6 +164,7 @@ class DashboardController extends Controller
                 'nextLessons',
                 'nextLesson',
                 'announcements',
+                'allAnnouncements',
                 'stations'
             )
         );

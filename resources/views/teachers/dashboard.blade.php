@@ -108,6 +108,10 @@
                             </th>
 
                             <th class="py-3">
+                                Station
+                            </th>
+
+                            <th class="py-3">
                                 Status
                             </th>
 
@@ -258,6 +262,21 @@
 
                                 </td>
 
+                                {{-- ===============================
+                                    Station
+                                ================================ --}}
+                                <td>
+
+                                    <div class="text-secondary small">
+
+                                        <i class="fa-solid fa-location-dot me-1"></i>
+
+                                        Station 3
+
+                                    </div>
+
+                                </td>
+
 
                                 {{-- ===============================
                                      Status
@@ -350,7 +369,7 @@
                             <tr>
 
                                 <td
-                                    colspan="5"
+                                    colspan="6"
                                     class="
                                         text-center
                                         py-5
@@ -444,19 +463,143 @@
         {{-- View All --}}
         <div class="text-end">
 
-            <a
-                href="#"
-                class="small text-decoration-none"
+            <button
+                type="button"
+                class="btn btn-link btn-sm text-decoration-none p-0"
+                data-bs-toggle="modal"
+                data-bs-target="#teacherAnnouncementsModal"
             >
                 View All
                 <i class="fa-solid fa-chevron-right ms-1"></i>
-            </a>
+            </button>
 
         </div>
 
     </div>
 
 </div>
+
+</div>
+
+{{-- =====================================================
+     Teacher Announcements Modal
+====================================================== --}}
+<div
+    class="modal fade"
+    id="teacherAnnouncementsModal"
+    tabindex="-1"
+    aria-labelledby="teacherAnnouncementsModalLabel"
+    aria-hidden="true"
+>
+
+    <div
+        class="
+            modal-dialog
+            modal-dialog-centered
+            modal-dialog-scrollable
+            modal-lg
+        "
+    >
+
+        <div class="modal-content">
+
+            {{-- Header --}}
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title fw-bold"
+                    id="teacherAnnouncementsModalLabel"
+                >
+                    Announcements
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+
+            </div>
+
+
+            {{-- Body --}}
+            <div class="modal-body">
+
+                @forelse ($allAnnouncements as $announcement)
+
+                    <div class="border-bottom py-3">
+
+                        {{-- Title / Date --}}
+                        <div
+                            class="
+                                d-flex
+                                justify-content-between
+                                align-items-start
+                                gap-3
+                                mb-2
+                            "
+                        >
+
+                            <div class="fw-semibold">
+                                {{ $announcement->title }}
+                            </div>
+
+                            <small class="text-secondary text-nowrap">
+                                {{ $announcement->created_at?->format('M d, Y') }}
+                            </small>
+
+                        </div>
+
+
+                        {{-- Content --}}
+                        <div class="text-secondary small">
+                            {{ $announcement->content }}
+                        </div>
+
+                    </div>
+
+                @empty
+
+                    <div class="text-center py-4">
+
+                        <i
+                            class="
+                                fa-regular
+                                fa-bell
+                                fa-2x
+                                text-secondary
+                                mb-3
+                            "
+                        ></i>
+
+                        <p class="text-secondary mb-0">
+                            No announcements.
+                        </p>
+
+                    </div>
+
+                @endforelse
+
+            </div>
+
+
+            {{-- Footer --}}
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
