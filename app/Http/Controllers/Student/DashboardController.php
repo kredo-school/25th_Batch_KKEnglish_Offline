@@ -104,7 +104,17 @@ class DashboardController extends Controller
                 ]
             )
             ->latest()
-            ->paginate(2);
+            ->take(2)
+            ->get();
+
+            // モーダルには全件表示
+            $allAnnouncements = Announcement::query()
+                ->whereIn('target', [
+                    'all',
+                    'students',
+                ])
+                ->latest()
+                ->get();
 
 
         // 可能であれば
@@ -181,6 +191,7 @@ class DashboardController extends Controller
                 'student',
                 'todayLessons',
                 'announcements',
+                'allAnnouncements',
                 'nextLesson',
                 'calendarReservations',
                 'calendarEvents',
