@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Models\Station;
 
 class DashboardController extends Controller
 {
@@ -130,9 +131,11 @@ class DashboardController extends Controller
             )
 
             ->latest()
+            ->paginate(2);
 
+        $stations = Station::query()
+            ->orderBy('name')
             ->get();
-
 
         /*
         |--------------------------------------------------------------------------
@@ -147,7 +150,8 @@ class DashboardController extends Controller
                 'todayLessons',
                 'nextLessons',
                 'nextLesson',
-                'announcements'
+                'announcements',
+                'stations'
             )
         );
     }

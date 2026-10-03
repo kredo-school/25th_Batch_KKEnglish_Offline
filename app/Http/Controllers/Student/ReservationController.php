@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\Student;
 use App\Models\TeacherLike;
+use App\Models\Station;
 use App\Models\Material;
 use App\Models\TeacherSchedule;
 use App\Models\Reservation;
@@ -156,6 +157,10 @@ class ReservationController extends Controller
                 $validated['schedule_id']
             );
 
+        $stations = Station::query()
+            ->orderBy('name')
+            ->get();
+
 
         /*
          * ========================================
@@ -276,13 +281,18 @@ class ReservationController extends Controller
                 $validated['schedule_id']
             );
 
+        $stations = Station::query()
+            ->orderBy('name')
+            ->get();
+
         return view(
             'students.reservations.confirm',
             compact(
                 'teacher',
                 'material',
                 'schedule',
-                'validated'
+                'validated',
+                'stations',
             )
         );
     }
@@ -661,12 +671,16 @@ class ReservationController extends Controller
          */
         $reservations = $upcomingReservations;
 
+        $stations = Station::query()
+            ->orderBy('name')
+            ->get();
         return view(
             'students.reservations.upcoming',
             compact(
                 'reservations',
                 'upcomingReservations',
-                'historyReservations'
+                'historyReservations',
+                'stations'
             )
         );
     }

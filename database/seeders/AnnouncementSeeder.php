@@ -13,6 +13,20 @@ class AnnouncementSeeder extends Seeder
 
             /*
             |--------------------------------------------------------------------------
+            | Emergency
+            |--------------------------------------------------------------------------
+            */
+
+            [
+                'title' => '⚠️ Haze Emergency Advisory',
+                'target' => 'all',
+                'content' =>
+                    'Due to heavy haze and poor air quality, please limit outdoor activities and wear a mask when going outside. Please stay updated with local health and safety advisories.',
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
             | All Users
             |--------------------------------------------------------------------------
             */

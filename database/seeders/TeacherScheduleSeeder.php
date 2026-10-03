@@ -77,20 +77,20 @@ class TeacherScheduleSeeder extends Seeder
         | Schedule Period
         |--------------------------------------------------------------------------
         |
-        | 2026-09-04 ～ 2026-10-15
+        | 2026-09-25 ～ 2026-10-31
         |
         */
 
         $startDate = Carbon::create(
             2026,
             9,
-            4
+            25
         )->startOfDay();
 
         $endDate = Carbon::create(
             2026,
             10,
-            15
+            31
         )->startOfDay();
 
         /*
