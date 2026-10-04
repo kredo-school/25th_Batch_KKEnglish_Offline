@@ -101,6 +101,7 @@ class ReservationController extends Controller
                 'teachers',
                 'materials',
                 'favoriteTeachers',
+                'favoriteTeacherIds'
             )
         );
     }
@@ -674,7 +675,7 @@ class ReservationController extends Controller
                 'reservations',
                 'upcomingReservations',
                 'historyReservations',
-                'stations'
+
             )
         );
     }
