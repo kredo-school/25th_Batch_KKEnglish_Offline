@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\Student;
 use App\Models\TeacherLike;
+use App\Models\Station;
 use App\Models\Material;
 use App\Models\TeacherSchedule;
 use App\Models\Reservation;
@@ -99,7 +100,8 @@ class ReservationController extends Controller
             compact(
                 'teachers',
                 'materials',
-                'favoriteTeachers'
+                'favoriteTeachers',
+                'favoriteTeacherIds'
             )
         );
     }
@@ -155,6 +157,8 @@ class ReservationController extends Controller
             ->findOrFail(
                 $validated['schedule_id']
             );
+
+
 
 
         /*
@@ -282,7 +286,7 @@ class ReservationController extends Controller
                 'teacher',
                 'material',
                 'schedule',
-                'validated'
+                'validated',
             )
         );
     }
@@ -622,8 +626,10 @@ class ReservationController extends Controller
             })
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station',
             ])
             ->orderBy('start_at')
             ->paginate(10);
@@ -649,8 +655,10 @@ class ReservationController extends Controller
             })
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station',
                 'review',
             ])
             ->orderByDesc('start_at')
@@ -666,7 +674,8 @@ class ReservationController extends Controller
             compact(
                 'reservations',
                 'upcomingReservations',
-                'historyReservations'
+                'historyReservations',
+
             )
         );
     }

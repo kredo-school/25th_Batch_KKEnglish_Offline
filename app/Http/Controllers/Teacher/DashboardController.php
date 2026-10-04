@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Models\Station;
 
 class DashboardController extends Controller
 {
@@ -59,6 +60,7 @@ class DashboardController extends Controller
                 'student.user',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             ->orderBy('start_at')
@@ -102,6 +104,7 @@ class DashboardController extends Controller
                 'student.user',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             ->orderBy('start_at')
@@ -130,7 +133,19 @@ class DashboardController extends Controller
             )
 
             ->latest()
+            ->take(2)
+            ->get();
 
+        // モーダルには全件表示
+        $allAnnouncements = Announcement::query()
+            ->whereIn(
+                'target',
+                [
+                    'all',
+                    'teachers',
+                ]
+            )
+            ->latest()
             ->get();
 
 
@@ -147,7 +162,9 @@ class DashboardController extends Controller
                 'todayLessons',
                 'nextLessons',
                 'nextLesson',
-                'announcements'
+                'announcements',
+                'allAnnouncements',
+
             )
         );
     }

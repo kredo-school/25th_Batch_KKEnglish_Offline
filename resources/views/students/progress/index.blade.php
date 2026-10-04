@@ -6,34 +6,36 @@
 
 <div class="container-fluid py-4">
 
-<style>
+    <style>
 
-    .progress-monkey-bubble {
-    margin-right: 4px;
+        .progress-monkey-bubble {
+            margin-right: 4px;
 
-    background-color: #fff;
-    border: 1px solid #d6d6d6;
-    border-radius: 14px;
+            background-color: #fff;
+            border: 1px solid #d6d6d6;
+            border-radius: 14px;
 
-    padding: 7px 12px;
+            padding: 7px 12px;
 
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
 
-.progress-monkey {
-    width: 57px;
-    height: 57px;
+        .progress-monkey {
+            width: 57px;
+            height: 57px;
 
-    object-fit: contain;
+            object-fit: contain;
 
-    margin-left: -8px;
-    margin-top: -4px;
+            margin-left: -8px;
+            margin-top: -4px;
 
-    flex-shrink: 0;
-}
-</style>
+            flex-shrink: 0;
+        }
+
+    </style>
+
 
     {{-- ===============================
          Title
@@ -72,7 +74,7 @@
                         <i class="fa-solid fa-book-open text-primary"></i>
 
                         <h3 class="fw-bold mb-0">
-                            24
+                            {{ $totalLessons }}
                         </h3>
 
                         <span class="text-secondary">
@@ -104,7 +106,7 @@
                         <i class="fa-regular fa-calendar text-success"></i>
 
                         <h3 class="fw-bold mb-0">
-                            8
+                            {{ $thisMonthLessons }}
                         </h3>
 
                         <span class="text-secondary">
@@ -136,7 +138,7 @@
                         <i class="fa-regular fa-clock text-warning"></i>
 
                         <h3 class="fw-bold mb-0">
-                            12
+                            {{ number_format($studyHours, 1) }}
                         </h3>
 
                         <span class="text-secondary">
@@ -188,17 +190,17 @@
                                 font-size: 1.3rem;
                             "
                         >
-                            B1
+                            {{ $currentLevel }}
                         </div>
 
                         <div>
 
                             <div class="fw-bold">
-                                Intermediate
+                                {{ $levelLabel }}
                             </div>
 
                             <div class="text-secondary small">
-                                You can handle everyday conversations.
+                                {{ $levelDescription }}
                             </div>
 
                         </div>
@@ -212,7 +214,7 @@
         </div>
 
 
-        {{-- Favorite Material --}}
+        {{-- Most Studied Material --}}
         <div class="col-lg-6">
 
             <div class="card h-100">
@@ -246,11 +248,11 @@
                         <div>
 
                             <div class="fw-bold">
-                                Daily English
+                                {{ $mostStudiedMaterialName }}
                             </div>
 
                             <div class="text-secondary small">
-                                9 lessons completed
+                                {{ $mostStudiedMaterialLessons }} lessons completed
                             </div>
 
                         </div>
@@ -267,26 +269,28 @@
 
 
     {{-- ===============================
-            Monkey Message
-        ================================ --}}
-        <div
-            class="
-                d-flex
-                align-items-center
-                justify-content-center
-                mt-4
-            "
-        >
-            <div class="progress-monkey-bubble">
-                Great job! 1 more lesson to reach 25!
-            </div>
+         Monkey Message
+    ================================ --}}
+    <div
+        class="
+            d-flex
+            align-items-center
+            justify-content-center
+            mt-4
+        "
+    >
 
-            <img
-                src="{{ asset('images/kk-monkey.png') }}"
-                alt="KK English Monkey"
-                class="progress-monkey"
-            >
+        <div class="progress-monkey-bubble">
+            {{ $monkeyMessage }}
         </div>
+
+        <img
+            src="{{ asset('images/kk-monkey.png') }}"
+            alt="KK English Monkey"
+            class="progress-monkey"
+        >
+
+    </div>
 
 </div>
 

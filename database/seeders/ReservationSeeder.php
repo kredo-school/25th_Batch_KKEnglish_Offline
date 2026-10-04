@@ -74,8 +74,8 @@ class ReservationSeeder extends Seeder
             ])
             ->where('status', 'confirmed')
             ->whereBetween('available_date', [
-                '2026-09-04',
-                '2026-10-15',
+                '2026-09-25',
+                '2026-10-31',
             ])
             ->orderBy('available_date')
             ->orderBy('teacher_id')
@@ -92,7 +92,7 @@ class ReservationSeeder extends Seeder
         | 予約可能枠を作成
         |--------------------------------------------------------------------------
         |
-        | 30分間隔で25分レッスン
+        | 30分間隔で25分レッスン + 5分休憩
         |
         | 例:
         | 09:00 - 09:25
@@ -170,7 +170,7 @@ class ReservationSeeder extends Seeder
             while (
                 $current
                     ->copy()
-                    ->addMinutes(25)
+                    ->addMinutes(30)
                     ->lte($shiftEnd)
             ) {
                 $slots->push([
@@ -178,11 +178,11 @@ class ReservationSeeder extends Seeder
                     'start_at' => $current->copy(),
                     'end_at' => $current
                         ->copy()
-                        ->addMinutes(25),
+                        ->addMinutes(30),
                     'materials' => $materials,
                 ]);
 
-                // 次のレッスンまで5分
+                // 次のレッスンまで5分休憩を含めて30分
                 $current->addMinutes(30);
             }
         }
@@ -199,9 +199,9 @@ class ReservationSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $targetCount = 100;
+        $targetCount = 5000;
 
-        $completedPerTeacher = 2;
+        $completedPerTeacher = 30;
 
         $createdCount = 0;
 
@@ -211,9 +211,9 @@ class ReservationSeeder extends Seeder
         |--------------------------------------------------------------------------
         |
         | Teacher 30人全員に
-        | completed予約を最低2件作成
+        | completed予約を最低30件作成
         |
-        | 30 teachers × 2 = 60 reservations
+        | 30 teachers × 30 = 900 reservations
         |
         */
 
@@ -245,7 +245,7 @@ class ReservationSeeder extends Seeder
 
             /*
             |--------------------------------------------------------------------------
-            | 過去枠が2件未満なら警告
+            | 過去枠が10件未満なら警告
             |--------------------------------------------------------------------------
             */
 
@@ -261,7 +261,7 @@ class ReservationSeeder extends Seeder
 
             /*
             |--------------------------------------------------------------------------
-            | Teacherごとに2件作成
+            | Teacherごとに10件作成
             |--------------------------------------------------------------------------
             */
 
@@ -458,12 +458,11 @@ class ReservationSeeder extends Seeder
         |
         | 残りをランダム生成
         |
-        | Phase 1 = 約60件
-        | Phase 2 = 約40件
-        | 合計 = 100件
+        | Phase 1 = 約240件
+        | Phase 2 = 約160件
+        | 合計 = 400件
         |
-        */
-
+            */
         $slots = $slots->shuffle();
 
         foreach ($slots as $slot) {

@@ -37,10 +37,8 @@ use App\Http\Controllers\Admin\TeacherStationAssignmentController;
 use App\Http\Controllers\Admin\StationController;
 use App\Http\Controllers\Admin\LessonStationOverrideController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Student\LearningProgressController;
 
-// Test route for frontend testing
-Route::view('/students/progress-test','students.progress.index')
-->name('students.progress.test');
 
 // Public routes
 Route::get('/', function () {
@@ -82,9 +80,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::post('/students/teachers/{teacher}/like', [TeacherLikeController::class, 'store'])->name('students.teacher.like');
     Route::delete('/students/teachers/{teacher}/unlike', [TeacherLikeController::class, 'destroy'])->name('students.teachers.unlike');
 
-// Teacher list/profile（studentも閲覧可）
+    // Teacher list/profile（studentも閲覧可）
     Route::get('/teachers', [TeacherController::class, 'index'])->name('students.teacher-list');
-
 
     // Student reservations
      // 予約一覧・検索画面
@@ -120,7 +117,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     Route::get('/students/teachers/search', [TeacherSearchController::class, 'search'])->name('students.teachers.search');
 
-
+    // Learning Progress
+    Route::get('/students/learning-progress', [LearningProgressController::class, 'index'])->name('students.progress.index');
 });
 
 // Teacher Dashboard

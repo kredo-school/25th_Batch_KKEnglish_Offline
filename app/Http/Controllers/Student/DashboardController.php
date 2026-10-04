@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\Reservation;
+use App\Models\Station;
 
 class DashboardController extends Controller
 {
@@ -19,7 +20,6 @@ class DashboardController extends Controller
             403,
             '生徒ユーザーではありません。'
         );
-
         $todayLessons = Reservation::query()
 
             ->where('student_id', $student->id)
@@ -41,8 +41,10 @@ class DashboardController extends Controller
 
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             ->orderBy('start_at')
@@ -58,7 +60,7 @@ class DashboardController extends Controller
 
                     default => 'upcoming',
                 };
-                
+
                 return $reservation;
             });
 
@@ -81,8 +83,10 @@ class DashboardController extends Controller
             // 関連データも一緒に取得
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             // 時間順
@@ -104,7 +108,17 @@ class DashboardController extends Controller
                 ]
             )
             ->latest()
+            ->take(2)
             ->get();
+
+            // モーダルには全件表示
+            $allAnnouncements = Announcement::query()
+                ->whereIn('target', [
+                    'all',
+                    'students',
+                ])
+                ->latest()
+                ->get();
 
 
         // 可能であれば
@@ -178,9 +192,10 @@ class DashboardController extends Controller
                 'student',
                 'todayLessons',
                 'announcements',
+                'allAnnouncements',
                 'nextLesson',
                 'calendarReservations',
-                'calendarEvents'
+                'calendarEvents',
             )
         );
     }
