@@ -47,8 +47,10 @@ class ReservationController extends Controller
             })
             ->with([
                 'student.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station',
             ])
             ->orderBy('start_at')
             ->get();
@@ -67,8 +69,10 @@ class ReservationController extends Controller
             })
             ->with([
                 'student.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station',
             ])
             ->orderBy('start_at')
             ->paginate(10);
@@ -159,8 +163,11 @@ class ReservationController extends Controller
 
         ->with([
             'teacher.user',
+            'teacher.stationAssignments.station',
             'material',
             'lessonRecord',
+            'stationOverride.station',
+
         ])
 
         ->orderByDesc('start_at')

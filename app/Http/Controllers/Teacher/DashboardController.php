@@ -60,6 +60,7 @@ class DashboardController extends Controller
                 'student.user',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             ->orderBy('start_at')
@@ -103,6 +104,7 @@ class DashboardController extends Controller
                 'student.user',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             ->orderBy('start_at')
@@ -146,9 +148,6 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        $stations = Station::query()
-            ->orderBy('name')
-            ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -165,7 +164,7 @@ class DashboardController extends Controller
                 'nextLesson',
                 'announcements',
                 'allAnnouncements',
-                'stations'
+
             )
         );
     }

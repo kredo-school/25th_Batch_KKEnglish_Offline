@@ -41,8 +41,10 @@ class DashboardController extends Controller
 
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             ->orderBy('start_at')
@@ -81,8 +83,10 @@ class DashboardController extends Controller
             // 関連データも一緒に取得
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station'
             ])
 
             // 時間順
@@ -181,9 +185,6 @@ class DashboardController extends Controller
                 }
             );
 
-        $stations = Station::query()
-            ->orderBy('name')
-            ->get();
 
         return view(
             'students.dashboard',
@@ -195,7 +196,6 @@ class DashboardController extends Controller
                 'nextLesson',
                 'calendarReservations',
                 'calendarEvents',
-                'stations'
             )
         );
     }

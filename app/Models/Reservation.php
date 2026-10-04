@@ -89,4 +89,31 @@ class Reservation extends Model
     {
         return $this->hasOne(LessonStationOverride::class);
     }
+
+
+    public function displayStation(): ?Station
+    {
+        // 予約ごとのStation変更があれば最優先
+        if ($this->stationOverride?->station) {
+            return $this->stationOverride->station;
+        }
+
+        // この予約の日付
+        $lessonDate = $this->start_at->toDateString();
+
+        // その日に有効なTeacherの通常Stationを取得
+        $assignment = $this->teacher
+            ->stationAssignments
+            ->filter(function ($assignment) use ($lessonDate) {
+                return $assignment->start_date->toDateString() <= $lessonDate
+                    && (
+                        $assignment->end_date === null
+                        || $assignment->end_date->toDateString() >= $lessonDate
+                    );
+            })
+            ->sortByDesc('start_date')
+            ->first();
+
+        return $assignment?->station;
+    }
 }
