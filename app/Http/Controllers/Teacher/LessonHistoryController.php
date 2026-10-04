@@ -56,9 +56,12 @@ class LessonHistoryController extends Controller
 
             ->with([
                 'student.user',
+                'teacher.stationAssignments.station',
+                'stationOverride.station',
                 'material',
                 'status',
                 'lessonRecord',
+
             ])
             /*
              * 新しい授業から表示
@@ -98,8 +101,10 @@ class LessonHistoryController extends Controller
             ->with([
                 'student.user',
                 'material',
+                'teacher.stationAssignments.station',
                 'status',
                 'lessonRecord',
+                'stationOverride.station',
             ])
             /*
              * 新しい授業から表示
@@ -152,6 +157,8 @@ class LessonHistoryController extends Controller
          */
         $reservation->load([
             'student.user',
+            'teacher.stationAssignments.station',
+            'stationOverride.station',
             'material',
             'status',
             'lessonRecord',

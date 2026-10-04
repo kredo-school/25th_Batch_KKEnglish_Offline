@@ -31,9 +31,11 @@ class LessonHistoryController extends Controller
         ->with([
             'teacher.user',
             'material',
+            'teacher.stationAssignments.station',
             'status',
             'lessonRecord',
             'review',
+            'stationOverride.station',
         ])
 
         ->orderByDesc('start_at')

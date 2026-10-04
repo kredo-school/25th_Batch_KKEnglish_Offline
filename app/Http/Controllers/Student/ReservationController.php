@@ -100,7 +100,7 @@ class ReservationController extends Controller
             compact(
                 'teachers',
                 'materials',
-                'favoriteTeachers'
+                'favoriteTeachers',
             )
         );
     }
@@ -157,9 +157,7 @@ class ReservationController extends Controller
                 $validated['schedule_id']
             );
 
-        $stations = Station::query()
-            ->orderBy('name')
-            ->get();
+
 
 
         /*
@@ -281,10 +279,6 @@ class ReservationController extends Controller
                 $validated['schedule_id']
             );
 
-        $stations = Station::query()
-            ->orderBy('name')
-            ->get();
-
         return view(
             'students.reservations.confirm',
             compact(
@@ -292,7 +286,6 @@ class ReservationController extends Controller
                 'material',
                 'schedule',
                 'validated',
-                'stations',
             )
         );
     }
@@ -632,8 +625,10 @@ class ReservationController extends Controller
             })
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station',
             ])
             ->orderBy('start_at')
             ->paginate(10);
@@ -659,8 +654,10 @@ class ReservationController extends Controller
             })
             ->with([
                 'teacher.user',
+                'teacher.stationAssignments.station',
                 'material',
                 'status',
+                'stationOverride.station',
                 'review',
             ])
             ->orderByDesc('start_at')
@@ -671,9 +668,6 @@ class ReservationController extends Controller
          */
         $reservations = $upcomingReservations;
 
-        $stations = Station::query()
-            ->orderBy('name')
-            ->get();
         return view(
             'students.reservations.upcoming',
             compact(
