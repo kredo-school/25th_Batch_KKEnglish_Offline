@@ -61,7 +61,7 @@
 
         <div class="mt-4 d-flex gap-2">
             <button type="submit" class="btn btn-primary">Register</button>
-            <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary">Back</a>
+            <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </form>
 </div>

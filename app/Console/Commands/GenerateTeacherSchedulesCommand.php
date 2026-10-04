@@ -7,7 +7,7 @@ use App\Services\Admin\TeacherScheduleGenerationService;
 
 class GenerateTeacherSchedulesCommand extends Command
 {
-    protected $signature = 'schedule:generate-teacher {created_by : user_id} {--teacher_id=* : Generate only for specific teacher IDs}';
+    protected $signature = 'schedule:generate-teacher {created_by=1 : user_id} {--teacher_id=* : Generate only for specific teacher IDs}';
     protected $description = 'Generate teacher_schedules for next 28 days from assignments + patterns + breaks';
 
     public function handle(TeacherScheduleGenerationService $service): int

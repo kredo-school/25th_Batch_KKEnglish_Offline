@@ -95,11 +95,11 @@
                                     </form>
                                 @endif
 
-                                <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('Would you like to delete this material?');">
+                                {{-- <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('Would you like to delete this material?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete</button>
-                                </form>
+                                </form> --}}
                             </div>
 
                         </div>

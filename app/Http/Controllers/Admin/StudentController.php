@@ -187,13 +187,16 @@ class StudentController extends Controller
             'pointTransactions',
         ]);
 
+        $user = $student->user;
+
         $pointBalance = (int) $student->point_balance;
 
         return view(
             'admin.students.profile',
-            compact('student', 'pointBalance')
+            compact('student', 'user', 'pointBalance')
         );
     }
+    
     /**
      * ポイント付与画面
      */

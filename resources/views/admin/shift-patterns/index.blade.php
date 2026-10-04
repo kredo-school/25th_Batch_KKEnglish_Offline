@@ -59,7 +59,7 @@
                         <th>Slot(min)</th>
                         <th>Teachers</th>
                         <th>Past Shift</th>
-                        <th></th>
+                        <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,16 +70,13 @@
                         <td>{{ $pattern->pattern_name }}</td>
                         <td>{{ $pattern->timezone ?? 'UTC' }}</td>
                         <td>{{ $pattern->slot_minutes ?? '-' }}</td>
-                        <td>@if (($pattern->teachers_count ?? 0) > 0)
-                            <a href="{{ route('admin.shift-pattern-assignments.bulk-edit-by-pattern', [
-                                'shiftPattern' => $pattern->id
-                            ]) }}"
-                            class="text-decoration-none fw-semibold">
-                                {{ $pattern->teachers_count }}
-                            </a>
-                        @else
-                            0
-                        @endif
+                        <td>
+                            @if (($pattern->teachers_count ?? 0) > 0)
+                                <a href="{{ route('admin.shift-pattern-assignments.bulk-edit-by-pattern', ['shiftPattern' => $pattern->id]) }}" class="text-decoration-none fw-semibold">{{ $pattern->teachers_count }}
+                                </a>
+                            @else
+                                0
+                            @endif
                         </td>
                         <td class="text-center">
                             @if (($pattern->past_assignments_count ?? 0) > 0)
@@ -97,7 +94,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="text-center text-muted py-4">No patterns found.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">No patterns found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

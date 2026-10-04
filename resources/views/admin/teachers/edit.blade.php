@@ -5,7 +5,7 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold mb-0">Edit Teacher</h2>
-        <a href="{{ route('admin.teachers.show', $teacher) }}" class="btn btn-outline-secondary btn-sm">Details</a>
+        <a href="{{ route('admin.teachers.show', $teacher) }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to Details</a>
     </div>
 
     @if (session('success'))
@@ -67,7 +67,17 @@
             @if($teacher->user->profile_image)
                 <div class="mb-3">
                     <p><strong>Current Profile Picture:</strong></p>
-                    <img src="{{ $teacher->user->profile_image }}" alt="Profile" class="img-thumbnail" style="max-width: 150px;">
+                    @if($teacher->user?->profile_image_url)
+
+                    <img src="{{ $teacher->user->profile_image_url }}"
+                        alt="{{ $teacher->user->first_name }}"
+                        width="100"
+                        height="100"
+                        class="rounded-circle me-4"
+                        style="object-fit: cover;">
+                @else
+                    <i class="fa-solid fa-circle-user fa-5x me-4 text-secondary"></i>
+                @endif
                 </div>
             @endif
 
@@ -127,7 +137,7 @@
 
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">Update</button>
-            <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary">Back</a>
+            <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </form>
 </div>

@@ -79,7 +79,7 @@ class User extends Authenticatable
 
     public function getProfileImageUrlAttribute(): ?string
     {
-        $image = $this->profile_image;
+        $image = trim((string) $this->profile_image);
 
         /*
     |--------------------------------------------------------------------------
@@ -120,15 +120,18 @@ class User extends Authenticatable
     | storage/app/public/teachers/mary.jpg
     |
     */
-        if (str_starts_with($image, 'storage:')) {
 
-            $path = substr(
-                $image,
-                strlen('storage:')
-            );
-
-            return Storage::disk('public')->url($path);
-        }
+        // storage: が付いている場合
+         if (str_starts_with($image, 'storage:')) { $image = substr($image, strlen('storage:')); }
+         // /storage/ が付いている場合
+         if (str_starts_with($image, '/storage/')) { $image = substr($image, strlen('/storage/')); }
+         // storage/ が付いている場合
+         if (str_starts_with($image, 'storage/')) { $image = substr($image, strlen('storage/')); }
+         // publicディスクに存在する画像
+         if (Storage::disk('public')->exists($image)) { return Storage::disk('public')->url($image); }
+         // ファイル名だけが保存されている場合
+         $profileImagePath = 'profile_images/' . ltrim($image, '/');
+         if (Storage::disk('public')->exists($profileImagePath)) { return Storage::disk('public')->url($profileImagePath); }
 
 
         /*

@@ -19,17 +19,26 @@
         <div class="card-body">
 
             <div class="d-flex align-items-center gap-3">
+@php
+                if (!$material->cover_image) {
+                    $imageUrl = asset('images/no-image.png');
+                } elseif (Str::startsWith($material->cover_image, ['http://', 'https://'])) {
+                    // Web上の画像
+                    $imageUrl = $material->cover_image;
+                } else {
+                    // Laravelのstorageに保存された画像
+                    $imageUrl = asset('storage/' . $material->cover_image);
+                }
+                @endphp
 
-                <img
-                    src="{{ $material->cover_image
-                        ? asset('storage/' . $material->cover_image)
-                        : asset('images/no-image.png') }}"
-                    alt="{{ $material->name }}"
-                    width="90"
-                    height="90"
-                    class="rounded border"
-                    style="object-fit: cover;"
-                >
+                <a href="{{ route('admin.materials.show', $material) }}" class="d-inline-block">
+                    <img src="{{ $imageUrl }}"
+                        alt="{{ $material->name }}"
+                        width="90"
+                        height="90"
+                        class="rounded me-3"
+                        style="object-fit: cover;">
+                </a>
 
                 <div>
                     <h4 class="fw-bold mb-1">

@@ -33,11 +33,30 @@
                         {{-- Profile Image --}}
                         <div class="mb-4 d-flex align-items-center gap-3">
                             <div>
-                                @if($student->user->profile_image)
-                                    <img src="{{ asset('storage/' . $student->user->profile_image) }}" alt="Profile" class="rounded-circle" width="80" height="80" style="object-fit: cover;">
+                                @if($student->user->profile_image_url)
+                                    {{-- @php
+                                        // 'http' から始まる場合はそのまま（Seeder）、そうでない場合は Storage の URL（新規作成）に変換する
+                                        $imageUrl = str_starts_with($student->user->profile_image_url, 'http')
+                                                    ? $student->user->profile_image_url
+                                                    : asset('storage/' . $student->user->profile_image_url);
+
+                                        // ※もし Storage ファサードを使う場合は以下のように書くこともできます
+                                        // : \Illuminate\Support\Facades\Storage::disk('public')->url($student->user->profile_image_url);
+                                    @endphp --}}
+                                    <img
+                                        src="{{ $student->user->profile_image_url }}"
+                                        alt="Profile Image"
+                                        class="rounded-circle"
+                                        width="80"
+                                        height="80"
+                                        style="object-fit: cover;"
+                                    >
                                 @else
-                                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 80px; height: 80px;">
-                                        <i class="bi bi-person-fill fs-2"></i>
+                                    <div
+                                        class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                                        style="width: 80px; height: 80px;"
+                                    >
+                                        <i class="fas fa-user"></i>
                                     </div>
                                 @endif
                             </div>
@@ -101,7 +120,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Phone Number</label>
-                                <input type="text" class="form-control" name="phone_number" value="{{ $student->user->{'phone-number'} }}">
+                                <input type="text" class="form-control" name="phone_number" value="{{ $student->user->{'phone_number'} }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Birthday</label>
