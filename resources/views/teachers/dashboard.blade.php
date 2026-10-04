@@ -271,7 +271,7 @@
 
                                         <i class="fa-solid fa-location-dot me-1"></i>
 
-                                        Station 3
+                                        {{ $reservation->displayStation()?->name ?? '-' }}
 
                                     </div>
 
