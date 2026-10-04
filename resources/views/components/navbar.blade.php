@@ -125,6 +125,15 @@
                                 </a>
                             </li>
 
+                        @elseif($roleCode == 'admin')
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('admin.profile.edit') }}"
+                                >
+                                    Profile
+                                </a>
+                            </li>
                         @endif
 
                         {{-- Divider --}}

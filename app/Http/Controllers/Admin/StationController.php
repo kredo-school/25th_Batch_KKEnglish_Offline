@@ -13,7 +13,32 @@ class StationController extends Controller
      */
     public function index()
     {
-        $stations = Station::orderBy('name')->get();
+        $today = today();
+
+        $stations = Station::query()
+            ->with([
+                'teacherStationAssignments' => function ($query) use ($today) {
+                    $query
+                        ->where(function ($q) use ($today) {
+
+                            // 現在有効
+                            $q->where(function ($q2) use ($today) {
+                                $q2->whereDate('start_date', '<=', $today)
+                                    ->where(function ($q3) use ($today) {
+                                        $q3->whereNull('end_date')
+                                            ->orWhereDate('end_date', '>=', $today);
+                                    });
+                            })
+
+                            // または未来に開始
+                            ->orWhereDate('start_date', '>', $today);
+                        })
+                        ->with('teacher.user')
+                        ->orderBy('start_date');
+                },
+            ])
+            ->orderBy('id')
+            ->get();
 
         return view('admin.stations.index', compact('stations'));
     }

@@ -36,6 +36,7 @@ use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardControll
 use App\Http\Controllers\Admin\TeacherStationAssignmentController;
 use App\Http\Controllers\Admin\StationController;
 use App\Http\Controllers\Admin\LessonStationOverrideController;
+use App\Http\Controllers\Admin\ProfileController;
 
 // Test route for frontend testing
 Route::view('/students/progress-test','students.progress.index')
@@ -157,6 +158,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard.details', [DashboardController::class, 'dashboardDetails'])->name('dashboard.details');
+
+    // Admin 編集
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     // Material 編集
     Route::get('/materials', [AdminMaterialController::class, 'index'])->name('materials.index');

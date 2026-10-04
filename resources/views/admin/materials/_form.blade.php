@@ -8,7 +8,25 @@
 
     @if(!empty($material?->cover_image))
         <div class="mt-2">
-            <img src="{{ asset('storage/' . $material->cover_image) }}" alt="cover" width="120" class="rounded border">
+            @php
+                            if (!$material->cover_image) {
+                                $imageUrl = asset('images/no-image.png');
+                            } elseif (Str::startsWith($material->cover_image, ['http://', 'https://'])) {
+                                // Web上の画像
+                                $imageUrl = $material->cover_image;
+                            } else {
+                                // Laravelのstorageに保存された画像
+                                $imageUrl = asset('storage/' . $material->cover_image);
+                            }
+                        @endphp
+
+                            <img src="{{ $imageUrl }}"
+                                alt="{{ $material->name }}"
+                                width="90"
+                                height="90"
+                                class="rounded me-3"
+                                style="object-fit: cover;">
+                        </a>
         </div>
     @endif
 </div>

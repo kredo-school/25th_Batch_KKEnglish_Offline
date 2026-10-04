@@ -25,14 +25,12 @@
                 }
                 @endphp
 
-                <a href="{{ route('admin.materials.show', $material) }}" class="d-inline-block">
                     <img src="{{ $imageUrl }}"
                         alt="{{ $material->name }}"
                         width="90"
                         height="90"
                         class="rounded me-3"
                         style="object-fit: cover;">
-                </a>
 
                 <div class="flex-grow-1">
                     <h4 class="fw-bold mb-3">{{ $material->name }}</h4>
@@ -52,7 +50,7 @@
             <p class="mb-0">{{ $material->description ?? 'No description' }}</p>
 
             <div class="mt-4 d-flex flex-wrap gap-2">
-                <a href="{{ route('admin.materials.edit', $material) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                <a href="{{ route('admin.materials.edit', $material) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-pen-to-square me-1"></i> Edit</a>
                 <a href="{{ route('admin.materials.teachers.edit', $material) }}" class="btn btn-outline-success btn-sm">
                     <i class="fa-solid fa-user-plus"></i>
                     Assign Teachers
@@ -75,7 +73,7 @@
                 <form method="POST" action="{{ route('admin.materials.destroy', $material) }}" onsubmit="return confirm('Would you like to delete this material?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete</button>
                 </form>
 
                 <a href="{{ route('admin.materials.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-angles-left"></i> Back to List</a>

@@ -23,7 +23,7 @@ class ShiftPatternController extends Controller
             ->withCount([
                 'assignments as teachers_count' => function ($query) use ($today) {
                     $query
-                        ->whereDate('start_date', '<=', $today)
+                        // ->whereDate('start_date', '<=', $today)
                         ->where(function ($q) use ($today) {
                             $q->whereNull('end_date')
                                 ->orWhereDate('end_date', '>=', $today);
