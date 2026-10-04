@@ -118,45 +118,79 @@
                                                             flex-column
                                                         ">
 
-                            {{-- Name + Lesson Point --}}
-                            <div class="
-                                                                d-flex
-                                                                justify-content-between
-                                                                align-items-start
-                                                                mb-2
-                                                            "
-                                style="min-height: 40px;">
-
-                                <h5 class="
-                                                                    fw-bold
-                                                                    mb-0
-                                                                    pe-2
-                                                                "
-                                    style="
-                                                                    line-height: 1.3;
-                                                                ">
+                            {{-- Name + Favorite --}}
+                            <div
+                                class="d-flex justify-content-between align-items-start mb-2"
+                                style="min-height: 32px;"
+                            >
+                                {{-- Name --}}
+                                <h5
+                                    class="fw-bold mb-0"
+                                    style="line-height: 1.3;"
+                                >
                                     {{ $teacher->user?->first_name ?? 'Teacher' }}
-
                                     {{ $teacher->user?->last_name ?? '' }}
                                 </h5>
 
+                                {{-- Favorite --}}
+                                @if ($favoriteTeacherIds->contains($teacher->id))
 
-                                <span
-                                    class="
-                                                                    badge
-                                                                    text-dark
-                                                                    px-2
-                                                                    py-2
-                                                                    flex-shrink-0
-                                                                "
-                                    style="
-                                                                    background-color: #f0c94d;
-                                                                    font-family: Arial, sans-serif;
-                                                                ">
-                                    {{ number_format($teacher->point_consumed ?? 0) }} pt
-                                </span>
+                                    {{-- Unlike --}}
+                                    <form
+                                        method="POST"
+                                        action="{{ route('students.teachers.unlike', $teacher) }}"
+                                        class="ms-2"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
 
+                                        <button
+                                            type="submit"
+                                            class="btn p-0 border-0 bg-transparent"
+                                            aria-label="Remove from favorites"
+                                        >
+                                            <i
+                                                class="fa-solid fa-heart text-danger"
+                                                style="font-size: 18px;"
+                                            ></i>
+                                        </button>
+                                    </form>
+
+                                @else
+
+                                    {{-- Like --}}
+                                    <form
+                                        method="POST"
+                                        action="{{ route('students.teacher.like', $teacher) }}"
+                                        class="ms-2"
+                                    >
+                                        @csrf
+
+                                        <button
+                                            type="submit"
+                                            class="btn p-0 border-0 bg-transparent"
+                                            aria-label="Add to favorites"
+                                        >
+                                            <i
+                                                class="fa-regular fa-heart text-secondary"
+                                                style="font-size: 18px;"
+                                            ></i>
+                                        </button>
+                                    </form>
+
+                                @endif
                             </div>
+
+                            {{-- Lesson Point --}}
+                            <span
+                                class="badge text-dark align-self-start mb-2"
+                                style="
+                                    background-color: #f0c94d;
+                                    font-family: Arial, sans-serif;
+                                "
+                            >
+                                {{ number_format($teacher->point_consumed ?? 0) }} pt
+                            </span>
 
 
                             {{-- Nationality --}}
@@ -887,93 +921,6 @@
                         );
                     }
                 }
-                /*
-                |--------------------------------------------------------------------------
-                | Favorite Heart表示
-                |--------------------------------------------------------------------------
-                */
-
-                function updateFavoriteButton(
-                    card,
-                    isFavorite
-                ) {
-
-                    const button =
-                        card.querySelector(
-                            '.favorite-heart-btn'
-                        );
-
-
-                    if (!button) {
-
-                        return;
-                    }
-
-
-                    const icon =
-                        button.querySelector(
-                            '.favorite-heart-icon'
-                        );
-
-
-                    if (!icon) {
-
-                        return;
-                    }
-
-
-                    /*
-                     * data-favorite更新
-                     */
-                    button.dataset.favorite =
-                        isFavorite ?
-                        '1' :
-                        '0';
-
-
-                    button.setAttribute(
-                        'aria-pressed',
-                        isFavorite ?
-                        'true' :
-                        'false'
-                    );
-
-
-                    /*
-                     * Favorite
-                     */
-                    if (isFavorite) {
-
-                        icon.classList.remove(
-                            'fa-regular',
-                            'text-secondary'
-                        );
-
-
-                        icon.classList.add(
-                            'fa-solid',
-                            'text-danger'
-                        );
-
-
-                        return;
-                    }
-
-
-                    /*
-                     * Not Favorite
-                     */
-                    icon.classList.remove(
-                        'fa-solid',
-                        'text-danger'
-                    );
-
-
-                    icon.classList.add(
-                        'fa-regular',
-                        'text-secondary'
-                    );
-                }
 
                 /*
                 |--------------------------------------------------------------------------
@@ -1430,13 +1377,6 @@
                                     return;
                                 }
 
-                                updateFavoriteButton(
-                                    card,
-                                    teacher.is_favorite ===
-                                    true
-                                );
-
-
                                 /*
                                  * 表示
                                  */
@@ -1565,127 +1505,6 @@
                             'Failed to search teachers.';
                     }
                 }
-                /*
-            |--------------------------------------------------------------------------
-            | Favorite Toggle
-            |--------------------------------------------------------------------------
-            */
-
-                document
-                    .querySelectorAll(
-                        '.favorite-heart-btn'
-                    )
-                    .forEach(
-                        function(button) {
-
-                            button.addEventListener(
-                                'click',
-                                async function() {
-
-                                    const teacherId =
-                                        this.dataset.teacherId;
-
-
-                                    const isFavorite =
-                                        this.dataset.favorite ===
-                                        '1';
-
-
-                                    /*
-                                     * Favoriteなら unlike
-                                     *
-                                     * Favoriteでなければ like
-                                     */
-                                    const url =
-                                        isFavorite ?
-                                        '/students/teachers/' +
-                                        teacherId +
-                                        '/unlike'
-
-                                        :
-                                        '/students/teachers/' +
-                                        teacherId +
-                                        '/like';
-
-
-                                    /*
-                                     * 連打防止
-                                     */
-                                    this.disabled =
-                                        true;
-
-
-                                    try {
-
-                                        const response =
-                                            await fetch(
-                                                url, {
-                                                    method: 'POST',
-
-                                                    headers: {
-
-                                                        'Accept': 'application/json',
-
-                                                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                                                    }
-                                                }
-                                            );
-
-
-                                        if (!response.ok) {
-
-                                            throw new Error(
-                                                'Favorite API error: ' +
-                                                response.status
-                                            );
-                                        }
-
-
-                                        /*
-                                         * 表示反転
-                                         */
-                                        updateFavoriteButton(
-                                            this.closest(
-                                                '.teacher-card'
-                                            ),
-                                            !isFavorite
-                                        );
-
-
-                                        /*
-                                         * Favorite Only検索中なら
-                                         * Teacher一覧を再取得
-                                         */
-                                        if (
-                                            favoriteOnlyInput &&
-                                            favoriteOnlyInput.checked
-                                        ) {
-
-                                            await updateTeachers();
-                                        }
-
-
-                                    } catch (error) {
-
-                                        console.error(
-                                            'お気に入り更新失敗',
-                                            error
-                                        );
-
-
-                                        alert(
-                                            'お気に入りの更新に失敗しました。'
-                                        );
-
-                                    } finally {
-
-                                        this.disabled =
-                                            false;
-                                    }
-                                }
-                            );
-                        }
-                    );
 
                 /*
                 |--------------------------------------------------------------------------

@@ -777,7 +777,7 @@
                                 </th>
 
                                 <th class="py-3">
-                                    Room
+                                    Station
                                 </th>
 
                                 <th class="py-3">
@@ -981,12 +981,12 @@
                                     </td>
 
                                     {{-- ===============================
-                                        Room
+                                        Station
                                     ================================ --}}
                                     <td>
                                         <div class="text-secondary small">
                                             <i class="fa-solid fa-location-dot me-1"></i>
-                                            Room 3
+                                           {{ $reservation->displayStation()?->name ?? '-' }}
                                         </div>
                                     </td>
 
