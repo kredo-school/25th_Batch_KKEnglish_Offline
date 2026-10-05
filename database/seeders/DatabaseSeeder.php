@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
 
             // Other
             TeacherLikeSeeder::class,
+            ExpectedReservationSettingSeeder::class,
             StationSeeder::class,
             TeacherStationAssignmentSeeder::class,
             AnnouncementSeeder::class,
