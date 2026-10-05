@@ -83,10 +83,12 @@
 
                 {{-- Profile Image --}}
 
-                @if($teacher->user?->profile_image_url)
+                @if($teacher->user?->profile_image)
 
                     <img
-                        src="{{ $teacher->user->profile_image_url }}"
+                        src="{{ str_starts_with($teacher->user->profile_image, 'http')
+                            ? $teacher->user->profile_image
+                            : asset('storage/' . $teacher->user->profile_image) }}"
                         alt="{{ $teacher->user->first_name }}"
                         width="100"
                         height="100"
