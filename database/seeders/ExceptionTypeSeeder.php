@@ -12,23 +12,23 @@ class ExceptionTypeSeeder extends Seeder
         $exceptionTypes = [
             [
                 'type_code' => 'personal',
-                'type_name' => '私用',
-                'description' => '個人的な都合による休日・休止時間',
+                'type_name' => 'Personal Leave',
+                'description' => 'Time off or unavailable periods for personal reasons.',
             ],
             [
                 'type_code' => 'medical',
-                'type_name' => '通院',
-                'description' => '通院や健康上の理由による休日・休止時間',
+                'type_name' => 'Medical Leave',
+                'description' => 'Time off or unavailable periods for medical appointments or health reasons.',
             ],
             [
                 'type_code' => 'training',
-                'type_name' => '研修',
-                'description' => '研修参加による休日・休止時間',
+                'type_name' => 'Training',
+                'description' => 'Time off or unavailable periods to attend training.',
             ],
             [
                 'type_code' => 'emergency',
-                'type_name' => '緊急休暇',
-                'description' => '急病など緊急事情による休日・休止時間',
+                'type_name' => 'Emergency Leave',
+                'description' => 'Time off or unavailable periods due to emergencies, such as sudden illness.',
             ],
         ];
 

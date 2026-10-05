@@ -34,6 +34,7 @@ class ProfileController extends Controller
             'gender' => 'nullable|string|max:20',
             'birthday' => 'nullable|date',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1048',
+            'profile_image_url' => 'nullable|url:http,https|max:255',
             'password' => 'nullable|string|min:8',
             // Add other fields as necessary
         ]);
