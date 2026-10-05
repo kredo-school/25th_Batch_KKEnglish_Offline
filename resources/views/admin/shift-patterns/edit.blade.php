@@ -37,13 +37,19 @@
         <div class="row">
             <div class="col-md-3 mb-3">
                 <label>Representative Start Time</label>
-                <input type="time" name="start_time" class="form-control"
-                       value="{{ old('start_time', \Illuminate\Support\Str::of($shiftPattern->start_time)->substr(0,5)) }}" required>
+                <input type="text" name="start_time" class="form-control time-input"
+                       value="{{ old('start_time', \Illuminate\Support\Str::of($shiftPattern->start_time)->substr(0,5)) }}" inputmode="numeric"
+                        pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                        maxlength="5"
+                        list="time-options" required>
             </div>
             <div class="col-md-3 mb-3">
                 <label>Representative End Time</label>
-                <input type="time" name="end_time" class="form-control"
-                       value="{{ old('end_time', \Illuminate\Support\Str::of($shiftPattern->end_time)->substr(0,5)) }}" required>
+                <input type="text" name="end_time" class="form-control time-input"
+                       value="{{ old('end_time', \Illuminate\Support\Str::of($shiftPattern->end_time)->substr(0,5)) }}" inputmode="numeric"
+                        pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                        maxlength="5"
+                        list="time-options" required>
             </div>
             <div class="col-md-3 mb-3">
                 <label>End Day Offset</label>
@@ -114,6 +120,45 @@
             </tbody>
         </table>
         <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-rule">＋ Add Rule</button> --}}
+        <datalist id="time-options">
+            <option value="06:00">
+            <option value="06:30">
+            <option value="07:00">
+            <option value="07:30">
+            <option value="08:00">
+            <option value="08:30">
+            <option value="09:00">
+            <option value="09:30">
+            <option value="10:00">
+            <option value="10:30">
+            <option value="11:00">
+            <option value="11:30">
+            <option value="12:00">
+            <option value="12:30">
+            <option value="13:00">
+            <option value="13:30">
+            <option value="14:00">
+            <option value="14:30">
+            <option value="15:00">
+            <option value="15:30">
+            <option value="16:00">
+            <option value="16:30">
+            <option value="17:00">
+            <option value="17:30">
+            <option value="18:00">
+            <option value="18:30">
+            <option value="19:00">
+            <option value="19:30">
+            <option value="20:00">
+            <option value="20:30">
+            <option value="21:00">
+            <option value="21:30">
+            <option value="22:00">
+            <option value="22:30">
+            <option value="23:00">
+            <option value="23:30">
+            <option value="00:00">
+        </datalist>
 
         <hr>
         <h3>Breaks</h3>
@@ -142,8 +187,14 @@
             @foreach($oldBreaks as $i => $b)
                 <tr>
                     {{-- <td><input type="number" name="breaks[{{ $i }}][weekday]" min="0" max="6" class="form-control" value="{{ $b['weekday'] ?? '' }}" required></td> --}}
-                    <td><input type="time" name="breaks[{{ $i }}][start_time]" class="form-control" value="{{ $b['start_time'] ?? '' }}" required></td>
-                    <td><input type="time" name="breaks[{{ $i }}][end_time]" class="form-control" value="{{ $b['end_time'] ?? '' }}" required></td>
+                    <td><input type="text" name="breaks[{{ $i }}][start_time]" class="form-control time-input" value="{{ $b['start_time'] ?? '' }}" inputmode="numeric"
+                    pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                    maxlength="5"
+                    list="time-options" required></td>
+                    <td><input type="text" name="breaks[{{ $i }}][end_time]" class="form-control time-input" value="{{ $b['end_time'] ?? '' }}" inputmode="numeric"
+                    pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                    maxlength="5"
+                    list="time-options" required></td>
                     <td><input type="text" name="breaks[{{ $i }}][reason]" class="form-control" value="{{ $b['reason'] ?? '' }}"></td>
                     <td><button type="button" class="btn btn-outline-danger btn-sm remove-row"><i class="fa-solid fa-trash me-1"></i> Delete</button></td>
                 </tr>
@@ -174,17 +225,31 @@
 
         tr.innerHTML = `
             <td>
-                <input type="time"
-                       name="breaks[${i}][start_time]"
-                       class="form-control"
-                       required>
+                <input
+                    type="text"
+                    name="breaks[${i}][start_time]"
+                    class="form-control time-input"
+                    placeholder="1200"
+                    inputmode="numeric"
+                    pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                    maxlength="5"
+                    list="time-options"
+                    required
+                >
             </td>
 
             <td>
-                <input type="time"
-                       name="breaks[${i}][end_time]"
-                       class="form-control"
-                       required>
+                <input
+                    type="text"
+                    name="breaks[${i}][end_time]"
+                    class="form-control time-input"
+                    placeholder="1300"
+                    inputmode="numeric"
+                    pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                    maxlength="5"
+                    list="time-options"
+                    required
+                >
             </td>
 
             <td>
@@ -219,5 +284,39 @@
     });
 
 })();
+// Time input
+
+document.addEventListener('input', function (e) {
+
+    if (!e.target.classList.contains('time-input')) {
+        return;
+    }
+
+    let value = e.target.value.replace(/\D/g, '');
+
+    value = value.substring(0, 4);
+
+    if (value.length === 4) {
+
+        const hour = parseInt(value.substring(0, 2), 10);
+        const minute = parseInt(value.substring(2, 4), 10);
+
+        // 正しい時刻の場合だけ変換
+        if (hour <= 23 && minute <= 59) {
+
+            e.target.value =
+                String(hour).padStart(2, '0')
+                + ':'
+                + String(minute).padStart(2, '0');
+        } else {
+
+            e.target.value = value;
+        }
+
+    } else {
+
+        e.target.value = value;
+    }
+});
 </script>
 @endsection
