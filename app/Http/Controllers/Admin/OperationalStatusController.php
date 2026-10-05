@@ -3,25 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Reservation;
+use App\Models\Review;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Reservation;
-use App\Models\Review;
 
 class OperationalStatusController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Operational Status
-    |--------------------------------------------------------------------------
-    */
+    /**
+     * Operational Status
+     */
     public function index(Request $request): View
     {
         /*
         |--------------------------------------------------------------------------
-        | 対象年月
+        | 1. 対象年月
         |--------------------------------------------------------------------------
         */
 
@@ -41,23 +39,19 @@ class OperationalStatusController extends Controller
             1
         )->startOfMonth();
 
-        $monthEnd = Carbon::create(
-            $year,
-            $month,
-            1
-        )->endOfMonth();
+        $monthEnd = $monthStart->copy()->endOfMonth();
 
 
         /*
         |--------------------------------------------------------------------------
-        | 1. Monthly Reservations
+        | 2. Monthly Reservations
         |--------------------------------------------------------------------------
         |
-        | 月内の予約総数
+        | 対象月の予約総数
         |
         */
 
-        $monthlyReservations = DB::table('reservations')
+        $monthlyReservations = Reservation::query()
             ->whereBetween('start_at', [
                 $monthStart,
                 $monthEnd,
@@ -67,14 +61,14 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 2. Monthly Cancellations
+        | 3. Cancellations
         |--------------------------------------------------------------------------
         |
         | cancelled_at が入っている予約
         |
         */
 
-        $monthlyCancellations = DB::table('reservations')
+        $monthlyCancellations = Reservation::query()
             ->whereBetween('start_at', [
                 $monthStart,
                 $monthEnd,
@@ -85,14 +79,14 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 3. Valid Reservations
+        | 4. Valid Reservations
         |--------------------------------------------------------------------------
         |
         | キャンセルされていない予約
         |
         */
 
-        $validReservations = DB::table('reservations')
+        $validReservations = Reservation::query()
             ->whereBetween('start_at', [
                 $monthStart,
                 $monthEnd,
@@ -103,8 +97,11 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 4. Cancellation Rate
+        | 5. Cancellation Rate
         |--------------------------------------------------------------------------
+        |
+        | キャンセル数 ÷ 全予約数 × 100
+        |
         */
 
         $cancellationRate = $monthlyReservations > 0
@@ -117,16 +114,12 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 5. Completed Lessons
+        | 6. Completed Lessons
         |--------------------------------------------------------------------------
         |
-        | ★重要
+        | lesson_records.completed_at が存在するレッスン
         |
-        | lesson_records.completed_at が入っているものを
-        | 「先生がレッスン報告まで完了したレッスン」
-        | としてカウントします。
-        |
-        | reservation.start_at を基準に対象月を判定します。
+        | キャンセル予約は除外
         |
         */
 
@@ -148,14 +141,10 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 6. Operation Rate
+        | 7. Operation Rate
         |--------------------------------------------------------------------------
         |
-        | 稼働率
-        |
-        | レッスン報告完了数
-        | ----------------
-        | キャンセルされていない予約数
+        | 完了レッスン数 ÷ 有効予約数 × 100
         |
         */
 
@@ -166,14 +155,35 @@ class OperationalStatusController extends Controller
             )
             : 0;
 
+
         /*
         |--------------------------------------------------------------------------
-        | Teacher Rating Analysis
+        | 8. Teacher Rating Analysis
         |--------------------------------------------------------------------------
+        |
+        | Review
+        |   ↓ reservation_id
+        | Reservation
+        |   ↓ teacher_id
+        | Teacher
+        |   ↓ user_id
+        | User
+        |
+        */
+
+
+        /*
+        | 対象月のレビュー
+        |
+        | キャンセルされていない予約に対するレビューのみ
+        |
         */
 
         $monthlyReviews = Review::query()
-            ->whereHas('reservation', function ($query) use ($monthStart, $monthEnd) {
+            ->whereHas('reservation', function ($query) use (
+                $monthStart,
+                $monthEnd
+            ) {
                 $query
                     ->whereBetween('start_at', [
                         $monthStart,
@@ -181,170 +191,127 @@ class OperationalStatusController extends Controller
                     ])
                     ->whereNull('cancelled_at');
             })
-            ->with([
-                'teacher.user',
-                'student.user',
-            ])
+            ->whereNotNull('rating')
             ->get();
 
 
-        // 全体の評価平均
-        $averageRating = $monthlyReviews->avg('rating');
+        /*
+        | Average Rating
+        */
 
-        // 最高評価
-        $maxRating = $monthlyReviews->max('rating');
+        $averageRating = $monthlyReviews->isNotEmpty()
+            ? round(
+                (float) $monthlyReviews->avg('rating'),
+                2
+            )
+            : null;
 
-        // 最低評価
-        $minRating = $monthlyReviews->min('rating');
 
-        // 評価件数
+        /*
+        | Highest Rating
+        */
+
+        $maxRating = $monthlyReviews->isNotEmpty()
+            ? (float) $monthlyReviews->max('rating')
+            : null;
+
+
+        /*
+        | Lowest Rating
+        */
+
+        $minRating = $monthlyReviews->isNotEmpty()
+            ? (float) $monthlyReviews->min('rating')
+            : null;
+
+
+        /*
+        | Review Count
+        */
+
         $reviewCount = $monthlyReviews->count();
+
 
         /*
         |--------------------------------------------------------------------------
-        | Teacher Rating Comparison
+        | 9. Teacher Rating Comparison
         |--------------------------------------------------------------------------
+        |
+        | TeacherはReview.teacher_idではなく、
+        | Reservation.teacher_idから取得する。
+        |
         */
 
-        $teacherRatingComparison = $monthlyReviews
-            ->groupBy('teacher_id')
-            ->map(function ($reviews) {
-
-                $teacher = $reviews->first()->teacher;
+        $teacherRatingComparison = DB::table('reviews')
+            ->join(
+                'reservations',
+                'reservations.id',
+                '=',
+                'reviews.reservation_id'
+            )
+            ->join(
+                'teachers',
+                'teachers.id',
+                '=',
+                'reservations.teacher_id'
+            )
+            ->join(
+                'users',
+                'users.id',
+                '=',
+                'teachers.user_id'
+            )
+            ->whereBetween('reservations.start_at', [
+                $monthStart,
+                $monthEnd,
+            ])
+            ->whereNull('reservations.cancelled_at')
+            ->whereNotNull('reviews.rating')
+            ->select(
+                'reservations.teacher_id',
+                'users.first_name',
+                'users.last_name',
+                DB::raw('AVG(reviews.rating) as average_rating'),
+                DB::raw('MAX(reviews.rating) as max_rating'),
+                DB::raw('MIN(reviews.rating) as min_rating'),
+                DB::raw('COUNT(*) as review_count')
+            )
+            ->groupBy(
+                'reservations.teacher_id',
+                'users.first_name',
+                'users.last_name'
+            )
+            ->orderByDesc('average_rating')
+            ->get()
+            ->map(function ($row) {
 
                 return [
-                    'teacher_id' => $teacher?->id,
+                    'teacher_id' => $row->teacher_id,
 
-                    'teacher_name' =>
-                        trim(
-                            ($teacher?->user?->first_name ?? '')
-                            . ' '
-                            . ($teacher?->user?->last_name ?? '')
-                        ),
+                    'teacher_name' => trim(
+                        ($row->first_name ?? '')
+                        . ' '
+                        . ($row->last_name ?? '')
+                    ),
 
                     'average_rating' => round(
-                        $reviews->avg('rating'),
+                        (float) $row->average_rating,
                         2
                     ),
 
-                    'max_rating' => $reviews->max('rating'),
+                    'max_rating' => (float) $row->max_rating,
 
-                    'min_rating' => $reviews->min('rating'),
+                    'min_rating' => (float) $row->min_rating,
 
-                    'review_count' => $reviews->count(),
+                    'review_count' => (int) $row->review_count,
                 ];
             })
-            ->sortByDesc('average_rating')
             ->values();
 
-            $annualTrend = collect();
-
-            for ($monthNumber = 1; $monthNumber <= 12; $monthNumber++) {
-
-                $start = Carbon::create(
-                    $year,
-                    $monthNumber,
-                    1
-                )->startOfMonth();
-
-                $end = Carbon::create(
-                    $year,
-                    $monthNumber,
-                    1
-                )->endOfMonth();
-
-                // 予約
-                $reservations = Reservation::query()
-                    ->whereBetween('start_at', [$start, $end])
-                    ->count();
-
-                // キャンセルされていない予約
-                $valid = Reservation::query()
-                    ->whereBetween('start_at', [$start, $end])
-                    ->whereNull('cancelled_at')
-                    ->count();
-
-                // レッスンレポート完了
-                $completed = DB::table('lesson_records')
-                    ->join(
-                        'reservations',
-                        'reservations.id',
-                        '=',
-                        'lesson_records.reservation_id'
-                    )
-                    ->whereBetween(
-                        'reservations.start_at',
-                        [$start, $end]
-                    )
-                    ->whereNull('reservations.cancelled_at')
-                    ->whereNotNull('lesson_records.completed_at')
-                    ->count();
-
-                // キャンセル
-                $cancellations = Reservation::query()
-                    ->whereBetween('start_at', [$start, $end])
-                    ->whereNotNull('cancelled_at')
-                    ->count();
-
-                // レビュー
-                $reviews = Review::query()
-                    ->whereHas('reservation', function ($query) use ($start, $end) {
-                        $query
-                            ->whereBetween('start_at', [$start, $end])
-                            ->whereNull('cancelled_at');
-                    })
-                    ->get();
-
-                $reviewCount = $reviews->count();
-
-                $averageRating = $reviewCount > 0
-                    ? round($reviews->avg('rating'), 2)
-                    : null;
-
-                $maxRating = $reviewCount > 0
-                    ? $reviews->max('rating')
-                    : null;
-
-                $minRating = $reviewCount > 0
-                    ? $reviews->min('rating')
-                    : null;
-
-                $operationRate = $valid > 0
-                    ? round(($completed / $valid) * 100, 1)
-                    : 0;
-
-                $cancellationRate = $reservations > 0
-                    ? round(($cancellations / $reservations) * 100, 1)
-                    : 0;
-
-                $annualTrend->push([
-                    'month' => $monthNumber,
-
-                    'reservations' => $reservations,
-
-                    'valid' => $valid,
-
-                    'completed' => $completed,
-
-                    'operation_rate' => $operationRate,
-
-                    'cancellations' => $cancellations,
-
-                    'cancellation_rate' => $cancellationRate,
-
-                    'review_count' => $reviewCount,
-
-                    'average_rating' => $averageRating,
-
-                    'max_rating' => $maxRating,
-
-                    'min_rating' => $minRating,
-                ]);
-            }
 
         /*
         |--------------------------------------------------------------------------
-        | 7. Shift Analysis
+        | 10. Shift Analysis
         |--------------------------------------------------------------------------
         */
 
@@ -365,7 +332,7 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 8. Shift Count
+        | 11. Shift Count
         |--------------------------------------------------------------------------
         */
 
@@ -374,7 +341,7 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 9. Active Teacher Count
+        | 12. Active Teacher Count
         |--------------------------------------------------------------------------
         */
 
@@ -387,7 +354,7 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 10. Working Hours
+        | 13. Working Hours
         |--------------------------------------------------------------------------
         */
 
@@ -396,8 +363,7 @@ class OperationalStatusController extends Controller
         foreach ($shiftSchedules as $schedule) {
 
             if (
-                !$schedule->start_time
-                ||
+                !$schedule->start_time ||
                 !$schedule->end_time
             ) {
                 continue;
@@ -416,6 +382,7 @@ class OperationalStatusController extends Controller
             );
 
             if ($end->gt($start)) {
+
                 $workingMinutes +=
                     $start->diffInMinutes($end);
             }
@@ -429,11 +396,11 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 11. Daily Reservation Analysis
+        | 14. Daily Reservation Analysis
         |--------------------------------------------------------------------------
         */
 
-        $dailyReservations = DB::table('reservations')
+        $dailyReservations = Reservation::query()
             ->selectRaw(
                 'DATE(start_at) as reservation_date,
                  COUNT(*) as total'
@@ -450,7 +417,7 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 12. Average / Maximum / Minimum
+        | 15. Average / Maximum / Minimum
         |--------------------------------------------------------------------------
         */
 
@@ -460,15 +427,18 @@ class OperationalStatusController extends Controller
                 fn ($value) => (int) $value
             );
 
-        $reservationAverage = $dailyReservationValues->count()
+
+        $reservationAverage = $dailyReservationValues->isNotEmpty()
             ? round(
                 $dailyReservationValues->avg(),
                 1
             )
             : 0;
 
+
         $reservationMaximum =
             $dailyReservationValues->max() ?? 0;
+
 
         $reservationMinimum =
             $dailyReservationValues->min() ?? 0;
@@ -476,7 +446,7 @@ class OperationalStatusController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 13. Annual Monthly Trend
+        | 16. Annual Monthly Trend
         |--------------------------------------------------------------------------
         |
         | 選択された年の1月～12月
@@ -484,6 +454,7 @@ class OperationalStatusController extends Controller
         */
 
         $monthlyTrend = [];
+
 
         for ($m = 1; $m <= 12; $m++) {
 
@@ -497,12 +468,10 @@ class OperationalStatusController extends Controller
 
 
             /*
-            |--------------------------------------------------------------
             | Total Reservations
-            |--------------------------------------------------------------
             */
 
-            $reservations = DB::table('reservations')
+            $reservations = Reservation::query()
                 ->whereBetween('start_at', [
                     $start,
                     $end,
@@ -511,12 +480,10 @@ class OperationalStatusController extends Controller
 
 
             /*
-            |--------------------------------------------------------------
             | Valid Reservations
-            |--------------------------------------------------------------
             */
 
-            $valid = DB::table('reservations')
+            $valid = Reservation::query()
                 ->whereBetween('start_at', [
                     $start,
                     $end,
@@ -526,12 +493,10 @@ class OperationalStatusController extends Controller
 
 
             /*
-            |--------------------------------------------------------------
             | Cancellations
-            |--------------------------------------------------------------
             */
 
-            $cancellations = DB::table('reservations')
+            $cancellations = Reservation::query()
                 ->whereBetween('start_at', [
                     $start,
                     $end,
@@ -541,9 +506,7 @@ class OperationalStatusController extends Controller
 
 
             /*
-            |--------------------------------------------------------------
             | Completed Lessons
-            |--------------------------------------------------------------
             */
 
             $completed = DB::table('lesson_records')
@@ -563,26 +526,38 @@ class OperationalStatusController extends Controller
 
 
             /*
-            |--------------------------------------------------------------
-            | Operation Rate
-            |--------------------------------------------------------------
+            | Monthly Operation Rate
             */
 
-            $operation = $valid > 0
+            $monthlyOperationRate = $valid > 0
                 ? round(
                     ($completed / $valid) * 100,
                     1
                 )
                 : 0;
 
+
             /*
-            |--------------------------------------------------------------------------
-            | Review Analysis
-            |--------------------------------------------------------------------------
+            | Cancellation Rate
+            */
+
+            $monthlyCancellationRate = $reservations > 0
+                ? round(
+                    ($cancellations / $reservations) * 100,
+                    1
+                )
+                : 0;
+
+
+            /*
+            | Reviews
             */
 
             $reviews = Review::query()
-                ->whereHas('reservation', function ($query) use ($start, $end) {
+                ->whereHas('reservation', function ($query) use (
+                    $start,
+                    $end
+                ) {
                     $query
                         ->whereBetween('start_at', [
                             $start,
@@ -590,30 +565,33 @@ class OperationalStatusController extends Controller
                         ])
                         ->whereNull('cancelled_at');
                 })
+                ->whereNotNull('rating')
                 ->get();
 
-            $reviewCount = $reviews->count();
 
-            $averageRating = $reviewCount > 0
+            $monthlyReviewCount = $reviews->count();
+
+
+            $monthlyAverageRating = $monthlyReviewCount > 0
                 ? round(
-                    $reviews->avg('rating'),
+                    (float) $reviews->avg('rating'),
                     2
                 )
                 : null;
 
-            $maxRating = $reviewCount > 0
-                ? $reviews->max('rating')
+
+            $monthlyMaxRating = $monthlyReviewCount > 0
+                ? (float) $reviews->max('rating')
                 : null;
 
-            $minRating = $reviewCount > 0
-                ? $reviews->min('rating')
+
+            $monthlyMinRating = $monthlyReviewCount > 0
+                ? (float) $reviews->min('rating')
                 : null;
 
 
             /*
-            |--------------------------------------------------------------------------
             | Monthly Trend
-            |--------------------------------------------------------------------------
             */
 
             $monthlyTrend[] = [
@@ -631,34 +609,138 @@ class OperationalStatusController extends Controller
                     $completed,
 
                 'operation_rate' =>
-                    $operation,
+                    $monthlyOperationRate,
 
                 'cancellations' =>
                     $cancellations,
 
                 'cancellation_rate' =>
-                    $reservations > 0
-            ? round(($cancellations / $reservations) * 100, 1)
-            : 0,
+                    $monthlyCancellationRate,
 
                 'review_count' =>
-                    $reviewCount,
+                    $monthlyReviewCount,
 
                 'average_rating' =>
-                    $averageRating,
+                    $monthlyAverageRating,
 
                 'max_rating' =>
-                    $maxRating,
+                    $monthlyMaxRating,
 
                 'min_rating' =>
-                    $minRating,
+                    $monthlyMinRating,
             ];
         }
+
+/*
+|--------------------------------------------------------------------------
+| 16-2. Annual Total
+|--------------------------------------------------------------------------
+|
+| 選択された年の年間総計
+|
+*/
+
+$annualReservations = 0;
+$annualValid = 0;
+$annualCompleted = 0;
+$annualCancellations = 0;
+$annualReviewCount = 0;
+
+$annualRatingValues = collect();
+
+
+foreach ($monthlyTrend as $row) {
+
+    $annualReservations += $row['reservations'];
+
+    $annualValid += $row['valid'];
+
+    $annualCompleted += $row['completed'];
+
+    $annualCancellations += $row['cancellations'];
+
+    $annualReviewCount += $row['review_count'];
+
+    if ($row['average_rating'] !== null) {
+        /*
+        | 月平均をそのまま足したり平均したりすると
+        | レビュー件数を考慮できないため、
+        | 年間評価は別途レビューから計算します。
+        */
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Annual Reviews
+|--------------------------------------------------------------------------
+*/
+
+$annualReviews = Review::query()
+    ->whereHas('reservation', function ($query) use (
+        $year
+    ) {
+        $query
+            ->whereYear('start_at', $year)
+            ->whereNull('cancelled_at');
+    })
+    ->whereNotNull('rating')
+    ->get();
+
+
+$annualReviewCount = $annualReviews->count();
+
+
+$annualAverageRating = $annualReviewCount > 0
+    ? round(
+        (float) $annualReviews->avg('rating'),
+        2
+    )
+    : null;
+
+
+$annualMaxRating = $annualReviewCount > 0
+    ? (float) $annualReviews->max('rating')
+    : null;
+
+
+$annualMinRating = $annualReviewCount > 0
+    ? (float) $annualReviews->min('rating')
+    : null;
+
+
+/*
+|--------------------------------------------------------------------------
+| Annual Operation Rate
+|--------------------------------------------------------------------------
+*/
+
+$annualOperationRate = $annualValid > 0
+    ? round(
+        ($annualCompleted / $annualValid) * 100,
+        1
+    )
+    : 0;
+
+
+/*
+|--------------------------------------------------------------------------
+| Annual Cancellation Rate
+|--------------------------------------------------------------------------
+*/
+
+$annualCancellationRate = $annualReservations > 0
+    ? round(
+        ($annualCancellations / $annualReservations) * 100,
+        1
+    )
+    : 0;
 
 
         /*
         |--------------------------------------------------------------------------
-        | View
+        | 17. View
         |--------------------------------------------------------------------------
         */
 
@@ -701,11 +783,26 @@ class OperationalStatusController extends Controller
                 'monthlyTrend',
 
                 'averageRating',
+
                 'maxRating',
+
                 'minRating',
+
                 'reviewCount',
+
                 'teacherRatingComparison',
+                'annualReservations',
+                'annualValid',
+                'annualCompleted',
+                'annualOperationRate',
+                'annualCancellations',
+                'annualCancellationRate',
+                'annualReviewCount',
+                'annualAverageRating',
+                'annualMaxRating',
+                'annualMinRating',
             )
         );
     }
 }
+

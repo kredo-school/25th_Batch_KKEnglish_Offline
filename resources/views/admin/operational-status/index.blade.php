@@ -752,6 +752,148 @@
 
                 </table>
 
+{{-- =========================================================
+     Annual Total
+========================================================= --}}
+
+<div class="mt-4">
+
+    <h6 class="fw-bold mb-3">
+        Annual Total
+    </h6>
+
+    <div class="table-responsive">
+
+        <table class="table table-bordered align-middle mb-0">
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>
+                        Annual Total
+                    </th>
+
+                    <th class="text-end">
+                        Reservations
+                    </th>
+
+                    <th class="text-end">
+                        Valid
+                    </th>
+
+                    <th class="text-end">
+                        Completed
+                    </th>
+
+                    <th class="text-end">
+                        Operation Rate
+                    </th>
+
+                    <th class="text-end">
+                        Cancellations
+                    </th>
+
+                    <th class="text-end">
+                        Cancellation Rate
+                    </th>
+
+                    <th class="text-end">
+                        Reviews
+                    </th>
+
+                    <th class="text-end">
+                        Avg Rating
+                    </th>
+
+                    <th class="text-end">
+                        Max / Min
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                <tr class="fw-bold">
+
+                    <td>
+                        {{ $year }} Total
+                    </td>
+
+
+                    <td class="text-end">
+                        {{ number_format($annualReservations) }}
+                    </td>
+
+
+                    <td class="text-end">
+                        {{ number_format($annualValid) }}
+                    </td>
+
+
+                    <td class="text-end">
+                        {{ number_format($annualCompleted) }}
+                    </td>
+
+
+                    <td class="text-end">
+                        {{ number_format($annualOperationRate, 1) }}%
+                    </td>
+
+
+                    <td class="text-end">
+                        {{ number_format($annualCancellations) }}
+                    </td>
+
+
+                    <td class="text-end">
+                        {{ number_format($annualCancellationRate, 1) }}%
+                    </td>
+
+
+                    <td class="text-end">
+                        {{ number_format($annualReviewCount) }}
+                    </td>
+
+
+                    <td class="text-end">
+
+                        {{ $annualAverageRating !== null
+                            ? number_format($annualAverageRating, 2)
+                            : '-' }}
+
+                    </td>
+
+
+                    <td class="text-end">
+
+                        @if ($annualMaxRating !== null)
+
+                            {{ $annualMaxRating }}
+                            /
+                            {{ $annualMinRating }}
+
+                        @else
+
+                            -
+
+                        @endif
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
             </div>
 
         </div>
