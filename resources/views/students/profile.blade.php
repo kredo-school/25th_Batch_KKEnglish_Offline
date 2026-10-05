@@ -15,9 +15,9 @@
 
                 <img
                     src="{{ str_starts_with($user->profile_image, 'http')
-                        ? $user->profile_image
-                        : asset('storage/' . $user->profile_image) }}"
-                    alt="{{ $user?->first_name }}"
+                    ? $user->profile_image
+                    : asset('storage/' . $user->profile_image) }}"
+                    alt="Profile Image"
                     width="120"
                     height="120"
                     class="rounded-circle"

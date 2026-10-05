@@ -44,7 +44,9 @@
                                         // : \Illuminate\Support\Facades\Storage::disk('public')->url($student->user->profile_image_url);
                                     @endphp --}}
                                     <img
-                                        src="{{ $student->user->profile_image_url }}"
+                                        src="{{ str_starts_with($student->user->profile_image, 'http')
+                                        ? $student->user->profile_image
+                                        : asset('storage/' . $student->user->profile_image) }}"
                                         alt="Profile Image"
                                         class="rounded-circle"
                                         width="80"
