@@ -11,7 +11,8 @@
             <i class="fa-regular fa-id-badge me-2"></i>
             My Account
 
-            @if($user->profile_image)
+            @if($user?->profile_image)
+
                 <img
                     src="{{ str_starts_with($user->profile_image, 'http')
                     ? $user->profile_image
@@ -19,10 +20,17 @@
                     alt="Profile Image"
                     width="120"
                     height="120"
-                    class="rounded-circle object-fit-cover"
+                    class="rounded-circle"
+                    style="object-fit: cover;"
                 >
+
             @else
-                <i class="fa-solid fa-circle-user fa-2x" style="width:120, height: 120"></i>
+
+                <i
+                    class="fa-solid fa-circle-user text-secondary"
+                    style="font-size: 120px;"
+                ></i>
+
             @endif
         </a>
     </div>

@@ -105,7 +105,7 @@
             id="editBtn"
             class="btn btn-dark"
         >
-            Edit Schedule
+            Set Availability
         </button>
 
     </div>
