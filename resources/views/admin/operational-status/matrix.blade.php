@@ -20,6 +20,27 @@
                     <p class="mb-1">All Capacity: {{ $totalCapacity }}</p>
                     <p class="mb-1">Booked: {{ $totalBooked }}</p>
                 </div>
+                <div class="col-md-6 border-start">
+                    {{-- <p class="mb-2 fw-semibold">Operational Status</p> --}}
+                    <div class="small">
+                        <div class="mb-1">
+                            <span class="badge" style="background-color: #cce5ff; color: #212529;"> Sufficient </span>
+                            <span class="ms-2">Booking rate is below 80%</span>
+                        </div>
+                        <div class="mb-1">
+                            <span class="badge" style="background-color: #fff3cd; color: #212529;"> Caution </span>
+                            <span class="ms-2">Booking rate is 80%-89%</span>
+                        </div>
+                        <div class="mb-1">
+                            <span class="badge" style="background-color: #fd7e14; color: #fff;"> Risk of Insufficiency </span>
+                            <span class="ms-2">Booking rate is 90%-94%</span>
+                        </div>
+                        <div>
+                            <span class="badge" style="background-color: #dc3545; color: #fff;"> Insufficient </span>
+                            <span class="ms-2">Booking rate is 95% or higher</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
