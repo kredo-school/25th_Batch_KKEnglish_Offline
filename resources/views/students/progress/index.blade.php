@@ -281,7 +281,7 @@
     >
 
         <div class="progress-monkey-bubble">
-            {{ $monkeyMessage }}
+            Great job! Keep going!
         </div>
 
         <img

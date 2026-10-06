@@ -81,14 +81,11 @@
             ================================ --}}
             <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
 
-                {{-- Profile Image --}}
-
-                @if($teacher->user?->profile_image)
+               {{-- Profile Image --}}
+                @if($teacher->user?->profile_image_url)
 
                     <img
-                        src="{{ str_starts_with($teacher->user->profile_image, 'http')
-                            ? $teacher->user->profile_image
-                            : asset('storage/' . $teacher->user->profile_image) }}"
+                        src="{{ $teacher->user->profile_image_url }}"
                         alt="{{ $teacher->user->first_name }}"
                         width="100"
                         height="100"

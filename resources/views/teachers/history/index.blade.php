@@ -155,22 +155,11 @@
                                                 $reservation
                                                     ->student
                                                     ?->user
-                                                    ?->profile_image
+                                                    ?->profile_image_url
                                             )
 
                                                 <img
-
-                                                    src="{{ str_starts_with(
-                                                        $reservation->student->user->profile_image,
-                                                        'http'
-                                                    )
-                                                        ? $reservation->student->user->profile_image
-                                                        : asset(
-                                                            'storage/' .
-                                                            $reservation->student->user->profile_image
-                                                        )
-                                                    }}"
-
+                                                    src="{{ $reservation->student->user->profile_image_url }}"
                                                     alt="{{ $reservation->student->user->first_name }}"
                                                     width="40"
                                                     height="40"
@@ -433,22 +422,11 @@
                                                 $reservation
                                                     ->student
                                                     ?->user
-                                                    ?->profile_image
+                                                    ?->profile_image_url
                                             )
 
                                                 <img
-
-                                                    src="{{ str_starts_with(
-                                                        $reservation->student->user->profile_image,
-                                                        'http'
-                                                    )
-                                                        ? $reservation->student->user->profile_image
-                                                        : asset(
-                                                            'storage/' .
-                                                            $reservation->student->user->profile_image
-                                                        )
-                                                    }}"
-
+                                                    src="{{ $reservation->student->user->profile_image_url }}"
                                                     alt="{{ $reservation->student->user->first_name }}"
                                                     width="40"
                                                     height="40"

@@ -881,20 +881,14 @@
 
 
                                             {{-- Teacher Image --}}
-                                            @if (
-                                                $reservation->teacher
-                                                &&
-                                                $reservation->teacher->user
-                                                &&
-                                                $reservation->teacher->user->profile_image
-                                            )
+                                           @if ($reservation->teacher?->user?->profile_image_url)
 
                                                 <img
-                                                    src="{{ $reservation->teacher->user->profile_image }}"
+                                                    src="{{ $reservation->teacher->user->profile_image_url }}"
                                                     alt="{{ $reservation->teacher->user->first_name }}"
-                                                    width="45"
-                                                    height="45"
-                                                    class="rounded-circle me-2"
+                                                    width="60"
+                                                    height="60"
+                                                    class="rounded-circle me-3"
                                                     style="object-fit: cover;"
                                                 >
 
@@ -903,21 +897,19 @@
                                                 <div
                                                     class="
                                                         rounded-circle
-                                                        bg-secondary
+                                                        bg-light
                                                         d-flex
                                                         justify-content-center
                                                         align-items-center
-                                                        text-white
-                                                        me-2
+                                                        text-secondary
+                                                        me-3
                                                     "
                                                     style="
-                                                        width: 45px;
-                                                        height: 45px;
+                                                        width: 60px;
+                                                        height: 60px;
                                                     "
                                                 >
-
-                                                    <i class="fa-solid fa-user"></i>
-
+                                                    No Image
                                                 </div>
 
                                             @endif

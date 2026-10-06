@@ -206,15 +206,15 @@
                                     <div class="d-flex align-items-center">
 
                                         {{-- Teacher Image --}}
-                                        @if (
+                                       @if (
                                             $reservation
                                                 ->teacher
                                                 ?->user
-                                                ?->profile_image
+                                                ?->profile_image_url
                                         )
 
                                             <img
-                                                src="{{ $reservation->teacher->user->profile_image }}"
+                                                src="{{ $reservation->teacher->user->profile_image_url }}"
                                                 alt="Teacher"
                                                 width="40"
                                                 height="40"
@@ -243,7 +243,6 @@
                                             </div>
 
                                         @endif
-
 
                                         {{-- Teacher Name --}}
                                         <span class="fw-semibold">
