@@ -67,12 +67,10 @@
                         {{-- ===============================
                             Profile Image
                         ================================ --}}
-                        @if($user?->profile_image)
+                        @if($user?->profile_image_url)
 
                             <img
-                                src="{{ str_starts_with($user->profile_image, 'http')
-                                    ? $user->profile_image
-                                    : asset('storage/' . $user->profile_image) }}"
+                                src="{{ $user->profile_image_url }}"
                                 alt="{{ $user?->first_name }}"
                                 width="40"
                                 height="40"

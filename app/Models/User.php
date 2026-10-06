@@ -77,77 +77,68 @@ class User extends Authenticatable
         return $this->hasOne(Admin::class);
     }
 
-    public function getProfileImageUrlAttribute(): ?string
-    {
-        $image = trim((string) $this->profile_image);
+public function getProfileImageUrlAttribute(): ?string
+{
+    $image = trim((string) $this->profile_image);
 
-        /*
-    |--------------------------------------------------------------------------
-    | 画像なし
-    |--------------------------------------------------------------------------
-    */
-        if (blank($image)) {
-            return null;
-        }
+    if (blank($image)) {
+        return null;
+    }
 
-
-        /*
+    /*
     |--------------------------------------------------------------------------
     | ① 外部URL
     |--------------------------------------------------------------------------
-    |
-    | DB例:
-    | https://images.unsplash.com/xxxxx.jpg
-    |
     */
-        if (
-            str_starts_with($image, 'http://') ||
-            str_starts_with($image, 'https://')
-        ) {
-            return $image;
-        }
+    if (
+        str_starts_with($image, 'http://') ||
+        str_starts_with($image, 'https://')
+    ) {
+        return $image;
+    }
 
-
-        /*
+    /*
     |--------------------------------------------------------------------------
-    | ② Laravel Storage
+    | ② storage 系
     |--------------------------------------------------------------------------
-    |
-    | DB例:
-    | storage:teachers/mary.jpg
-    |
-    | 実ファイル:
-    | storage/app/public/teachers/mary.jpg
-    |
     */
 
-        // storage: が付いている場合
-         if (str_starts_with($image, 'storage:')) { $image = substr($image, strlen('storage:')); }
-         // /storage/ が付いている場合
-         if (str_starts_with($image, '/storage/')) { $image = substr($image, strlen('/storage/')); }
-         // storage/ が付いている場合
-         if (str_starts_with($image, 'storage/')) { $image = substr($image, strlen('storage/')); }
-         // publicディスクに存在する画像
-         if (Storage::disk('public')->exists($image)) { return Storage::disk('public')->url($image); }
-         // ファイル名だけが保存されている場合
-         $profileImagePath = 'profile_images/' . ltrim($image, '/');
-         if (Storage::disk('public')->exists($profileImagePath)) { return Storage::disk('public')->url($profileImagePath); }
+    if (str_starts_with($image, '/storage/')) {
+        $image = substr($image, strlen('/storage/'));
+    }
 
+    if (str_starts_with($image, 'storage/')) {
+        $image = substr($image, strlen('storage/'));
+    }
 
-        /*
+    // profile_images/... の場合
+    if (str_starts_with($image, 'profile_images/')) {
+        return asset('storage/' . $image);
+    }
+
+    /*
     |--------------------------------------------------------------------------
-    | ③ public フォルダ
+    | ③ public/images 系
     |--------------------------------------------------------------------------
     |
     | DB例:
     | images/IMG_4426.jpeg
     |
-    | 実ファイル:
-    | public/images/IMG_4426.jpeg
+    */
+    if (str_starts_with($image, 'images/')) {
+        return asset($image);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ④ ファイル名だけの場合
+    |--------------------------------------------------------------------------
+    |
+    | 生徒画像として profile_images を見る
     |
     */
-        return asset(
-            ltrim($image, '/')
-        );
-    }
+    return asset(
+        'storage/profile_images/' . basename($image)
+    );
+}
 }
