@@ -121,16 +121,11 @@
                             $reservation
                                 ->teacher
                                 ?->user
-                                ?->profile_image
+                                ?->profile_image_url
                         )
 
                             <img
-                                src="{{
-                                    $reservation
-                                        ->teacher
-                                        ->user
-                                        ->profile_image
-                                }}"
+                                src="{{ $reservation->teacher->user->profile_image_url }}"
                                 alt="Teacher"
                                 width="48"
                                 height="48"
@@ -154,15 +149,7 @@
                                     height: 48px;
                                 "
                             >
-
-                                <i
-                                    class="
-                                        fa-solid
-                                        fa-user
-                                        text-secondary
-                                    "
-                                ></i>
-
+                                <i class="fa-solid fa-user text-secondary"></i>
                             </div>
 
                         @endif

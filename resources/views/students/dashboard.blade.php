@@ -656,10 +656,10 @@
                             >
 
                                 {{-- Teacher Image --}}
-                                @if ($lesson->teacher?->user?->profile_image)
+                                @if ($lesson->teacher?->user?->profile_image_url)
 
                                     <img
-                                        src="{{ $lesson->teacher->user->profile_image }}"
+                                        src="{{ $lesson->teacher->user->profile_image_url }}"
                                         alt="Teacher"
                                         class="rounded-circle"
                                         style="

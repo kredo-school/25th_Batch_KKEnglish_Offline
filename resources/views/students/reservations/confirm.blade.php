@@ -101,42 +101,42 @@
 
 
                             {{-- Teacher Image --}}
-                            @if (
-                                $teacher->user
-                                &&
-                                $teacher->user->profile_image
-                            )
+                                @if (
+                                    $teacher->user
+                                    &&
+                                    $teacher->user->profile_image_url
+                                )
 
-                                <img
-                                    src="{{ $teacher->user->profile_image }}"
-                                    alt="{{ $teacher->user->first_name }}"
-                                    width="60"
-                                    height="60"
-                                    class="rounded-circle me-3"
-                                    style="object-fit: cover;"
-                                >
+                                    <img
+                                        src="{{ $teacher->user->profile_image_url }}"
+                                        alt="{{ $teacher->user->first_name }}"
+                                        width="60"
+                                        height="60"
+                                        class="rounded-circle me-3"
+                                        style="object-fit: cover;"
+                                    >
 
-                            @else
+                                @else
 
-                                <div
-                                    class="
-                                        rounded-circle
-                                        bg-light
-                                        d-flex
-                                        justify-content-center
-                                        align-items-center
-                                        text-secondary
-                                        me-3
-                                    "
-                                    style="
-                                        width: 60px;
-                                        height: 60px;
-                                    "
-                                >
-                                    No Image
-                                </div>
+                                    <div
+                                        class="
+                                            rounded-circle
+                                            bg-light
+                                            d-flex
+                                            justify-content-center
+                                            align-items-center
+                                            text-secondary
+                                            me-3
+                                        "
+                                        style="
+                                            width: 60px;
+                                            height: 60px;
+                                        "
+                                    >
+                                        No Image
+                                    </div>
 
-                            @endif
+                                @endif
 
 
                             {{-- Teacher Name --}}

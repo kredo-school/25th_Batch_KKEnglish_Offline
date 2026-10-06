@@ -187,7 +187,7 @@
                                 {{-- ===============================
                                      Teacher
                                 ================================ --}}
-                                <td>
+                               <td>
 
                                     @if ($transaction->reservation)
 
@@ -199,11 +199,11 @@
                                                     ->reservation
                                                     ->teacher
                                                     ?->user
-                                                    ?->profile_image
+                                                    ?->profile_image_url
                                             )
 
                                                 <img
-                                                    src="{{ $transaction->reservation->teacher->user->profile_image }}"
+                                                    src="{{ $transaction->reservation->teacher->user->profile_image_url }}"
                                                     alt="Teacher"
                                                     width="40"
                                                     height="40"
@@ -232,7 +232,6 @@
                                                 </div>
 
                                             @endif
-
 
                                             {{-- Teacher Name --}}
                                             <span class="fw-semibold">

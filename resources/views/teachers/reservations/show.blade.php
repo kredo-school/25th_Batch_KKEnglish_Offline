@@ -183,43 +183,11 @@
                         $reservation->student->user
                     )
 
-                        @if (
-                            $reservation
-                                ->student
-                                ->user
-                                ->profile_image
-                        )
+                       @if ($reservation->student->user->profile_image_url)
 
                             <img
-                                src="{{
-                                    str_starts_with(
-                                        $reservation
-                                            ->student
-                                            ->user
-                                            ->profile_image,
-                                        'http'
-                                    )
-                                        ?
-                                        $reservation
-                                            ->student
-                                            ->user
-                                            ->profile_image
-                                        :
-                                        asset(
-                                            'storage/'
-                                            .
-                                            $reservation
-                                                ->student
-                                                ->user
-                                                ->profile_image
-                                        )
-                                }}"
-                                alt="{{
-                                    $reservation
-                                        ->student
-                                        ->user
-                                        ->first_name
-                                }}"
+                                src="{{ $reservation->student->user->profile_image_url }}"
+                                alt="{{ $reservation->student->user->first_name }}"
                                 width="45"
                                 height="45"
                                 class="rounded-circle me-2"
@@ -228,7 +196,7 @@
 
                         @else
 
-                           <i
+                            <i
                                 class="
                                     fa-solid
                                     fa-circle-user

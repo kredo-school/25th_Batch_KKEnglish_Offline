@@ -71,7 +71,7 @@
 
                             <img
                                 src="{{ $user->profile_image_url }}"
-                                alt="{{ $user?->first_name }}"
+                                alt="Profile Image"
                                 width="40"
                                 height="40"
                                 class="rounded-circle me-2"

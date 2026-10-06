@@ -11,12 +11,10 @@
             <i class="fa-regular fa-id-badge me-2"></i>
             My Account
 
-            @if($user?->profile_image)
+            @if($user?->profile_image_url)
 
                 <img
-                    src="{{ str_starts_with($user->profile_image, 'http')
-                    ? $user->profile_image
-                    : asset('storage/' . $user->profile_image) }}"
+                    src="{{ $user->profile_image_url }}"
                     alt="Profile Image"
                     width="120"
                     height="120"

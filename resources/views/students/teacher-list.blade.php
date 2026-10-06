@@ -37,11 +37,11 @@
                     @if (
                         $teacher->user
                         &&
-                        $teacher->user->profile_image
+                        $teacher->user->profile_image_url
                     )
 
                         <img
-                            src="{{ $teacher->user->profile_image }}"
+                            src="{{ $teacher->user->profile_image_url }}"
                             alt="{{ $teacher->user->first_name }}"
                             class="card-img-top"
                             style="
@@ -278,11 +278,11 @@
                     @if (
                         $teacher->user
                         &&
-                        $teacher->user->profile_image
+                        $teacher->user->profile_image_url
                     )
 
                         <img
-                            src="{{ $teacher->user->profile_image }}"
+                            src="{{ $teacher->user->profile_image_url }}"
                             alt="{{ $teacher->user->first_name }}"
                             class="card-img-top"
                             style="
