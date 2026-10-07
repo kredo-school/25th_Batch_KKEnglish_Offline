@@ -547,6 +547,28 @@
 
                 </div>
 
+                    {{-- Pagination --}}
+                <div class="d-flex justify-content-between align-items-center px-3 py-3">
+
+                    <small class="text-secondary">
+
+                        {{ $completedReservations->firstItem() }}
+                        -
+                        {{ $completedReservations->lastItem() }}
+                        /
+                        {{ $completedReservations->total() }}
+
+                    </small>
+
+                    <div>
+
+                        {{ $completedReservations
+                            ->onEachSide(1)
+                            ->links('pagination::bootstrap-5') }}
+
+                    </div>
+
+                </div>
 
             @else
 
