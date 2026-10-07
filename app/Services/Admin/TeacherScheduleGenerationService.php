@@ -93,12 +93,22 @@ class TeacherScheduleGenerationService
             // 休憩を除いた「勤務可能な時間帯」を作ります。
             // 09-18 + 13-14休憩なら 09-13 / 14-18 になります。
             foreach ($this->buildPeriods($date, $pattern) as $period) {
+
+                // ---------------------------------------------------
+                // ③ フォーマット処理（00:00:00 で日またぎの場合は 24:00:00 にする）
+                // ---------------------------------------------------
+                $startStr = $period['start']->format('H:i:s');
+                $endStr = $period['end']->format('H:i:s');
+                if ($endStr === '00:00:00' && $period['end']->gt($period['start'])) {
+                    $endStr = '24:00:00';
+                }
+
                 // まったく同じ teacher / date / start / end が既にあれば二重登録しません。
                 $exists = TeacherSchedule::query()
                     ->where('teacher_id', $assignment->teacher_id)
                     ->where('available_date', $date->toDateString())
-                    ->where('start_time', $period['start']->format('H:i:s'))
-                    ->where('end_time', $period['end']->format('H:i:s'))
+                    ->where('start_time', $startStr)
+                    ->where('end_time', $endStr)
                     ->whereNotIn('status', ['cancelled'])
                     ->exists();
 
@@ -111,8 +121,8 @@ class TeacherScheduleGenerationService
                     'teacher_id' => $assignment->teacher_id,
                     'shift_pattern_id' => $pattern->id,
                     'available_date' => $date->toDateString(),
-                    'start_time' => $period['start']->format('H:i:s'),
-                    'end_time' => $period['end']->format('H:i:s'),
+                    'start_time' => $startStr,
+                    'end_time' => $endStr,
                     'status' => 'confirmed',
                     'created_by' => $createdBy,
                     'confirmed_by' => $createdBy,
@@ -299,6 +309,9 @@ class TeacherScheduleGenerationService
             foreach ($this->mergePeriods($dayCandidates) as $period) {
                 $start = $period['start']->format('H:i:s');
                 $end = $period['end']->format('H:i:s');
+                if ($end === '00:00:00' && $period['end']->gt($period['start'])) {
+                    $end = '24:00:00';
+                }
 
                 $exists = $existing->contains(function ($row) use ($period, $start, $end) {
                     return (int) $row->teacher_id === $period['teacher_id']
@@ -351,46 +364,74 @@ class TeacherScheduleGenerationService
      * ここでは slot_minutes は使いません。
      * teacher_schedules は「09:00～13:00」のような時間帯を保存する場所だからです。
      */
-    private function buildPeriods(Carbon $date, ShiftPattern $pattern): array
-    {
-        $periods = [];
-        $shiftStart = $date->copy()->setTimeFromTimeString($pattern->start_time);
-        $shiftEnd = $date->copy()->addDays((int) $pattern->end_day_offset)->setTimeFromTimeString($pattern->end_time);
-        $weekday = $date->dayOfWeek;
-        $breaks = $pattern->breaks
-            ->filter(fn ($break) => is_null($break->weekday) || (int) $break->weekday === $weekday)
-            ->sortBy('start_time')
-            ->values();
+        private function buildPeriods(Carbon $date, ShiftPattern $pattern): array
+        {
+            $periods = [];
+            $shiftStart = $date->copy()->setTimeFromTimeString($pattern->start_time);
 
-        $cursor = $shiftStart->copy();
+            // ------------------------------------------------------------------
+            // ① シフト終了時間の処理（24:00 / 00:00 対応）
+            // ------------------------------------------------------------------
+            $shiftEnd = $date->copy()->addDays((int) $pattern->end_day_offset);
 
-        // 休憩時間のところを勤務可能時間から切り取ります。
-        foreach ($breaks as $break) {
-            $breakStart = $date->copy()->setTimeFromTimeString($break->start_time);
-            $breakEnd = $date->copy()->setTimeFromTimeString($break->end_time);
-
-            if ($breakEnd->lte($shiftStart) || $breakStart->gte($shiftEnd)) {
-                continue;
+            if (str_starts_with($pattern->end_time, '24:00') || str_starts_with($pattern->end_time, '00:00')) {
+                // "24:00" または "00:00" の場合は「翌日の00:00」として扱う
+                $shiftEnd->addDay()->setTime(0, 0, 0);
+            } else {
+                $shiftEnd->setTimeFromTimeString($pattern->end_time);
+                // 終了時間が開始時間より前なら、日またぎ（夜勤等）とみなす
+                if ($shiftEnd->lte($shiftStart)) {
+                    $shiftEnd->addDay();
+                }
             }
 
-            $breakStart = $breakStart->lt($shiftStart) ? $shiftStart->copy() : $breakStart;
-            $breakEnd = $breakEnd->gt($shiftEnd) ? $shiftEnd->copy() : $breakEnd;
+            $weekday = $date->dayOfWeek;
+            $breaks = $pattern->breaks
+                ->filter(fn ($break) => is_null($break->weekday) || (int) $break->weekday === $weekday)
+                ->sortBy('start_time')
+                ->values();
 
-            if ($cursor->lt($breakStart)) {
-                $periods[] = ['start' => $cursor->copy(), 'end' => $breakStart->copy()];
+            $cursor = $shiftStart->copy();
+
+            foreach ($breaks as $break) {
+                $breakStart = $date->copy()->setTimeFromTimeString($break->start_time);
+
+                // ------------------------------------------------------------------
+                // ② 休憩終了時間の処理（24:00 / 00:00 対応）
+                // ------------------------------------------------------------------
+                $breakEnd = $date->copy();
+
+                if (str_starts_with($break->end_time, '24:00') || str_starts_with($break->end_time, '00:00')) {
+                    $breakEnd->addDay()->setTime(0, 0, 0);
+                } else {
+                    $breakEnd->setTimeFromTimeString($break->end_time);
+                    if ($breakEnd->lte($breakStart)) {
+                        $breakEnd->addDay();
+                    }
+                }
+
+                if ($breakEnd->lte($shiftStart) || $breakStart->gte($shiftEnd)) {
+                    continue;
+                }
+
+                $breakStart = $breakStart->lt($shiftStart) ? $shiftStart->copy() : $breakStart;
+                $breakEnd = $breakEnd->gt($shiftEnd) ? $shiftEnd->copy() : $breakEnd;
+
+                if ($cursor->lt($breakStart)) {
+                    $periods[] = ['start' => $cursor->copy(), 'end' => $breakStart->copy()];
+                }
+
+                if ($cursor->lt($breakEnd)) {
+                    $cursor = $breakEnd->copy();
+                }
             }
 
-            if ($cursor->lt($breakEnd)) {
-                $cursor = $breakEnd->copy();
+            if ($cursor->lt($shiftEnd)) {
+                $periods[] = ['start' => $cursor->copy(), 'end' => $shiftEnd->copy()];
             }
+
+            return $periods;
         }
-
-        if ($cursor->lt($shiftEnd)) {
-            $periods[] = ['start' => $cursor->copy(), 'end' => $shiftEnd->copy()];
-        }
-
-        return $periods;
-    }
 
     /**
      * 同じ先生・同じ日付の勤務時間が重なった場合に1つへまとめます。

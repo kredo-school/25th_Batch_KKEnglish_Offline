@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ReservationStatusSeeder::class,
             TransactionTypeSeeder::class,
             ExceptionTypeSeeder::class,
+            StationSeeder::class,
 
             // Users
             StudentSeeder::class,
@@ -36,7 +37,9 @@ class DatabaseSeeder extends Seeder
             MaterialTeacherSeeder::class,
 
             // Schedule
+            TeacherShiftPatternAssignmentSeeder::class,
             TeacherScheduleSeeder::class,
+            ScheduleExceptionSeeder::class,
 
             // Reservation
             ReservationSeeder::class,
@@ -49,7 +52,6 @@ class DatabaseSeeder extends Seeder
             // Other
             TeacherLikeSeeder::class,
             ExpectedReservationSettingSeeder::class,
-            StationSeeder::class,
             TeacherStationAssignmentSeeder::class,
             AnnouncementSeeder::class,
         ]);
