@@ -663,8 +663,8 @@
                                         alt="Teacher"
                                         class="rounded-circle"
                                         style="
-                                            width: 36px;
-                                            height: 36px;
+                                            width: 60px;
+                                            height: 60px;
                                             object-fit: cover;
                                         "
                                     >
@@ -680,8 +680,8 @@
                                             justify-content-center
                                         "
                                         style="
-                                            width: 36px;
-                                            height: 36px;
+                                            width: 60px;
+                                            height: 60px;
                                         "
                                     >
                                         <i class="fa-solid fa-user text-secondary"></i>

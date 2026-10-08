@@ -216,8 +216,8 @@
                                             <img
                                                 src="{{ $reservation->teacher->user->profile_image_url }}"
                                                 alt="Teacher"
-                                                width="40"
-                                                height="40"
+                                                width="60"
+                                                height="60"
                                                 class="rounded-circle me-2"
                                                 style="object-fit: cover;"
                                             >
@@ -235,8 +235,8 @@
                                                     me-2
                                                 "
                                                 style="
-                                                    width: 40px;
-                                                    height: 40px;
+                                                    width: 60px;
+                                                    height: 60px;
                                                 "
                                             >
                                                 <i class="fa-solid fa-user"></i>

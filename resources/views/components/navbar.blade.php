@@ -10,7 +10,7 @@
             href="{{ $homeHref }}"
         >
             <img
-                src="{{ asset('images/kkenglish-logo.png') }}"
+                src="{{ asset('images/kkenglish-logo2.png') }}"
                 alt="KK English"
                 height="55"
             >
@@ -20,11 +20,12 @@
         {{-- ===============================
              Home
         ================================ --}}
-        <a
+       <a
             href="{{ $homeHref }}"
-            class="nav-link {{ $textClass }}"
+            class="nav-link {{ $textClass }} d-flex align-items-center gap-2 px-2 py-2"
         >
-            Home
+            <i class="fa-solid fa-house"></i>
+            <span class="fw-medium">Home</span>
         </a>
 
 
@@ -72,8 +73,8 @@
                             <img
                                 src="{{ $user->profile_image_url }}"
                                 alt="Profile Image"
-                                width="40"
-                                height="40"
+                                width="48"
+                                height="48"
                                 class="rounded-circle me-2"
                                 style="object-fit: cover;"
                             >
@@ -82,7 +83,7 @@
 
                             <i
                                 class="fa-solid fa-circle-user text-secondary me-2"
-                                style="font-size: 40px;"
+                                style="font-size: 48px;"
                             ></i>
 
                         @endif
