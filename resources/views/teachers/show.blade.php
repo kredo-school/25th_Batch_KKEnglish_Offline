@@ -96,7 +96,8 @@
                 @else
 
                     <i
-                        class="fa-solid fa-circle-user fa-5x me-4 text-secondary"
+                        class="fa-solid fa-circle-user me-4 text-secondary"
+                        style="font-size: 100px; flex-shrink: 0;"
                     ></i>
 
                 @endif

@@ -188,8 +188,8 @@
                             <img
                                 src="{{ $reservation->student->user->profile_image_url }}"
                                 alt="{{ $reservation->student->user->first_name }}"
-                                width="45"
-                                height="45"
+                                width="60"
+                                height="60"
                                 class="rounded-circle me-2"
                                 style="object-fit: cover;"
                             >
@@ -203,7 +203,7 @@
                                     me-2
                                     text-secondary
                                 "
-                                style="font-size: 45px;"
+                                style="font-size: 60px;"
                             ></i>
 
                         @endif
