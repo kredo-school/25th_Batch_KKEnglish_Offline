@@ -201,7 +201,7 @@ class ReservationSeeder extends Seeder
 
         $targetCount = 15000;
 
-        $completedPerTeacher = 30;
+        $completedPerTeacher = 50;
 
         $futurePerTeacher = 30;
 
