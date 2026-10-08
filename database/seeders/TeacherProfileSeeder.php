@@ -293,9 +293,9 @@ class TeacherProfileSeeder extends Seeder
                 'biography' => 'The final boss of Kredo IT. Bugs fear him. Students respect him. Laravel sometimes listens to him.',
                 'point_consumed' => 150,
                 'career' => 'Professional developer, instructor, team leader, and part-time therapist for stressed programmers.',
-                'graduation_school' =>'Kredo School of Coding, Coffee, and Survival',
+                'graduation_school' =>'Kredo University',
                 'certification' => 'Certified Bug Destroyer & Stack Overflow Specialist',
-                'about_me' => 'I like sushi and ramen.',
+                'about_me' => 'I like sushi.',
                 'specialty' => 'Laravel, IT, English, debugging, and finding the semicolon you forgot 3 hours ago.',
                 'rating_average' => 5.0,
             ],
@@ -585,65 +585,77 @@ class TeacherProfileSeeder extends Seeder
 
             /*
             |--------------------------------------------------------------------------
-            | Skip already registered teachers
+            | 1. Create or Update User
             |--------------------------------------------------------------------------
             */
+
             $existingUser = DB::table('users')
                 ->where('email', $teacher['email'])
                 ->first();
 
             if ($existingUser) {
-                continue;
+
+                // 既存Userを更新
+                $userId = $existingUser->id;
+
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->update([
+                        'first_name' => $teacher['first_name'],
+                        'last_name' => $teacher['last_name'],
+                        'role_id' => 2,
+                        'profile_image' => $teacher['profile_image'],
+                        'nationality' => $teacher['nationality'],
+                        'gender' => $teacher['gender'],
+                        'updated_at' => now(),
+                    ]);
+
+            } else {
+
+                // 新規Userを作成
+                $userId = DB::table('users')->insertGetId([
+                    'first_name' => $teacher['first_name'],
+                    'last_name' => $teacher['last_name'],
+                    'role_id' => 2,
+                    'email' => $teacher['email'],
+                    'phone_number' => '09' . rand(100000000, 999999999),
+                    'profile_image' => $teacher['profile_image'],
+                    'nationality' => $teacher['nationality'],
+                    'gender' => $teacher['gender'],
+                    'status' => 'active',
+                    'email_verified_at' => now(),
+                    'password' => Hash::make('password123'),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
 
             /*
             |--------------------------------------------------------------------------
-            | 1. Insert into users table
-            |--------------------------------------------------------------------------
-            */
-            $userId = DB::table('users')->insertGetId([
-                'first_name' => $teacher['first_name'],
-                'last_name' => $teacher['last_name'],
-                'role_id' => 2,
-                'email' => $teacher['email'],
-                'phone_number' => '09' . rand(100000000, 999999999),
-                'profile_image' => $teacher['profile_image'],
-                'nationality' => $teacher['nationality'],
-                'gender' => $teacher['gender'],
-                'status' => 'active',
-                'email_verified_at' => now(),
-                'password' => Hash::make('password123'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            /*
-            |--------------------------------------------------------------------------
-            | 2. Insert into teachers table
-            |--------------------------------------------------------------------------
-            */
-            DB::table('teachers')->insert([
-                'user_id' => (string) $userId,
-                'biography' => $teacher['biography'],
-                'point_consumed' => $teacher['point_consumed'],
-                'career' => $teacher['career'],
-                'graduation_school' => $teacher['graduation_school'],
-                'certification' => $teacher['certification'],
-                'about_me' => $teacher['about_me'],
-                'specialty' => $teacher['specialty'],
-                'rating_average' => $teacher['rating_average'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            /*
-            |--------------------------------------------------------------------------
-            | Add dummy teachers until total reaches 50
+            | 2. Create or Update Teacher
             |--------------------------------------------------------------------------
             */
 
+            DB::table('teachers')->updateOrInsert(
+                [
+                    'user_id' => $userId,
+                ],
+                [
+                    'biography' => $teacher['biography'],
+                    'point_consumed' => $teacher['point_consumed'],
+                    'career' => $teacher['career'],
+                    'graduation_school' => $teacher['graduation_school'],
+                    'certification' => $teacher['certification'],
+                    'about_me' => $teacher['about_me'],
+                    'specialty' => $teacher['specialty'],
+                    'rating_average' => $teacher['rating_average'],
+                    'updated_at' => now(),
+                ]
+            );
 
-
-
+            $this->command?->info(
+                "Teacher updated: {$teacher['first_name']} {$teacher['last_name']}"
+            );
         }
     }
 }
