@@ -330,6 +330,22 @@
                 </select>
 
             </div>
+            {{-- ===============================
+                Clear All Filters
+            ================================ --}}
+            <div class="mt-4 pt-3 border-top">
+
+                <button
+                    type="button"
+                    id="clearReservationFilters"
+                    class="btn btn-outline-secondary w-100"
+                >
+                    <i class="fa-solid fa-rotate-left me-2"></i>
+                    Clear All Filters
+                </button>
+
+            </div>
+
 
         </div>
 

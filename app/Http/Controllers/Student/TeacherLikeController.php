@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Teacher;
 use App\Models\TeacherLike;
-use Illuminate\Http\RedirectResponse;
 
 class TeacherLikeController extends Controller
 {
     public function store(
         Request $request,
         Teacher $teacher
-    ): RedirectResponse {
+    ) {
 
         $student = $request->user()->student;
 
@@ -28,16 +27,35 @@ class TeacherLikeController extends Controller
             'teacher_id' => $teacher->id,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Ajaxの場合
+        |--------------------------------------------------------------------------
+        */
+        if ($request->expectsJson()) {
+
+            return response()->json([
+                'liked' => true,
+                'message' => '講師をお気に入りに追加しました。',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 通常アクセスの場合
+        |--------------------------------------------------------------------------
+        */
         return back()->with(
             'success',
             '講師をお気に入りに追加しました。'
         );
     }
 
+
     public function destroy(
         Request $request,
         Teacher $teacher
-    ): RedirectResponse {
+    ) {
 
         $student = $request->user()->student;
 
@@ -52,10 +70,27 @@ class TeacherLikeController extends Controller
             ->where('teacher_id', $teacher->id)
             ->delete();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Ajaxの場合
+        |--------------------------------------------------------------------------
+        */
+        if ($request->expectsJson()) {
+
+            return response()->json([
+                'liked' => false,
+                'message' => 'お気に入りを解除しました。',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 通常アクセスの場合
+        |--------------------------------------------------------------------------
+        */
         return back()->with(
             'success',
             'お気に入りを解除しました。'
         );
     }
-    //
 }

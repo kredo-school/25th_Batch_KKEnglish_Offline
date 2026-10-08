@@ -132,53 +132,33 @@
                                     {{ $teacher->user?->last_name ?? '' }}
                                 </h5>
 
-                                {{-- Favorite --}}
-                                @if ($favoriteTeacherIds->contains($teacher->id))
+                            {{-- Favorite --}}
+                            @php
+                                $isFavorite = $favoriteTeacherIds->contains($teacher->id);
+                            @endphp
 
-                                    {{-- Unlike --}}
-                                    <form
-                                        method="POST"
-                                        action="{{ route('students.teachers.unlike', $teacher) }}"
-                                        class="ms-2"
-                                    >
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
-                                            type="submit"
-                                            class="btn p-0 border-0 bg-transparent"
-                                            aria-label="Remove from favorites"
-                                        >
-                                            <i
-                                                class="fa-solid fa-heart text-danger"
-                                                style="font-size: 18px;"
-                                            ></i>
-                                        </button>
-                                    </form>
-
-                                @else
-
-                                    {{-- Like --}}
-                                    <form
-                                        method="POST"
-                                        action="{{ route('students.teacher.like', $teacher) }}"
-                                        class="ms-2"
-                                    >
-                                        @csrf
-
-                                        <button
-                                            type="submit"
-                                            class="btn p-0 border-0 bg-transparent"
-                                            aria-label="Add to favorites"
-                                        >
-                                            <i
-                                                class="fa-regular fa-heart text-secondary"
-                                                style="font-size: 18px;"
-                                            ></i>
-                                        </button>
-                                    </form>
-
-                                @endif
+                            <button
+                                type="button"
+                                class="btn p-0 border-0 bg-transparent teacher-like-button"
+                                data-liked="{{ $isFavorite ? '1' : '0' }}"
+                                data-like-url="{{ route('students.teacher.like', $teacher) }}"
+                                data-unlike-url="{{ route('students.teachers.unlike', $teacher) }}"
+                                aria-label="{{ $isFavorite
+                                    ? 'Remove from favorites'
+                                    : 'Add to favorites'
+                                }}"
+                            >
+                                <i
+                                    class="
+                                        teacher-like-icon
+                                        {{ $isFavorite
+                                            ? 'fa-solid fa-heart text-danger'
+                                            : 'fa-regular fa-heart text-secondary'
+                                        }}
+                                    "
+                                    style="font-size: 18px;"
+                                ></i>
+                            </button>
                             </div>
 
                             {{-- Lesson Point --}}
@@ -1631,6 +1611,263 @@
                     }
                 );
 
+            /*
+            |--------------------------------------------------------------------------
+            | Favorite
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .querySelectorAll('.teacher-like-button')
+                .forEach(function(button) {
+
+                    button.addEventListener(
+                        'click',
+                        async function() {
+
+                            const icon =
+                                button.querySelector(
+                                    '.teacher-like-icon'
+                                );
+
+                            const isLiked =
+                                button.dataset.liked === '1';
+
+                            /*
+                            * Like済みならDELETE
+                            * 未LikeならPOST
+                            */
+                            const method =
+                                isLiked
+                                    ? 'DELETE'
+                                    : 'POST';
+
+                            const url =
+                                isLiked
+                                    ? button.dataset.unlikeUrl
+                                    : button.dataset.likeUrl;
+
+                            button.disabled = true;
+
+                            try {
+
+                                const response =
+                                    await fetch(
+                                        url,
+                                        {
+                                            method: method,
+
+                                            headers: {
+                                                'Accept':
+                                                    'application/json',
+
+                                                'X-Requested-With':
+                                                    'XMLHttpRequest',
+
+                                                'X-CSRF-TOKEN':
+                                                    '{{ csrf_token() }}',
+                                            },
+                                        }
+                                    );
+
+                                if (!response.ok) {
+
+                                    throw new Error(
+                                        'Favorite update failed: ' +
+                                        response.status
+                                    );
+                                }
+
+                                const data =
+                                    await response.json();
+
+                                /*
+                                * Like
+                                */
+                                if (data.liked) {
+
+                                    button.dataset.liked = '1';
+
+                                    icon.classList.remove(
+                                        'fa-regular',
+                                        'text-secondary'
+                                    );
+
+                                    icon.classList.add(
+                                        'fa-solid',
+                                        'text-danger'
+                                    );
+
+                                    button.setAttribute(
+                                        'aria-label',
+                                        'Remove from favorites'
+                                    );
+
+                                /*
+                                * Unlike
+                                */
+                                } else {
+
+                                    button.dataset.liked = '0';
+
+                                    icon.classList.remove(
+                                        'fa-solid',
+                                        'text-danger'
+                                    );
+
+                                    icon.classList.add(
+                                        'fa-regular',
+                                        'text-secondary'
+                                    );
+
+                                    button.setAttribute(
+                                        'aria-label',
+                                        'Add to favorites'
+                                    );
+                                }
+
+                                /*
+                                * Favorite Only検索中なら
+                                * 一覧を再検索
+                                */
+                                if (
+                                    favoriteOnlyInput &&
+                                    favoriteOnlyInput.checked
+                                ) {
+
+                                    updateTeachers();
+                                }
+
+                            } catch (error) {
+
+                                console.error(
+                                    'Favorite update failed',
+                                    error
+                                );
+
+                                alert(
+                                    'Failed to update favorite.'
+                                );
+
+                            } finally {
+
+                                button.disabled = false;
+                            }
+                        }
+                    );
+                });
+            /*
+            |--------------------------------------------------------------------------
+            | Clear All Filters
+            |--------------------------------------------------------------------------
+            */
+
+            document.addEventListener(
+                'click',
+                function(event) {
+
+                    const button =
+                        event.target.closest(
+                            '#clearReservationFilters'
+                        );
+
+                    if (!button) {
+                        return;
+                    }
+
+                    console.log('Clear Filters clicked');
+
+
+                    /*
+                    * Keyword
+                    */
+                    if (keywordInput) {
+                        keywordInput.value = '';
+                    }
+
+
+                    /*
+                    * Favorite
+                    */
+                    if (favoriteOnlyInput) {
+                        favoriteOnlyInput.checked = false;
+                    }
+
+
+                    /*
+                    * Material
+                    */
+                    if (materialInput) {
+                        materialInput.value = '';
+                    }
+
+
+                    /*
+                    * Nationality
+                    */
+                    if (nationalityInput) {
+                        nationalityInput.value = '';
+                    }
+
+
+                    /*
+                    * Coins
+                    */
+                    if (
+                        pointRangeSlider &&
+                        pointRangeSlider.noUiSlider
+                    ) {
+
+                        pointRangeSlider
+                            .noUiSlider
+                            .set([
+                                50,
+                                150
+                            ]);
+                    }
+
+
+                    /*
+                    * Rating
+                    */
+                    if (minRatingInput) {
+                        minRatingInput.value = '';
+                    }
+
+                    updateRatingDisplay('');
+
+
+                    /*
+                    * Date
+                    */
+                    if (dateInput) {
+                        dateInput.value = '';
+                    }
+
+
+                    /*
+                    * Hour
+                    */
+                    if (hourInput) {
+                        hourInput.value = '';
+                    }
+
+
+                    /*
+                    * Minute
+                    */
+                    if (minuteInput) {
+                        minuteInput.value = '';
+                    }
+
+
+                    /*
+                    * Teacher一覧を再検索
+                    */
+                    updateTeachers();
+
+                }
+            );
 
                 /*
                 |--------------------------------------------------------------------------
