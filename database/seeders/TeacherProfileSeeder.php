@@ -579,6 +579,63 @@ class TeacherProfileSeeder extends Seeder
             ],
 
 
+            [
+                'first_name' => 'Joevert',
+                'last_name' => 'Kredo',
+
+                'email' => 'joevert.kredo@example.com',
+
+                'gender' => 'Male',
+                'nationality' => 'Philippines',
+
+                'profile_image' => 'images/Joevert.png',
+
+                'biography' => 'A legendary instructor whose existence is whispered about in the darkest corners of Kredo. Some say he can debug an entire Laravel project without opening VS Code. Others claim he once fixed a production server simply by looking at it. No one knows his true level. His appearance is considered an extremely rare event.',
+
+                'point_consumed' => 150,
+
+                'career' => 'Legendary Code Master, Secret Guardian of Kredo, Former Final Boss Trainer, and the Man Who Debugged the Impossible.',
+
+                'graduation_school' => 'The Ancient Academy of Forbidden Programming Arts',
+
+                'certification' => 'SSS-Rank Developer, Grandmaster of Laravel, Certified Bug Exorcist, Legendary System Architect',
+
+                'about_me' => 'You did not find me. I allowed you to find me. I do not teach ordinary lessons. I reveal the secrets of programming to those who are worthy. Even ChatGPT asks me for advice sometimes. If your code works on the first try, perhaps you have already received my blessing.',
+
+                'specialty' => 'Forbidden Laravel Techniques, Legendary Debugging, Database Resurrection, AI Whispering, Defeating Final Bosses, Unlocking Hidden Developer Potential',
+
+                'rating_average' => 5.00,
+            ],
+
+            [
+                'first_name' => 'Kurt',
+                'last_name' => 'John',
+
+                'email' => 'kurt.john@example.com',
+
+                'gender' => 'Male',
+                'nationality' => 'Philippines',
+
+                'profile_image' => 'images/Kurt2.png',
+
+                'biography' => 'Before Stack Overflow, before GitHub, and before the first computer, there was Magnus. Legend says he wrote the first line of code in human history and accidentally created the first bug. He has spent centuries correcting that mistake. Even the most powerful developers tremble when he says, "Let me review your code."',
+
+                'point_consumed' => 150,
+
+                'career' => 'Creator of the First Bug, Ancient Guardian of Source Code, Supreme Architect of the Digital Universe, and Mentor of Legendary Masters.',
+
+                'graduation_school' => 'The Kredo University That Existed Before the Internet',
+
+                'certification' => 'EX-Rank Developer, Master of All Programming Languages, Certified Reality Debugger, Supreme Database Guardian',
+
+                'about_me' => 'I was coding before electricity was invented. I do not use Stack Overflow. Stack Overflow uses me. When my code fails, the universe apologizes. Joevert was once my student, but he still has much to learn.',
+
+                'specialty' => 'Creation of Programming Languages, Reality Debugging, Ancient Laravel Secrets, Database Time Travel, Defeating Legendary Developers, Fixing Bugs Before They Exist',
+
+                'rating_average' => 5.00,
+            ],
+
+
         ];
 
         foreach ($teachers as $teacher) {
