@@ -38,6 +38,7 @@ use App\Http\Controllers\Admin\StationController;
 use App\Http\Controllers\Admin\LessonStationOverrideController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Student\LearningProgressController;
+use App\Http\Controllers\Admin\TeacherBookingListController;
 
 
 // Public routes
@@ -209,6 +210,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admins')->name('admin.')->gro
     // Schedule Management
     Route::get('/schedules', [DashboardController::class, 'schedulesIndex'])->name('schedules.index');
     Route::get('/schedules/details', [DashboardController::class, 'details'])->name('schedules.index_details');
+
+    Route::get('/teacher-booking-list',[TeacherBookingListController::class, 'index'])->name('teacher-booking-list.index');
 
     Route::get('/operational-status/matrix', [ScheduleMatrixController::class, 'index'])->name('operational-status.matrix');
     Route::get('/operational-status/matrix/details', [ScheduleMatrixController::class, 'details'])->name('operational-status.matrix_details');

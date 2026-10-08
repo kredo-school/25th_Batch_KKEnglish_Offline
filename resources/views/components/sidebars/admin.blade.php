@@ -59,6 +59,12 @@
                 Today's schedule
             </a>
 
+            <a href="{{ route('admin.teacher-booking-list.index', ['menu' => 'schedule'])  }}"
+                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teacher-booking-list.*') ? 'active' : '' }}">
+                {{-- <i class="fa-solid fa-list-check me-2"></i> --}}
+                Teacher Booking List
+            </a>
+
             <hr>
 
             {{-- シフト作成 --}}

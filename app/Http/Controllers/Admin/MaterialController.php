@@ -95,14 +95,33 @@ class MaterialController extends Controller
 
     public function destroy(Material $material): RedirectResponse
     {
-        // 画像があれば先に削除
-        if (!empty($material->cover_image) && Storage::disk('public')->exists($material->cover_image)) {
+        $hasReservations = \App\Models\Reservation::query()
+            ->where('material_id', $material->material_id)
+            ->exists();
+
+        if ($hasReservations) {
+            return redirect()
+                ->route('admin.materials.edit', $material)
+                ->with(
+                    'delete_error',
+                    'This material cannot be deleted because it is being used for a lesson.'
+                );
+        }
+
+        if (
+            !empty($material->cover_image)
+            && Storage::disk('public')->exists($material->cover_image)
+        ) {
             Storage::disk('public')->delete($material->cover_image);
         }
 
         $material->delete();
 
-        return redirect()->route('admin.materials.index')
-            ->with('success', 'Successfully deleted the material.');
+        return redirect()
+            ->route('admin.materials.index')
+            ->with(
+                'success',
+                'Successfully deleted the material.'
+            );
     }
 }

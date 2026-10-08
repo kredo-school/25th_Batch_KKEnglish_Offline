@@ -470,11 +470,14 @@ class ReservationSeeder extends Seeder
             | このTeacherの未来枠だけ取得
             |--------------------------------------------------------------------------
             */
+            $futureLimit = now()->copy()->addDays(14);
+
             $teacherFutureSlots = $slots
-                ->filter(function ($slot) use ($teacherId) {
+                ->filter(function ($slot) use ($teacherId, $futureLimit) {
                     return
                         $slot['schedule']->teacher_id == $teacherId
-                        && $slot['start_at']->isFuture(); // ★ 未来の枠に絞り込み
+                        && $slot['start_at']->isFuture()
+                        && $slot['start_at']->lte($futureLimit);
                 })
                 ->shuffle();
 

@@ -129,26 +129,56 @@ class ShiftPatternAssignmentController extends Controller
                 // 1) assignment保存だけをトランザクションで確定
                 DB::transaction(function () use ($data, $teacherIds, $weekdays, $newStart, $newEnd, $priority, $createdBy, &$insertedIds) {
 
-                // 【重要】設定日以降の「未予約の古いスケジュール」を事前に削除する
-                $query = TeacherSchedule::whereIn('teacher_id', $teacherIds)
+                // ------------------------------------------------------
+                // 設定日以降の「未予約の古いスケジュール」を削除する
+                // ------------------------------------------------------
+                $query = TeacherSchedule::query()
+                    ->whereIn('teacher_id', $teacherIds)
                     ->where('available_date', '>=', $newStart)
-                    ->whereIn('status', ['confirmed', 'draft']); // ★未予約の confirmed と draft の両方を対象にする
+                    ->whereIn('status', ['confirmed', 'draft']);
+
+                // end_date がある場合は、その期間内だけ対象
                 if ($newEnd) {
                     $query->where('available_date', '<=', $newEnd);
                 }
 
-                // MySQLの場合 DAYOFWEEK は 1(Sun)~7(Sat) なので -1 して 0~6 に合わせる
-                $query->whereIn(DB::raw('DAYOFWEEK(available_date) - 1'), $weekdays);
-                // 削除対象のID配列を取得
-                $scheduleIdsToDelete = $query->pluck('schedule_id');
+                // 指定された曜日だけ対象
+                // MySQL: DAYOFWEEK() は 1=Sun ～ 7=Sat
+                // システム側は 0=Sun ～ 6=Sat
+                $query->whereIn(
+                    DB::raw('DAYOFWEEK(available_date) - 1'),
+                    $weekdays->all()
+                );
 
-                if ($scheduleIdsToDelete->isNotEmpty()) {
-                    // 【修正】例外(休講)データは消さず、紐づけ(schedule_id)のみを外して残す
-                    \App\Models\ScheduleException::whereIn('schedule_id', $scheduleIdsToDelete)
-                        ->update(['schedule_id' => null]);
+                // ------------------------------------------------------
+                // ★重要
+                // 予約が1件も入っていないScheduleだけ削除対象にする
+                // ------------------------------------------------------
+                $query->whereDoesntHave('reservations');
 
-                    // その後、古いスケジュール枠のみを削除
-                    TeacherSchedule::whereIn('schedule_id', $scheduleIdsToDelete)->delete();
+                $schedulesToDelete = $query->get();
+
+                if ($schedulesToDelete->isNotEmpty()) {
+
+                    $scheduleIdsToDelete = $schedulesToDelete
+                        ->pluck('schedule_id')
+                        ->filter()
+                        ->values();
+
+                    // ScheduleExceptionは履歴として残す。
+                    // ただし削除するScheduleとの紐付けだけ外す。
+                    ScheduleException::whereIn(
+                        'schedule_id',
+                        $scheduleIdsToDelete
+                    )->update([
+                        'schedule_id' => null,
+                    ]);
+
+                    // 予約のないScheduleだけ削除する
+                    TeacherSchedule::whereIn(
+                        'schedule_id',
+                        $scheduleIdsToDelete
+                    )->delete();
                 }
 
                 // Assignmentsの保存と更新
@@ -291,10 +321,17 @@ class ShiftPatternAssignmentController extends Controller
             TeacherShiftPatternAssignment::where('teacher_id', $teacher->id)->delete();
 
             // 削除対象の「未来（今日以降）の未予約スケジュール」のIDを取得
-            $scheduleIdsToDelete = TeacherSchedule::where('teacher_id', $teacher->id)
-                ->where('available_date', '>=', now()->toDateString()) // 過去は残す
-                ->where('status', 'confirmed') // 未予約のみ
-                ->pluck('schedule_id'); // 主キーを取得
+            $schedules = TeacherSchedule::query()
+                ->where('teacher_id', $teacher->id)
+                ->where('available_date', '>=', now()->toDateString())
+                ->where('status', 'confirmed')
+                ->whereDoesntHave('reservations')
+                ->get();
+
+            $scheduleIdsToDelete = $schedules
+                ->pluck('schedule_id')
+                ->filter()
+                ->values();
 
             if ($scheduleIdsToDelete->isNotEmpty()) {
                 // 例外(休講)データは消さず、紐づけ(schedule_id)のみを外して残す
