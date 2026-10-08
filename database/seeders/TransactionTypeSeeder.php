@@ -15,8 +15,8 @@ class TransactionTypeSeeder extends Seeder
                 'type_code' => 'reservation_use',
             ],
             [
-                'type_name' => '予約ポイント消費',
-                'description' => 'レッスン予約時のポイント消費',
+                'type_name' => 'Use Reservation Points',
+                'description' => 'Lesson Reservation Points Consumption',
             ]
         );
 
@@ -26,8 +26,8 @@ class TransactionTypeSeeder extends Seeder
                 'type_code' => 'reservation_refund',
             ],
             [
-                'type_name' => '予約ポイント返還',
-                'description' => '予約キャンセル時のポイント返還',
+                'type_name' => 'Refund Reservation Points',
+                'description' => 'Reservation Points Refund (e.g., when a lesson is canceled)',
             ]
         );
 

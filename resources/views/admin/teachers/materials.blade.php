@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Save</button>
+        <button type="submit" class="btn btn-primary mt-3"><i class="fas fa-save"></i> Save</button>
     </form>
     <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-secondary btn-sm my-3">Cancel</a>
 </div>

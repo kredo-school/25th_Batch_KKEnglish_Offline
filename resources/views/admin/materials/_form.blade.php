@@ -26,7 +26,6 @@
                                 height="90"
                                 class="rounded me-3"
                                 style="object-fit: cover;">
-                        </a>
         </div>
     @endif
 </div>
