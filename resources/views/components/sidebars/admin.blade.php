@@ -15,6 +15,7 @@
         && (
             request('menu') === 'schedule'
             || request()->routeIs('admin.schedules.*')
+            || request()->routeIs('admin.teacher-booking-list.*')
             || request()->routeIs('admin.shift-patterns.*')
             || request()->routeIs('admin.shift-pattern-assignments.*')
         );
