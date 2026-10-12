@@ -12,202 +12,99 @@ use RuntimeException;
 
 class TeacherScheduleSeeder extends Seeder
 {
+    private const START_DATE = '2026-09-25';
+    private const END_DATE = '2026-11-14';
+    private const PRESENTATION_DATE = '2026-10-14';
+
     public function run(): void
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Admin
-        |--------------------------------------------------------------------------
-        */
-
         $adminUser = User::query()
-            ->whereHas('role', function ($query) {
-                $query->where('role_code', 'admin');
-            })
+            ->whereHas('role', fn ($query) => $query->where('role_code', 'admin'))
             ->first();
 
-        if (!$adminUser) {
-            throw new RuntimeException(
-                '先に管理者ユーザーを作成してください。'
-            );
+        if (! $adminUser) {
+            throw new RuntimeException('先に管理者ユーザーを作成してください。');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Teachers
-        |--------------------------------------------------------------------------
-        |
-        | 先頭30人のTeacherを取得
-        |
-        */
-
         $teachers = Teacher::query()
+            ->with('user')
             ->orderBy('id')
             ->limit(30)
             ->get();
 
         if ($teachers->count() < 30) {
-            throw new RuntimeException(
-                "Teacherが30人必要です。現在: {$teachers->count()}人"
-            );
+            throw new RuntimeException("Teacherが30人必要です。現在: {$teachers->count()}人");
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Shift Patterns
-        |--------------------------------------------------------------------------
-        |
-        | Pattern 1～3を使用
-        |
-        */
+        $kirby = Teacher::query()
+            ->whereHas('user', fn ($query) => $query
+                ->where('first_name', 'Kirby')
+                ->where('last_name', 'Kredo'))
+            ->first();
+
+        if (! $kirby) {
+            throw new RuntimeException('デモ用講師 Kirby Kredo が見つかりません。');
+        }
+
+        if (! $teachers->contains('id', $kirby->id)) {
+            throw new RuntimeException('Kirby Kredo が最初の30人のTeacherに含まれていません。');
+        }
 
         $patterns = ShiftPattern::query()
             ->whereIn('id', [1, 2, 3])
             ->orderBy('id')
             ->get();
 
-        if ($patterns->count() < 3) {
-            throw new RuntimeException(
-                'ShiftPattern ID 1～3を先に作成してください。'
-            );
+        if ($patterns->count() !== 3) {
+            throw new RuntimeException('ShiftPattern ID 1～3を先に作成してください。');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Schedule Period
-        |--------------------------------------------------------------------------
-        |
-        | 2026-09-25 ～ 2026-10-31
-        |
-        */
-
-        $startDate = Carbon::create(
-            2026,
-            9,
-            25
-        )->startOfDay();
-
-        $endDate = Carbon::create(
-            2026,
-            10,
-            31
-        )->startOfDay();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Teacher Schedules
-        |--------------------------------------------------------------------------
-        |
-        | Teacherごとに勤務シフトを固定
-        |
-        | 1人目  → Pattern 1
-        | 2人目  → Pattern 2
-        | 3人目  → Pattern 3
-        | 4人目  → Pattern 1
-        | ...
-        | 30人目 → Pattern 3
-        |
-        | 30人なので
-        |
-        | Pattern 1 → 10人
-        | Pattern 2 → 10人
-        | Pattern 3 → 10人
-        |
-        */
+        $startDate = Carbon::parse(self::START_DATE)->startOfDay();
+        $endDate = Carbon::parse(self::END_DATE)->startOfDay();
+        $createdOrUpdated = 0;
 
         foreach ($teachers as $index => $teacher) {
+            // 30 teachers / 3 patterns = 10 teachers per pattern.
+            $pattern = $patterns[$index % $patterns->count()];
 
-            /*
-            |--------------------------------------------------------------------------
-            | Fixed Shift Pattern
-            |--------------------------------------------------------------------------
-            |
-            | $index
-            | 0 → Pattern 1
-            | 1 → Pattern 2
-            | 2 → Pattern 3
-            | 3 → Pattern 1
-            | ...
-            |
-            */
-
-            $patternIndex =
-                $index % $patterns->count();
-
-            $pattern =
-                $patterns[$patternIndex];
-
-            /*
-            |--------------------------------------------------------------------------
-            | Date
-            |--------------------------------------------------------------------------
-            */
-
-            $date = $startDate->copy();
-
-            while ($date->lte($endDate)) {
-
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
                 TeacherSchedule::updateOrCreate(
                     [
-                        'teacher_id' =>
-                            $teacher->id,
-
-                        'available_date' =>
-                            $date->toDateString(),
+                        'teacher_id' => $teacher->id,
+                        'available_date' => $date->toDateString(),
                     ],
                     [
-                        'shift_pattern_id' =>
-                            $pattern->id,
-
-                        'start_time' =>
-                            $pattern->start_time,
-
-                        'end_time' =>
-                            $pattern->end_time,
-
-                        'status' =>
-                            'confirmed',
-
-                        'created_by' =>
-                            $adminUser->id,
-
-                        'confirmed_by' =>
-                            $adminUser->id,
-
-                        'confirmed_at' =>
-                            now(),
-
-                        'cancelled_by' =>
-                            null,
-
-                        'cancelled_at' =>
-                            null,
+                        'shift_pattern_id' => $pattern->id,
+                        'start_time' => $pattern->start_time,
+                        'end_time' => $pattern->end_time,
+                        'status' => 'confirmed',
+                        'created_by' => $adminUser->id,
+                        'confirmed_by' => $adminUser->id,
+                        'confirmed_at' => now(),
+                        'cancelled_by' => null,
+                        'cancelled_at' => null,
                     ]
                 );
-
-                $date->addDay();
+                $createdOrUpdated++;
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Result
-            |--------------------------------------------------------------------------
-            */
-
             $this->command?->info(
-                "Teacher {$teacher->id}: "
-                . "Shift Pattern {$pattern->id}"
+                "Teacher {$teacher->id}: Shift Pattern {$pattern->id}"
             );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Final Result
-        |--------------------------------------------------------------------------
-        */
+        $kirbyPresentationSchedule = TeacherSchedule::query()
+            ->where('teacher_id', $kirby->id)
+            ->whereDate('available_date', self::PRESENTATION_DATE)
+            ->where('status', 'confirmed')
+            ->first();
 
-        $this->command?->info(
-            'Teacher schedules created for 30 teachers.'
-        );
+        if (! $kirbyPresentationSchedule) {
+            throw new RuntimeException('Kirby Kredo の発表当日の勤務スケジュールが生成されませんでした。');
+        }
+
+        $this->command?->info("Teacher schedules created/updated: {$createdOrUpdated}");
+        $this->command?->info('Kirby Kredo: confirmed schedule exists on ' . self::PRESENTATION_DATE);
+        $this->command?->warn('予約枠の確保はReservationSeeder側で実施してください。');
     }
 }

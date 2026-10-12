@@ -18,12 +18,12 @@ class AnnouncementSeeder extends Seeder
             */
 
             [
-                'title' => '⚠️ Haze Emergency Advisory',
+                'title' => '🔴 ⚠️ Haze Emergency Advisory',
                 'target' => 'all',
                 'content' =>
                     'Due to heavy haze and poor air quality, please limit outdoor activities and wear a mask when going outside. Please stay updated with local health and safety advisories.',
+                'created_at' => '2026-10-14 08:00:00',
             ],
-
 
             /*
             |--------------------------------------------------------------------------
@@ -52,7 +52,6 @@ class AnnouncementSeeder extends Seeder
                     'New English learning materials have been added. Please check them before your next lesson.',
             ],
 
-
             /*
             |--------------------------------------------------------------------------
             | Students
@@ -79,7 +78,6 @@ class AnnouncementSeeder extends Seeder
                 'content' =>
                     'Please check your current point balance before booking your next lesson.',
             ],
-
 
             /*
             |--------------------------------------------------------------------------
@@ -109,9 +107,15 @@ class AnnouncementSeeder extends Seeder
             ],
         ];
 
+        /*
+        |--------------------------------------------------------------------------
+        | Create or Update Announcements
+        |--------------------------------------------------------------------------
+        */
+
         foreach ($announcements as $announcement) {
 
-            Announcement::updateOrCreate(
+            $record = Announcement::updateOrCreate(
                 [
                     'title' => $announcement['title'],
                     'target' => $announcement['target'],
@@ -120,10 +124,23 @@ class AnnouncementSeeder extends Seeder
                     'content' => $announcement['content'],
                 ]
             );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Set date only for Haze Emergency Advisory
+            |--------------------------------------------------------------------------
+            */
+
+            if (isset($announcement['created_at'])) {
+
+                $record->created_at = $announcement['created_at'];
+
+                $record->saveQuietly();
+            }
         }
 
         $this->command?->info(
-            'Announcements created: '
+            'Announcements created or updated: '
             . count($announcements)
         );
     }
