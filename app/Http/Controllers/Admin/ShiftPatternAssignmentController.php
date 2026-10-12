@@ -314,204 +314,305 @@ class ShiftPatternAssignmentController extends Controller
         }
     }
 
-    public function destroyByTeacher(Teacher $teacher): RedirectResponse
-    {
-        DB::transaction(function () use ($teacher) {
-            // アサインメントの削除
-            TeacherShiftPatternAssignment::where('teacher_id', $teacher->id)->delete();
 
-            // 削除対象の「未来（今日以降）の未予約スケジュール」のIDを取得
-            $schedules = TeacherSchedule::query()
-                ->where('teacher_id', $teacher->id)
-                ->where('available_date', '>=', now()->toDateString())
-                ->where('status', 'confirmed')
-                ->whereDoesntHave('reservations')
-                ->get();
+public function destroyByTeacher(
+        Teacher $teacher,
+        Request $request
+    ): RedirectResponse {
+        // 1. 削除開始日を検証
+        $data = $request->validate([
+            'delete_from_date' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+            ],
+        ]);
 
-            $scheduleIdsToDelete = $schedules
-                ->pluck('schedule_id')
-                ->filter()
-                ->values();
+        $deleteFromDate = Carbon::parse(
+            $data['delete_from_date']
+        )->toDateString();
 
-            if ($scheduleIdsToDelete->isNotEmpty()) {
-                // 例外(休講)データは消さず、紐づけ(schedule_id)のみを外して残す
-                \App\Models\ScheduleException::whereIn('schedule_id', $scheduleIdsToDelete)->update(['schedule_id' => null]);
+        $dayBeforeDelete = Carbon::parse($deleteFromDate)
+            ->subDay()
+            ->toDateString();
 
-                // その後、スケジュール本体を削除
-                TeacherSchedule::whereIn('schedule_id', $scheduleIdsToDelete)->delete();
-            }
-        });
-        return redirect()
-            ->route('admin.shift-pattern-assignments.index', ['menu' => 'schedule'])
-            ->with('status', "Teacher #{$teacher->id} の割り当てと、未来の未予約シフトを一括削除しました。（休講記録は保持されます）");
-    }
+        $deletedScheduleCount = 0;
+        $deletedAssignmentCount = 0;
+        $updatedAssignmentCount = 0;
 
-/**
- * Bulk Editで選択した曜日の未来の未予約Shiftを削除
- *
- * - 選択した曜日だけ対象
- * - 今日以降だけ対象
- * - confirmed / draft の両方を対象
- * - 予約があるScheduleは削除しない
- * - 過去のAssignmentは履歴として残す
- * - 未来のAssignmentは終了させる
- */
-public function bulkDestroy(
-    Teacher $teacher,
-    Request $request
-): RedirectResponse {
-    $data = $request->validate([
-        'weekdays' => ['required', 'array', 'min:1'],
-        'weekdays.*' => ['integer', 'between:0,6'],
-    ]);
-
-    $weekdays = collect($data['weekdays'])
-        ->map(fn ($value) => (int) $value)
-        ->unique()
-        ->values();
-
-    $today = now()->toDateString();
-    $yesterday = now()->subDay()->toDateString();
-
-    $deletedScheduleCount = 0;
-    $deletedAssignmentCount = 0;
-    $updatedAssignmentCount = 0;
-
-    try {
-        DB::transaction(function () use (
-            $teacher,
-            $weekdays,
-            $today,
-            $yesterday,
-            &$deletedScheduleCount,
-            &$deletedAssignmentCount,
-            &$updatedAssignmentCount
-        ) {
-
-            /*
-             * ----------------------------------------------------------
-             * 1. 今日以降の未予約Scheduleを取得
-             * ----------------------------------------------------------
-             *
-             * confirmed と draft の両方を対象にする。
-             */
-            $schedules = TeacherSchedule::query()
-                ->where('teacher_id', $teacher->id)
-                ->whereDate('available_date', '>=', $today)
-                ->whereIn('status', ['confirmed', 'draft'])
-                ->whereIn(
-                    DB::raw('DAYOFWEEK(available_date) - 1'),
-                    $weekdays->all()
-                )
-                ->whereDoesntHave('reservations')
-                ->get();
-
-            /*
-             * ----------------------------------------------------------
-             * 2. Scheduleを削除
-             * ----------------------------------------------------------
-             */
-            if ($schedules->isNotEmpty()) {
-
-                $scheduleIds = $schedules->pluck('schedule_id');
+        try {
+            DB::transaction(function () use (
+                $teacher,
+                $deleteFromDate,
+                $dayBeforeDelete,
+                &$deletedScheduleCount,
+                &$deletedAssignmentCount,
+                &$updatedAssignmentCount
+            ) {
+                /*
+                * 2. 指定日以降の未予約Scheduleを取得
+                *    全曜日が対象
+                */
+                $schedules = TeacherSchedule::query()
+                    ->where('teacher_id', $teacher->id)
+                    ->whereDate('available_date', '>=', $deleteFromDate)
+                    ->whereIn('status', ['confirmed', 'draft'])
+                    ->whereDoesntHave('reservations')
+                    ->get();
 
                 /*
-                 * ScheduleExceptionは履歴として残す。
-                 * ただし削除するScheduleとの紐付けだけ外す。
-                 */
-                ScheduleException::whereIn('schedule_id', $scheduleIds)
-                    ->update([
+                * 3. Scheduleを削除
+                *    ScheduleExceptionの履歴は残す
+                */
+                if ($schedules->isNotEmpty()) {
+                    $scheduleIds = $schedules
+                        ->pluck('schedule_id')
+                        ->filter()
+                        ->unique()
+                        ->values();
+
+                    ScheduleException::whereIn(
+                        'schedule_id',
+                        $scheduleIds
+                    )->update([
                         'schedule_id' => null,
                     ]);
 
-                $deletedScheduleCount = TeacherSchedule::query()
-                    ->whereIn('schedule_id', $scheduleIds)
-                    ->delete();
-            }
-
-            /*
-             * ----------------------------------------------------------
-             * 3. 選択された曜日のAssignmentを停止
-             * ----------------------------------------------------------
-             *
-             * 未来から始まるAssignment
-             * → Assignment自体を削除
-             *
-             * 過去から継続しているAssignment
-             * → 昨日までに終了させる
-             *
-             * こうすることで過去の履歴は残しつつ、
-             * 今後の自動Schedule生成を止める。
-             */
-            $assignments = TeacherShiftPatternAssignment::query()
-                ->where('teacher_id', $teacher->id)
-                ->whereIn('weekday', $weekdays->all())
-                ->where(function ($query) use ($today) {
-                    $query
-                        ->whereNull('end_date')
-                        ->orWhereDate('end_date', '>=', $today);
-                })
-                ->lockForUpdate()
-                ->get();
-
-            foreach ($assignments as $assignment) {
+                    $deletedScheduleCount = TeacherSchedule::query()
+                        ->whereIn('schedule_id', $scheduleIds)
+                        ->delete();
+                }
 
                 /*
-                 * Assignmentが今日より前から始まっている場合
-                 * → 昨日で終了させる
-                 */
-                if ($assignment->start_date < $today) {
+                * 4. 指定日以降も有効なAssignmentを取得
+                */
+                $assignments = TeacherShiftPatternAssignment::query()
+                    ->where('teacher_id', $teacher->id)
+                    ->where(function ($query) use ($deleteFromDate) {
+                        $query
+                            ->whereNull('end_date')
+                            ->orWhereDate(
+                                'end_date',
+                                '>=',
+                                $deleteFromDate
+                            );
+                    })
+                    ->lockForUpdate()
+                    ->get();
 
-                    $assignment->end_date = $yesterday;
-                    $assignment->save();
+                /*
+                * 5. Assignmentを終了または削除
+                */
+                foreach ($assignments as $assignment) {
+                    if ($assignment->start_date < $deleteFromDate) {
+                        // 指定日より前の履歴は残す
+                        $assignment->end_date = $dayBeforeDelete;
+                        $assignment->save();
 
-                    $updatedAssignmentCount++;
+                        $updatedAssignmentCount++;
+                    } else {
+                        // 指定日以降に始まるAssignmentは削除
+                        $assignment->delete();
 
-                } else {
-
-                    /*
-                     * 今日以降から始まるAssignmentなら
-                     * 完全に未来側なので削除する。
-                     */
-                    $assignment->delete();
-
-                    $deletedAssignmentCount++;
+                        $deletedAssignmentCount++;
+                    }
                 }
-            }
-        });
+            });
 
-        return redirect()
-            ->route(
-                'admin.shift-pattern-assignments.index',
-                $teacher
-            )
-            ->with(
-                'status',
-                "Successfully deleted the day shifts selected."
-                . " Schedule {$deletedScheduleCount} deleted, "
-                . " Assignment {$deletedAssignmentCount} deleted, "
-                . " {$updatedAssignmentCount} Assignments ended."
+            return redirect()
+                ->route(
+                    'admin.shift-pattern-assignments.index',
+                    ['menu' => 'schedule']
+                )
+                ->with(
+                    'status',
+                    "All shift deletion completed from {$deleteFromDate}. "
+                    . "Schedules deleted: {$deletedScheduleCount}. "
+                    . "Assignments deleted: {$deletedAssignmentCount}. "
+                    . "Assignments ended: {$updatedAssignmentCount}."
+                );
+
+        } catch (\Throwable $e) {
+            Log::error(
+                'ShiftPatternAssignment Destroy By Teacher Error.',
+                [
+                    'teacher_id' => $teacher->id,
+                    'delete_from_date' => $deleteFromDate,
+                    'error' => $e->getMessage(),
+                ]
             );
 
-    } catch (\Throwable $e) {
-
-        Log::error(
-            'ShiftPatternAssignment Bulk Destroy Error.',
-            [
-                'teacher_id' => $teacher->id,
-                'weekdays' => $weekdays->all(),
-                'error' => $e->getMessage(),
-            ]
-        );
-
-        return back()
-            ->withInput()
-            ->withErrors([
-                'error' => 'An error occurred while deleting the shifts: '
-                    . $e->getMessage(),
-            ]);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => 'An error occurred while deleting all shifts: '
+                        . $e->getMessage(),
+                ]);
+        }
     }
-}
+
+
+
+/**
+ * Bulk Editで選択した曜日の指定日以降の未予約Shiftを削除
+ *
+ * - 指定日以降の選択曜日だけを対象
+ * - 予約があるScheduleは削除しない
+ * - 過去のScheduleは削除しない
+ * - 過去から続くAssignmentは指定日の前日で終了
+ * - 指定日以降に開始するAssignmentは削除
+ */
+public function bulkDestroy(
+        Teacher $teacher,
+        Request $request
+    ): RedirectResponse {
+        $data = $request->validate([
+            'weekdays' => ['required', 'array', 'min:1'],
+            'weekdays.*' => ['integer', 'between:0,6'],
+            'delete_from_date' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+            ],
+        ]);
+
+        $weekdays = collect($data['weekdays'])
+            ->map(fn ($value) => (int) $value)
+            ->unique()
+            ->values();
+
+        $deleteFromDate = Carbon::parse(
+            $data['delete_from_date']
+        )->toDateString();
+
+        $dayBeforeDelete = Carbon::parse($deleteFromDate)
+            ->subDay()
+            ->toDateString();
+
+        $deletedScheduleCount = 0;
+        $deletedAssignmentCount = 0;
+        $updatedAssignmentCount = 0;
+
+        try {
+            DB::transaction(function () use (
+                $teacher,
+                $weekdays,
+                $deleteFromDate,
+                $dayBeforeDelete,
+                &$deletedScheduleCount,
+                &$deletedAssignmentCount,
+                &$updatedAssignmentCount
+            ) {
+                /*
+                * 1. 指定日以降の未予約Scheduleを取得
+                */
+                $schedules = TeacherSchedule::query()
+                    ->where('teacher_id', $teacher->id)
+                    ->whereDate('available_date', '>=', $deleteFromDate)
+                    ->whereIn('status', ['confirmed', 'draft'])
+                    ->whereIn(
+                        DB::raw('DAYOFWEEK(available_date) - 1'),
+                        $weekdays->all()
+                    )
+                    ->whereDoesntHave('reservations')
+                    ->get();
+
+                /*
+                * 2. Scheduleを削除
+                */
+                if ($schedules->isNotEmpty()) {
+                    $scheduleIds = $schedules
+                        ->pluck('schedule_id')
+                        ->filter()
+                        ->unique()
+                        ->values();
+
+                    // 休講記録は残し、Scheduleとの紐付けだけ解除
+                    ScheduleException::whereIn(
+                        'schedule_id',
+                        $scheduleIds
+                    )->update([
+                        'schedule_id' => null,
+                    ]);
+
+                    $deletedScheduleCount = TeacherSchedule::query()
+                        ->whereIn('schedule_id', $scheduleIds)
+                        ->delete();
+                }
+
+                /*
+                * 3. 指定日以降も有効なAssignmentを取得
+                */
+                $assignments = TeacherShiftPatternAssignment::query()
+                    ->where('teacher_id', $teacher->id)
+                    ->whereIn('weekday', $weekdays->all())
+                    ->where('start_date', '<=', '9999-12-31')
+                    ->where(function ($query) use ($deleteFromDate) {
+                        $query
+                            ->whereNull('end_date')
+                            ->orWhereDate(
+                                'end_date',
+                                '>=',
+                                $deleteFromDate
+                            );
+                    })
+                    ->lockForUpdate()
+                    ->get();
+
+                foreach ($assignments as $assignment) {
+                    /*
+                    * 指定日より前に始まったAssignmentは
+                    * 指定日の前日で終了させ、履歴を残す
+                    */
+                    if ($assignment->start_date < $deleteFromDate) {
+                        $assignment->end_date = $dayBeforeDelete;
+                        $assignment->save();
+
+                        $updatedAssignmentCount++;
+                    } else {
+                        /*
+                        * 指定日以降に始まるAssignmentは削除
+                        */
+                        $assignment->delete();
+
+                        $deletedAssignmentCount++;
+                    }
+                }
+            });
+
+            return redirect()
+                ->route(
+                    'admin.shift-pattern-assignments.index',
+                    ['menu' => 'schedule']
+                )
+                ->with(
+                    'status',
+                    "Deletion completed from {$deleteFromDate}. "
+                    . "Schedules deleted: {$deletedScheduleCount}. "
+                    . "Assignments deleted: {$deletedAssignmentCount}. "
+                    . "Assignments ended: {$updatedAssignmentCount}."
+                );
+
+        } catch (\Throwable $e) {
+            Log::error(
+                'ShiftPatternAssignment Bulk Destroy Error.',
+                [
+                    'teacher_id' => $teacher->id,
+                    'weekdays' => $weekdays->all(),
+                    'delete_from_date' => $deleteFromDate,
+                    'error' => $e->getMessage(),
+                ]
+            );
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => 'An error occurred while deleting shifts: '
+                        . $e->getMessage(),
+                ]);
+        }
+    }
+
     public function edit(TeacherShiftPatternAssignment $assignment): View
     {
         $assignment->load(['teacher.user', 'shiftPattern',

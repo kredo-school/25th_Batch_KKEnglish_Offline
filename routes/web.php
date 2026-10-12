@@ -277,11 +277,33 @@ Route::get(
 )->name('teacher-station-assignments.edit');
 
     // Teacher Station Assignment Management
-    Route::get('/teacher-station-assignments',[TeacherStationAssignmentController::class, 'index'])->name('teacher-station-assignments.index');
-    Route::get('/teacher-station-assignments/create',[TeacherStationAssignmentController::class, 'create'])->name('teacher-station-assignments.create');
-    Route::post('/teacher-station-assignments',[TeacherStationAssignmentController::class, 'store'])->name('teacher-station-assignments.store');
-    Route::get('/teacher-station-assignments/{teacherStationAssignment}/edit',[TeacherStationAssignmentController::class, 'edit'])->name('teacher-station-assignments.edit');
-    Route::put('/teacher-station-assignments/StationAssignment',[TeacherStationAssignmentController::class, 'update'])->name('teacher-station-assignments.update');
+    // Teacher Station Assignment Management
+Route::get(
+    '/teacher-station-assignments',
+    [TeacherStationAssignmentController::class, 'index']
+)->name('teacher-station-assignments.index');
+
+Route::get(
+    '/teacher-station-assignments/create',
+    [TeacherStationAssignmentController::class, 'create']
+)->name('teacher-station-assignments.create');
+
+Route::post(
+    '/teacher-station-assignments',
+    [TeacherStationAssignmentController::class, 'store']
+)->name('teacher-station-assignments.store');
+
+Route::get(
+    '/teacher-station-assignments/{teacherStationAssignment}/edit',
+    [TeacherStationAssignmentController::class, 'edit']
+)->name('teacher-station-assignments.edit');
+
+// ★ 更新ルートを修正
+Route::put(
+    '/teacher-station-assignments/{teacherStationAssignment}',
+    [TeacherStationAssignmentController::class, 'update']
+)->name('teacher-station-assignments.update');
+
     Route::put('/teacher-station-assignments/lesson/{reservation}',[TeacherStationAssignmentController::class, 'override'])->name('teacher-station-assignments.override');
 
     // Lesson Station Override Management

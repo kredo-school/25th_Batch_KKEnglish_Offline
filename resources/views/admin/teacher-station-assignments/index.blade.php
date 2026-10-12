@@ -130,7 +130,7 @@
                             <td class="text-end pe-4">
 
                                 <a href="{{ route('admin.teacher-station-assignments.edit', [
-                                    'teacherStationAssignment' => $assignment,
+                                    'teacherStationAssignment' => $assignment->id,
                                     'menu' => 'station-assignment'
                                 ]) }}"
                                 class="btn btn-sm btn-outline-primary">

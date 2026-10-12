@@ -158,8 +158,8 @@
                 <div class="col-md-3">
                     <label>Break Start</label>
                     <input type="text" name="breaks[0][start_time]" class="form-control time-input"
-                        value="{{ old('breaks.0.start_time', '--:--') }}"
-                        placeholder="13:00"
+                        value="{{ old('breaks.0.start_time') }}"
+                        placeholder="--:--"
                         inputmode="numeric"
                         pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
                         maxlength="5"
@@ -168,8 +168,8 @@
                 <div class="col-md-3">
                     <label>Break End</label>
                     <input type="text" name="breaks[0][end_time]" class="form-control time-input"
-                        value="{{ old('breaks.0.end_time', '--:--') }}"
-                        placeholder="14:00"
+                        value="{{ old('breaks.0.end_time') }}"
+                        placeholder="--:--"
                         inputmode="numeric"
                         pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
                         maxlength="5"

@@ -167,8 +167,9 @@
             <h5 class="text-warning">Delete Selected Weekdays</h5>
 
             <p class="text-muted small">
-                Deletes future unreserved shifts only for the weekdays selected above.
-                Reserved lessons and past shifts will not be deleted.
+                Deletes unreserved shifts for the selected weekdays
+                from the specified date onward.
+                Reserved lessons and past shifts will be preserved.
             </p>
 
             <form
@@ -180,13 +181,34 @@
                 @csrf
                 @method('DELETE')
 
+                {{-- 削除開始日 --}}
+                <div class="mb-3">
+                    <label for="delete_from_date" class="form-label fw-bold">
+                        Delete Shifts From
+                    </label>
+
+                    <input
+                        type="date"
+                        id="delete_from_date"
+                        name="delete_from_date"
+                        class="form-control"
+                        value="{{ old('delete_from_date', now()->toDateString()) }}"
+                        min="{{ now()->toDateString() }}"
+                        required
+                    >
+
+                    <div class="form-text">
+                        Selected weekdays will be deleted from this date onward.
+                        Past shifts and reserved lessons will be preserved.
+                    </div>
+                </div>
+
+                {{-- 選択した曜日を格納する --}}
                 <div id="bulk-delete-weekdays"></div>
 
-                <button
-                    type="submit"
-                    class="btn btn-warning"
-                >
-                    <i class="fa-solid fa-trash me-1"></i> Delete Selected Weekday Shifts
+                <button type="submit" class="btn btn-warning">
+                    <i class="fa-solid fa-trash me-1"></i>
+                    Delete Selected Weekday Shifts
                 </button>
             </form>
         </div>
@@ -195,46 +217,107 @@
     <div class="card border-danger mb-4">
         <div class="card-body">
             <h5 class="text-danger">All Shifts Deletion</h5>
+
             <p class="text-muted small">
-                Deletes all shift assignments for this teacher and all future unreserved schedules. (Reserved lessons will not be deleted.)
+                Deletes all future unreserved shifts for this teacher
+                from the selected date onward.
+                Reserved lessons and past shifts will be preserved.
             </p>
-            <form action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete all shifts for this teacher?');">
+
+            <form
+                action="{{ route('admin.shift-pattern-assignments.destroy-by-teacher', $teacher) }}"
+                method="POST"
+                onsubmit="return confirmAllShiftDeletion();"
+            >
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash me-1"></i> Execute Bulk Deletion</button>
+
+                <div class="mb-3">
+                    <label for="all_delete_from_date" class="form-label fw-bold">
+                        Delete All Shifts From
+                    </label>
+
+                    <input
+                        type="date"
+                        id="all_delete_from_date"
+                        name="delete_from_date"
+                        class="form-control"
+                        value="{{ old('delete_from_date', now()->toDateString()) }}"
+                        min="{{ now()->toDateString() }}"
+                        required
+                    >
+
+                    <div class="form-text">
+                        All weekdays will be affected from this date onward.
+                        Past shifts and reserved lessons will be preserved.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-trash me-1"></i>
+                    Execute Bulk Deletion
+                </button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-    function prepareBulkDelete() {
-        const checkedWeekdays = document.querySelectorAll(
-            '.weekday-checkbox:checked'
-        );
 
-        if (checkedWeekdays.length === 0) {
-            alert('Please select at least one weekday.');
-            return false;
-        }
+function prepareBulkDelete() {
+    const checkedWeekdays = document.querySelectorAll(
+        '.weekday-checkbox:checked'
+    );
 
-        const container = document.getElementById('bulk-delete-weekdays');
-
-        container.innerHTML = '';
-
-        checkedWeekdays.forEach(function (checkbox) {
-            const input = document.createElement('input');
-
-            input.type = 'hidden';
-            input.name = 'weekdays[]';
-            input.value = checkbox.value;
-
-            container.appendChild(input);
-        });
-
-        return confirm(
-            'Are you sure you want to delete the future unreserved shifts for the selected weekdays?'
-        );
+    if (checkedWeekdays.length === 0) {
+        alert('Please select at least one weekday.');
+        return false;
     }
+
+    const dateInput = document.getElementById('delete_from_date');
+    const deleteFromDate = dateInput.value;
+
+    if (!deleteFromDate) {
+        alert('Please select the deletion start date.');
+        dateInput.focus();
+        return false;
+    }
+
+    const container = document.getElementById('bulk-delete-weekdays');
+    container.innerHTML = '';
+
+    checkedWeekdays.forEach(function (checkbox) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'weekdays[]';
+        input.value = checkbox.value;
+        container.appendChild(input);
+    });
+
+    return confirm(
+        'Delete future unreserved shifts from ' +
+        deleteFromDate +
+        ' onward for the selected weekdays?'
+    );
+}
+
+function confirmAllShiftDeletion() {
+    const dateInput = document.getElementById('all_delete_from_date');
+    const deleteFromDate = dateInput.value;
+
+    if (!deleteFromDate) {
+        alert('Please select the deletion start date.');
+        dateInput.focus();
+        return false;
+    }
+
+    return confirm(
+        'Are you sure you want to delete all future unreserved shifts from ' +
+        deleteFromDate +
+        ' onward?\n\n' +
+        'Past shifts and reserved lessons will be preserved.'
+    );
+}
+
 </script>
 @endsection
