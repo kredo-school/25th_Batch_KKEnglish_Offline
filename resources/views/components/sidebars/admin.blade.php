@@ -61,7 +61,7 @@
             </a>
 
             <a href="{{ route('admin.teacher-booking-list.index', ['menu' => 'schedule'])  }}"
-                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teacher-booking-list.*') ? 'active' : '' }}">
+                class="d-block px-3 py-2 rounded mb-1 text-dark text-decoration-none {{ request()->routeIs('admin.teacher-booking-list.*') ? 'bg-secondary-subtle fw-semibold' : '' }}">
                 {{-- <i class="fa-solid fa-list-check me-2"></i> --}}
                 Teacher Booking List
             </a>

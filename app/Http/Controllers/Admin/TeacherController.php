@@ -116,7 +116,7 @@ class TeacherController extends Controller
 
         $scheduleByTeacher = $todaySchedules->groupBy('teacher_id');
 
-        $teachers->getCollection()->transform(function ($teacher) use ($scheduleByTeacher, $bookedByTeacher, $assignments) {
+        $teachers->getCollection()->transform(function ($teacher) use ($scheduleByTeacher, $bookedByTeacher) {
             $schedules = $scheduleByTeacher->get($teacher->id, collect());
 
             $teacher->booked = (int) $bookedByTeacher->get($teacher->id, 0);
@@ -168,36 +168,37 @@ class TeacherController extends Controller
             // Shift Pattern は assignment → shift_patterns から取得します。
             // 今日の teacher_schedules がなくても、Teacherに設定されている
             // Shift Patternを表示します。
-            $teacherAssignments = $assignments->get($teacher->id, collect());
-            if ($teacherAssignments->isNotEmpty()) {
-                $patterns = $teacherAssignments
-                    ->map(function ($assignment) {
-                        return $assignment->shiftPattern?->pattern_name;
-                    })
-                    ->filter()
-                    ->unique()
-                    ->values();
+ 
 
-                $teacher->shift_pattern_name = $patterns->isNotEmpty()
-                    ? $patterns->implode(', ')
-                    : null;
-            } else {
-                $patterns = $schedules->pluck('pattern_name')->filter()->unique()->values();
-                $teacher->shift_pattern_name = $patterns->isNotEmpty()
-                    ? $patterns->implode(', ')
-                    : null;
-            }
+            // Shift Pattern は今日の teacher_schedules を基準に表示する。
+            // 期間指定の assignment からは取得しない。
+            $patterns = $schedules
+                ->pluck('pattern_name')
+                ->filter()
+                ->unique()
+                ->values();
 
-            // inactive または 今日の勤務予定がなければ Off と表示します。
+            $teacher->shift_pattern_name = $patterns->isNotEmpty()
+                ? $patterns->implode(', ')
+                : '-';
+
+            // inactive または今日の勤務予定がなければ Off と表示する。
             if ($isInactive || $schedules->isEmpty()) {
                 $teacher->today = 'Off';
+
+                // 非稼働の先生は Shift Pattern も表示しない。
+                $teacher->shift_pattern_name = '-';
             } else {
                 $ranges = $schedules->map(function ($schedule) {
-                    return substr($schedule->start_time, 0, 5) . '–' . substr($schedule->end_time, 0, 5);
+                    return substr($schedule->start_time, 0, 5)
+                        . '–'
+                        . substr($schedule->end_time, 0, 5);
                 })->unique()->values();
 
                 $teacher->today = 'Working ' . $ranges->implode(', ');
             }
+
+
 
             return $teacher;
         });

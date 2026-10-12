@@ -33,9 +33,13 @@
     <div class="card shadow-sm">
         <div class="card-body">
 
-            <form method="POST"
-                  action="{{ route('admin.teacher-station-assignments.update', $teacherStationAssignment) }}">
-
+            <form
+                action="{{ route('admin.teacher-station-assignments.update', [
+                    'teacherStationAssignment' => $teacherStationAssignment->id,
+                    'menu' => 'station-assignment'
+                ]) }}"
+                method="POST"
+            >
                 @csrf
                 @method('PUT')
 
