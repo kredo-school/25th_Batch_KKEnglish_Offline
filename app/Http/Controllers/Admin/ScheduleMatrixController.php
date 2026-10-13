@@ -88,19 +88,24 @@ class ScheduleMatrixController extends Controller
                     $status = 'No Slot';
                     $bgColor = '#e9ecef'; // グレー
                 } elseif ($percentage < 80) {
-                    $status = 'Sufficient';
-                    $bgColor = '#cce5ff'; // 薄い青
+                    $status = 'Available Capacity';
+                    $bgColor = '#d1fae5'; // 薄い緑
+                    $textColor = '';
+
                 } elseif ($percentage < 90) {
-                    $status = 'Caution';
-                    $bgColor = '#fff3cd'; // 黄色
+                    $status = 'Capacity Tightening';
+                    $bgColor = '#fef3c7'; // 薄い黄色
+                    $textColor = '';
+
                 } elseif ($percentage < 95) {
-                    $status = 'Risk of Insufficiency';
-                    $bgColor = '#fd7e14'; // オレンジ
-                    $textColor = 'text-white';
+                    $status = 'High Workload';
+                    $bgColor = '#ffedd5'; // 薄いオレンジ
+                    $textColor = '';
+
                 } else {
-                    $status = 'Insufficient';
-                    $bgColor = '#dc3545'; // 赤
-                    $textColor = 'text-white';
+                    $status = 'Full Capacity';
+                    $bgColor = '#fee2e2'; // 薄い赤
+                    $textColor = '';
                 }
 
                 $matrix[$hour][$dateStr] = [
